@@ -42,7 +42,7 @@ public class AgreementNegotiationContract implements Contract {
             final AgreementNegotiationState out = (AgreementNegotiationState) tx.getOutputs().get(0).getData();
             final Party cptyA = out.getCptyInitiator();
             final Party cptyB = out.getCptyReciever();
-            check.using("The Agreement Parameters's value must be Initialized.",out.getValue().isInitialized()==true);
+         //   check.using("The Agreement Parameters's value must be Initialized.",out.getValue().isInitialized()==true);
             check.using("The Initiator and the Reciever cannot be the same entity.", cptyA != cptyB);
 
             // Constraints on the signers.

@@ -2,7 +2,7 @@ package com.genpact.agreementnegotiation.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
-import com.genpact.agreementnegotiation.state.AgreementNegotiationParams;
+
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
@@ -15,6 +15,7 @@ import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
 
 import java.security.PublicKey;
+import java.util.Date;
 import java.util.List;
 
 import static net.corda.core.contracts.ContractsDSL.requireThat;
@@ -28,9 +29,29 @@ public class AgreementNegotiationInitiateFlow {
      */
     @InitiatingFlow
     @StartableByRPC
-    public static class Initiator extends FlowLogic<Void> {
-        private final AgreementNegotiationParams agreementParams;
+    public static class Initiator extends FlowLogic<SignedTransaction> {
         private final Party otherParty;
+        private String agrementName = null;
+        private Date agrementInitiationDate = null;
+        private Date agrementLastAmendDate = null;
+        private Date agrementAgreedDate = null;
+        private Double agreementValue = null;
+        private String collateral = null;
+
+        /**
+         * The progress tracker provides checkpoints indicating the progress of the flow to observers.
+         */
+        public Initiator(String name, Date initialDate, Double value, String collateral, Party otherParty) {
+
+            this.agrementName = name;
+            this.agrementInitiationDate = initialDate;
+            this.agrementLastAmendDate = null;
+            this.agrementAgreedDate = null;
+            this.agreementValue= value;
+            this.collateral=collateral;
+
+            this.otherParty = otherParty;
+        }
 
         /**
          * The progress tracker provides checkpoints indicating the progress of the flow to observers.
@@ -68,10 +89,6 @@ public class AgreementNegotiationInitiateFlow {
                 SIGS_GATHERING,
                 FINALISATION);
 
-        public Initiator(AgreementNegotiationParams agreementParams, Party otherParty) {
-            this.agreementParams = agreementParams;
-            this.otherParty = otherParty;
-        }
 
         @Override
         public ProgressTracker getProgressTracker() {
@@ -81,7 +98,7 @@ public class AgreementNegotiationInitiateFlow {
          * Define the initiator's flow logic here.
          */
         @Suspendable
-        @Override public Void call() throws FlowException{
+        @Override public SignedTransaction call() throws FlowException{
 
             progressTracker.setCurrentStep(ID_OTHER_NODES);
             // We retrieve the notary identity from the network map.
@@ -93,7 +110,8 @@ public class AgreementNegotiationInitiateFlow {
             txBuilder.setNotary(notary);
 
             // We create the transaction components.
-            AgreementNegotiationState outputState = new AgreementNegotiationState(agreementParams, getOurIdentity(), otherParty);
+            AgreementNegotiationState outputState = new AgreementNegotiationState("name", new Date(),11.1,
+                    "collateral", getOurIdentity(), otherParty);
             String outputContract = AgreementNegotiationContract.class.getName();
             StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
@@ -153,7 +171,7 @@ public class AgreementNegotiationInitiateFlow {
                         ContractState output = stx.getTx().getOutputs().get(0).getData();
                         require.using("This must be an Agreement Negotiation transaction.", output instanceof AgreementNegotiationState);
                         AgreementNegotiationState agreementNegotiationState = (AgreementNegotiationState) output;
-                        require.using("The IOU's value can't be too high.", agreementNegotiationState.getValue().isInitialized()==true);
+                        require.using("The IOU's value can't be too high.", agreementNegotiationState.isInitialized()==true);
                         return null;
                     });
                 }
