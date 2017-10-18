@@ -103,19 +103,23 @@ public class AgreementNegotiationInitiateFlow {
             // We add the items to the builder.
             txBuilder.withItems(outputContractAndState, cmd);
 
+            progressTracker.setCurrentStep(TX_VERIFICATION);
             // Verifying the transaction.
             txBuilder.verify(getServiceHub());
 
+            progressTracker.setCurrentStep(TX_SIGNING);
             // Signing the transaction.
             final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
 
             /// Creating a session with the other party.
             FlowSession otherpartySession = initiateFlow(otherParty);
 
+            progressTracker.setCurrentStep(SIGS_GATHERING);
             // Obtaining the counterparty's signature.
             SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(
                     signedTx, ImmutableList.of(otherpartySession), CollectSignaturesFlow.tracker()));
 
+            progressTracker.setCurrentStep(FINALISATION);
             // Finalising the transaction.
             subFlow(new FinalityFlow(signedTx));
 
