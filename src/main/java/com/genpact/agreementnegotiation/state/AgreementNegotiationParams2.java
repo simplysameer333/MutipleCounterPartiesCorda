@@ -1,17 +1,9 @@
 package com.genpact.agreementnegotiation.state;
 
-import net.corda.core.contracts.ContractState;
-import net.corda.core.identity.AbstractParty;
-import net.corda.core.identity.Party;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
-import com.google.common.collect.ImmutableList;
 
-/**
- * Define your state object here.
- */
-public class AgreementNegotiationState implements ContractState {
+public class AgreementNegotiationParams2 {
+
 
     private String agrementName = null;
     private Date agrementInitiationDate = null;
@@ -20,29 +12,12 @@ public class AgreementNegotiationState implements ContractState {
     private Double agreementValue = null;
     private String collateral = null;
 
-    private Party cptyInitiator;
-    private Party cptyReciever;
-
-    public AgreementNegotiationState(String name, Date initialDate, Double value, String collateral,
-                                     Party cptyInitiator, Party cptyReciever) {
-        this.agrementName = name;
-        this.agrementInitiationDate = initialDate;
-        this.agrementLastAmendDate = null;
-        this.agrementAgreedDate = null;
-        this.agreementValue= value;
-        this.collateral=collateral;
-        this.negotiationState= NegotiationStates.INITIAL;
-        this.cptyInitiator = cptyInitiator;
-        this.cptyReciever = cptyReciever;
-    }
-
-
     public enum NegotiationStates
     {
         INITIAL("INITIAL"), AMEND("AMEND"), ACCEPT("ACCEPT");
         private final String name;
 
-        private NegotiationStates(String s) {
+        NegotiationStates(String s) {
             name = s;
         }
 
@@ -58,6 +33,21 @@ public class AgreementNegotiationState implements ContractState {
     }
 
     private NegotiationStates negotiationState ;
+
+
+    public AgreementNegotiationParams2() { ;
+    }
+
+    public AgreementNegotiationParams2(String name, Date initialDate, Double value, String collateral)
+    {
+        this.agrementName = name;
+        this.agrementInitiationDate = initialDate;
+        this.agrementLastAmendDate = null;
+        this.agrementAgreedDate = null;
+        this.agreementValue= value;
+        this.collateral=collateral;
+        this.negotiationState= NegotiationStates.INITIAL;
+    }
 
     public String getAgrementName() {
         return agrementName;
@@ -125,19 +115,16 @@ public class AgreementNegotiationState implements ContractState {
         return false;
     }
 
-
-
-
-    public Party getCptyInitiator() {
-        return cptyInitiator;
+    @Override
+    public String toString() {
+        return "AgreementNegotiationParams{" +
+                "agrementName='" + agrementName + '\'' +
+                ", agrementInitiationDate=" + agrementInitiationDate +
+                ", agrementLastAmendDate=" + agrementLastAmendDate +
+                ", agrementAgreedDate=" + agrementAgreedDate +
+                ", agreementValue=" + agreementValue +
+                ", collateral='" + collateral + '\'' +
+                ", negotiationState=" + negotiationState +
+                '}';
     }
-
-    public Party getCptyReciever() {
-        return cptyReciever;
-    }
-
-    /** The public keys of the involved parties. */
-    @Override public List<AbstractParty> getParticipants() { return ImmutableList.of(cptyInitiator, cptyReciever); }
-
-
 }
