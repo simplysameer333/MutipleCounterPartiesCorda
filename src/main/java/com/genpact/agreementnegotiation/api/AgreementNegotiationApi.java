@@ -14,8 +14,10 @@ import net.corda.core.transactions.SignedTransaction;
 import static java.util.stream.Collectors.toList;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Date;
@@ -46,21 +48,21 @@ public class AgreementNegotiationApi {
     }
 
     /**
-     * Accessible at /api/template/initFlow.
+     * Accessible at /api/template/<party>/initFlow.
      */
-    @GET
-    @Path("initFlow")
+    @PUT
+    @Path("{party}/initFlow")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startInitFlow() {
+    public Response startInitFlow(AgreementNegotiationState state, @PathParam("party") String partyName) {
 
         try {
-
+        System.out.println("Initiate Flow :"+partyName);
         //create state
        // AgreementNegotiationParams agreementNegotiationParams = new AgreementNegotiationParams();
         AgreementNegotiationState iouValue = new AgreementNegotiationState("name", new Date(), 10.0, "collateral",
                 rpcOps.nodeInfo().getLegalIdentities().get(0),
                 rpcOps.nodeInfo().getLegalIdentities().get(0));
-
+            //rpcOps.partiesFromName("NodeA", true);
         AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator("name",
                 new Date(), 10.0, "collateral",
                 iouValue.getCptyReciever());
