@@ -29,7 +29,7 @@ public class AgreementNegotiationAgreeFlow {
      */
     @InitiatingFlow
     @StartableByRPC
-    public static class Initiator extends FlowLogic<Void> {
+    public static class Initiator extends FlowLogic<SignedTransaction> {
        // private final AgreementNegotiationParams agreementParams;
 
         private final Party otherParty;
@@ -64,7 +64,7 @@ public class AgreementNegotiationAgreeFlow {
          * Define the initiator's flow logic here.
          */
         @Suspendable
-        @Override public Void call() throws FlowException{
+        @Override public SignedTransaction call() throws FlowException{
 
             // We retrieve the notary identity from the network map.
             final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
@@ -99,14 +99,13 @@ public class AgreementNegotiationAgreeFlow {
                     signedTx, ImmutableList.of(otherpartySession), CollectSignaturesFlow.tracker()));
 
             // Finalising the transaction.
-            subFlow(new FinalityFlow(signedTx));
+            return subFlow(new FinalityFlow(signedTx));
 
-            return null;
         }
     }
 
     @InitiatedBy(Initiator.class)
-    public static class Responder extends FlowLogic<Void> {
+    public static class Responder extends FlowLogic<SignedTransaction> {
         private FlowSession counterpartySession;
 
         public Responder(FlowSession counterpartySession) {
@@ -118,7 +117,7 @@ public class AgreementNegotiationAgreeFlow {
          */
         @Suspendable
         @Override
-        public Void call() throws FlowException{
+        public SignedTransaction call() throws FlowException{
 
             class SignTxFlow extends SignTransactionFlow {
                 private SignTxFlow(FlowSession otherPartySession, ProgressTracker progressTracker) {
@@ -137,9 +136,8 @@ public class AgreementNegotiationAgreeFlow {
                 }
             }
 
-            subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
+            return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
 
-
-            return null; }
+         }
     }
 }

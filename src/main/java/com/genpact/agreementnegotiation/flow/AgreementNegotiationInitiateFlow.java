@@ -139,14 +139,13 @@ public class AgreementNegotiationInitiateFlow {
 
             progressTracker.setCurrentStep(FINALISATION);
             // Finalising the transaction.
-            subFlow(new FinalityFlow(signedTx));
+            return subFlow(new FinalityFlow(signedTx));
 
-            return null;
         }
     }
 
     @InitiatedBy(Initiator.class)
-    public static class Responder extends FlowLogic<Void> {
+    public static class Responder extends FlowLogic<SignedTransaction> {
         private FlowSession counterpartySession;
 
         public Responder(FlowSession counterpartySession) {
@@ -158,7 +157,7 @@ public class AgreementNegotiationInitiateFlow {
          */
         @Suspendable
         @Override
-        public Void call() throws FlowException{
+        public SignedTransaction call() throws FlowException{
 
             class SignTxFlow extends SignTransactionFlow {
                 private SignTxFlow(FlowSession otherPartySession, ProgressTracker progressTracker) {
@@ -177,9 +176,7 @@ public class AgreementNegotiationInitiateFlow {
                 }
             }
 
-            subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
-
-
-            return null; }
+            return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
+        }
     }
 }
