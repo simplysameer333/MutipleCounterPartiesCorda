@@ -38,6 +38,8 @@ import net.corda.core.node.services.Vault;
 import net.corda.core.node.services.Vault.Page;
 import net.corda.core.node.services.vault.QueryCriteria.VaultQueryCriteria;
 
+import javax.annotation.Signed;
+
 
 /**
  * Define your flow here.
@@ -48,7 +50,7 @@ public class AgreementNegotiationAmendFlow {
      */
     @InitiatingFlow
     @StartableByRPC
-    public static class Initiator extends FlowLogic<Void> {
+    public static class Initiator extends FlowLogic<SignedTransaction> {
 
         private String agrementName = null;
         private Date agrementInitiationDate = null;
@@ -114,7 +116,7 @@ public class AgreementNegotiationAmendFlow {
          * Define the initiator's flow logic here.
          */
         @Suspendable
-        @Override public Void call() throws FlowException{
+        @Override public SignedTransaction call() throws FlowException{
 
             progressTracker.setCurrentStep(ID_OTHER_NODES);
             // We retrieve the notary identity from the network map.
@@ -162,14 +164,13 @@ public class AgreementNegotiationAmendFlow {
 
             progressTracker.setCurrentStep(FINALISATION);
             // Finalising the transaction.
-            subFlow(new FinalityFlow(signedTx));
+            return subFlow(new FinalityFlow(signedTx));
 
-            return null;
         }
     }
 
     @InitiatedBy(Initiator.class)
-    public static class Responder extends FlowLogic<Void> {
+    public static class Responder extends FlowLogic<SignedTransaction> {
         private FlowSession counterpartySession;
 
         public Responder(FlowSession counterpartySession) {
@@ -189,7 +190,7 @@ public class AgreementNegotiationAmendFlow {
          */
         @Suspendable
         @Override
-        public Void call() throws FlowException{
+        public SignedTransaction call() throws FlowException{
 
             class SignTxFlow extends SignTransactionFlow {
                 private SignTxFlow(FlowSession otherPartySession, ProgressTracker progressTracker) {
@@ -210,9 +211,7 @@ public class AgreementNegotiationAmendFlow {
                 }
             }
             progressTracker.setCurrentStep(TX_SIGNING);
-            subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
-
-
-            return null; }
+            return  subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
+        }
     }
 }
