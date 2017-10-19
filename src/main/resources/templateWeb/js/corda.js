@@ -1,13 +1,10 @@
 "use strict";
-
 const app = angular.module('demoAppModule', ['ui.bootstrap']);
-
-// Fix for unhandled rejections bug.
 app.config(['$qProvider', function ($qProvider) {
     $qProvider.errorOnUnhandledRejections(false);
 }]);
 
-app.controller('DemoAppController', function($http, $location, $uibModal) {
+app.controller('AgreementController', function($http, $location, $uibModal) {
     const demoApp = this;
 
     // We identify the node.
@@ -20,7 +17,7 @@ app.controller('DemoAppController', function($http, $location, $uibModal) {
 
     demoApp.openModal = () => {
         const modalInstance = $uibModal.open({
-            templateUrl: 'InitiateAgreementModal.html',
+            templateUrl: 'initiateAgreementModal.html',
             controller: 'ModalInstanceCtrl',
             controllerAs: 'modalInstance',
             resolve: {
@@ -32,15 +29,15 @@ app.controller('DemoAppController', function($http, $location, $uibModal) {
         modalInstance.result.then(() => {}, () => {});
     };
 
-    demoApp.getIOUs = () => $http.get(apiBaseURL + "ious")
+    demoApp.getAgreements = () => $http.get(apiBaseURL + "getAgreements")
         .then((response) => demoApp.ious = Object.keys(response.data)
             .map((key) => response.data[key].state.data)
             .reverse());
 
-    demoApp.getIOUs();
+    demoApp.getAgreements();
 });
 
-app.controller('ModalInstanceCtrl', function ($http, $location, $uibModalInstance, $uibModal, apiBaseURL, peers) {
+app.controller('ModalInstanceCtrl', function ($scope, $http, $location, $uibModalInstance, $uibModal, apiBaseURL, peers) {
     const modalInstance = this;
 
     modalInstance.peers = peers;
@@ -49,32 +46,25 @@ app.controller('ModalInstanceCtrl', function ($http, $location, $uibModalInstanc
 
     // Validate and create IOU.
     modalInstance.create = () => {
+		console.log('Called Create');
         if (invalidFormInput()) {
             modalInstance.formError = true;
         } else {
             modalInstance.formError = false;
 
-            const iou = {
-                value: modalInstance.form.value,
-				address: modalInstance.form.address,
-				eligibleCollateral: modalInstance.form.eligibleCollateral,
-				interestCashCollateral: modalInstance.form.interestCashCollateral,
-				threshold: modalInstance.form.threshold,
-				mta: modalInstance.form.mta,
-				initialMarginCollateral: modalInstance.form.initialMarginCollateral,
-				variationMarginCollateral: modalInstance.form.variationMarginCollateral,
-				comments: modalInstance.form.comments
+            const agreement = {
+                agrementName: modalInstance.form.agrementName,
+				agreementValue: modalInstance.form.agreementValue,
+				agrementInitiationDate: modalInstance.form.agrementInitiationDate,
+				collateral: modalInstance.form.collateral
             };
 
             $uibModalInstance.close();
-
-            const createIOUEndpoint =
-                apiBaseURL +
-                modalInstance.form.counterparty +
-                "/initFlow";
+			
+            const createIOUEndpoint = apiBaseURL + "initFlow/" +modalInstance.form.counterparty;
 
             // Create PO and handle success / fail responses.
-            $http.put(createIOUEndpoint).then(
+            $http.put(createIOUEndpoint, angular.toJson(agreement)).then(
                 (result) => modalInstance.displayMessage(result),
                 (result) => modalInstance.displayMessage(result)
             );
