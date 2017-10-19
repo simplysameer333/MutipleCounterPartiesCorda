@@ -1,10 +1,580 @@
+<!--
+--------
+WARNING:
+--------
+
+THIS CODE IS ONLY MADE AVAILABLE FOR DEMONSTRATION PURPOSES AND IS NOT SECURE! DO NOT USE IN PRODUCTION!
+
+FOR SECURITY REASONS, USING A JAVASCRIPT WEB APP HOSTED VIA THE CORDA NODE IS NOT THE RECOMMENDED WAY TO INTERFACE
+WITH CORDA NODES! HOWEVER, FOR THIS PRE-ALPHA RELEASE IT'S A USEFUL WAY TO EXPERIMENT WITH THE PLATFORM AS IT ALLOWS
+YOU TO QUICKLY BUILD A UI FOR DEMONSTRATION PURPOSES.
+
+GOING FORWARD WE RECOMMEND IMPLEMENTING A STANDALONE WEB SERVER THAT AUTHORISES VIA THE NODE'S RPC INTERFACE. IN THE
+COMING WEEKS WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Template CorDapp</title>
+    <title>Example CorDapp</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.0-rc.1/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.2.0/ui-bootstrap-tpls.min.js"></script>
+    <script src="js/corda.js"></script>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-<div>Template CorDapp frontend.</div>
+<body ng-app="demoAppModule" ng-controller="DemoAppController as demoApp">
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">{{demoApp.thisNode}}</a>
+        </div>
+        <button ng-click="demoApp.openModal()" type="button" class="btn btn-primary navbar-btn">Initiate Agreement</button>
+        <button ng-click="demoApp.getIOUs()" title="See all Contracts" type="button" class="btn btn-default navbar-btn">
+			<span class="glyphicon glyphicon-book">
+		</span></button>
+    </div>
+</nav>
+
+<script type="text/ng-template" id="demoAppModal1.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Initiate Agreement</h4>
+    </div>
+    <form>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="counterparty" class="control-label">Counter-party:</label>
+                <select ng-model="modalInstance.form.counterparty" 
+				class="form-control" id="counterparty" 
+				ng-options="peer as peer for peer in modalInstance.peers">
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="value" class="control-label">Value:</label>
+                <input type="text" ng-model="modalInstance.form.value" class="form-control" id="value">
+				<label for="value" class="control-label">Name:</label>
+                <input type="text" ng-model="modalInstance.form.name" class="form-control" id="name">
+				<label for="value" class="control-label">Address:</label>
+                <input type="text" ng-model="modalInstance.form.address" class="form-control" id="address">
+				<label for="value" class="control-label">EligibleCollateral:</label>
+                <input type="text" ng-model="modalInstance.form.eligibleCollateral" class="form-control" id="eligibleCollateral">
+				<label for="value" class="control-label">InterestCashCollateral:</label>
+                <input type="text" ng-model="modalInstance.form.interestCashCollateral" class="form-control" id="interestCashCollateral">
+				<label for="value" class="control-label">Threshold:</label>
+                <input type="text" ng-model="modalInstance.form.threshold" class="form-control" id="threshold">
+				<label for="value" class="control-label">Mta:</label>
+                <input type="text" ng-model="modalInstance.form.mta" class="form-control" id="mta">
+				<label for="value" class="control-label">InitialMarginCollateral:</label>
+                <input type="text" ng-model="modalInstance.form.initialMarginCollateral" class="form-control" id="initialMarginCollateral">
+				<label for="value" class="control-label">VariationMarginCollateral:</label>
+                <input type="text" ng-model="modalInstance.form.variationMarginCollateral" class="form-control" id="variationMarginCollateral">
+				<label for="value" class="control-label">Comments:</label>
+                <input type="text" ng-model="modalInstance.form.comments" class="form-control" id="comments">
+            </div>
+            <div ng-show="modalInstance.formError" class="form-group">
+                <div class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Error:</span>
+                    Enter valid Contract parameters
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
+            <button ng-click="modalInstance.create()" type="button" class="btn btn-primary">Create</button>
+        </div>
+    </form>
+    </div>
+</script>
+<script type="text/ng-template" id="messageContent.html">
+    <div class="modal-body" id="modal-body">
+        {{ modalInstanceTwo.message }}
+    </div>
+</script>
+
+<script type="text/ng-template" id="FirmideModal.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Firm Side UI</h4>
+    </div>
+    <form class="gp-firm-side-ui">
+        <div class="modal-body">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label for="counterparty" class="control-label">Select Template:</label>
+							<select ng-model="modalInstance.form.counterparty" 
+									class="form-control" id="counterparty" 
+									ng-options="peer as peer for peer in modalInstance.peers">
+							</select>
+						</div>           
+					
+						<h4 class="modal-title">Agreement 1 - Version V2</h4>
+						<div class="form-group">
+							<label for="value" class="control-label">CPTY:</label>
+							<input type="text" ng-model="modalInstance.form.value" class="form-control" id="value">
+							<label for="value" class="control-label">Date:</label>
+							<input type="text" ng-model="modalInstance.form.name" class="form-control" id="name">
+							<label for="value" class="control-label">Address:</label>
+							<input type="text" ng-model="modalInstance.form.address" class="form-control" id="address">
+							<label for="value" class="control-label">Eligible Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.eligibleCollateral" class="form-control" id="eligibleCollateral">
+							<label for="value" class="control-label">Interest on Cash Collateral :</label>
+							<input type="text" ng-model="modalInstance.form.interestCashCollateral" class="form-control" id="interestCashCollateral">
+							<label for="value" class="control-label">Threshold:</label>
+							<input type="text" ng-model="modalInstance.form.threshold" class="form-control" id="threshold">
+							<label for="value" class="control-label">MTA:</label>
+							<input type="text" ng-model="modalInstance.form.mta" class="form-control" id="mta">
+							<label for="value" class="control-label">Initial Margin Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.initialMarginCollateral" class="form-control" id="initialMarginCollateral">
+							<label for="value" class="control-label">Variation Margin Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.variationMarginCollateral" class="form-control" id="variationMarginCollateral">
+						</div> 
+					</div> 
+					<div class="col-lg-6">
+					
+					<h4 class="modal-title">Recent Transactions</h4>
+						
+					<table class="table table-bordered table-striped gp-table">
+						<thead>
+							<tr>
+								<td>
+									Agreement Name 
+								</td>
+								<td>
+									Agreement Status 
+								</td>
+								<td>
+								</td>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr>
+								<td>Agreement 1</td>
+								<td>In Negotiation</td>
+								<td><a>Audit Trail</a></td>
+							</tr>
+							
+							<tr>
+								<td>Agreement 2</td>
+								<td>In Negotiation</td>
+								<td><a>Audit Trail</a></td>
+							</tr>
+							
+							<tr>
+								<td>Agreement 3</td>
+								<td>In Negotiation</td>
+								<td><a>Audit Trail</a></td>
+							</tr>
+						</tbody>
+
+					</table>
+					</div> 
+				</div> 
+			</div>         
+        </div>
+        <div class="modal-footer">          
+            <button ng-click="modalInstance.create()" type="button" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="FIRM_CPTY.html">
+    <div class="modal-header">
+        <h4 class="modal-title">FIRM/CPTY SIDE UI</h4>
+    </div>
+    <form class="gp-firm-side-ui">
+        <div class="modal-body">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label for="counterparty" class="control-label">Select Template:</label>
+							<select ng-model="modalInstance.form.counterparty" 
+									class="form-control" id="counterparty" 
+									ng-options="peer as peer for peer in modalInstance.peers">
+							</select>
+						</div>           
+					
+						<h4 class="modal-title">Agreement 1 - Version V2</h4>
+						<div class="form-group">
+							<label for="value" class="control-label">CPTY:</label>
+							<input type="text" ng-model="modalInstance.form.value" class="form-control" id="value">
+							<label for="value" class="control-label">Date:</label>
+							<input type="text" ng-model="modalInstance.form.name" class="form-control" id="name">
+							<label for="value" class="control-label">Address:</label>
+							<input type="text" ng-model="modalInstance.form.address" class="form-control" id="address">
+							<label for="value" class="control-label">Eligible Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.eligibleCollateral" class="form-control" id="eligibleCollateral">
+							<label for="value" class="control-label">Interest on Cash Collateral :</label>
+							<input type="text" ng-model="modalInstance.form.interestCashCollateral" class="form-control" id="interestCashCollateral">
+							<label for="value" class="control-label">Threshold:</label>
+							<input type="text" ng-model="modalInstance.form.threshold" class="form-control" id="threshold">
+							<label for="value" class="control-label">MTA:</label>
+							<input type="text" ng-model="modalInstance.form.mta" class="form-control" id="mta">
+							<label for="value" class="control-label">Initial Margin Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.initialMarginCollateral" class="form-control" id="initialMarginCollateral">
+							<label for="value" class="control-label">Variation Margin Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.variationMarginCollateral" class="form-control" id="variationMarginCollateral">
+						</div> 
+					</div> 
+					<div class="col-lg-6">
+						<h4 class="modal-title">Recent Documents</h4>
+						
+						<table class="table table-bordered table-striped gp-table">
+							<thead>
+								<tr>
+									<td>
+										Agreement Name 
+									</td>
+									<td>
+										Agreement Status 
+									</td>
+									<td>
+									</td>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr>
+									<td>Agreement 1</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+								
+								<tr>
+									<td>Agreement 2</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+								
+								<tr>
+									<td>Agreement 3</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+							</tbody>
+
+						</table>
+					</div> 
+				</div> 
+			</div>         
+        </div>
+        <div class="modal-footer">          
+            <button ng-click="modalInstance.create()" type="button" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="CPTYSIDEUI.html">
+    <div class="modal-header">
+        <h4 class="modal-title">CPTY SIDE UI – New Version/Updated Version</h4>
+    </div>
+    <form class="gp-firm-side-ui">
+        <div class="modal-body">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="col-lg-6">
+						<div class="form-group">
+							<input type="text" class="form-control gp-upload-file" >
+							<button type="button" class="btn btn-primary">Upload</button>
+						</div>           
+					
+						<h4 class="modal-title gp-inner-title">Agreement 1 - Version V2</h4>
+						
+						<div class="form-group">
+							<label for="value" class="control-label">CPTY:</label>
+							<input type="text" ng-model="modalInstance.form.value" class="form-control" id="value">
+							<label for="value" class="control-label">Date:</label>
+							<input type="text" ng-model="modalInstance.form.name" class="form-control" id="name">
+							<label for="value" class="control-label">Address:</label>
+							<input type="text" ng-model="modalInstance.form.address" class="form-control" id="address">
+							<label for="value" class="control-label">Eligible Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.eligibleCollateral" class="form-control" id="eligibleCollateral">
+							<label for="value" class="control-label">Threshold:</label>
+							<input type="text" ng-model="modalInstance.form.threshold" class="form-control" id="threshold">
+							<label for="value" class="control-label">MTA:</label>
+							<input type="text" ng-model="modalInstance.form.mta" class="form-control" id="mta">
+						</div> 
+					</div> 
+					<div class="col-lg-6">
+						<h4 class="modal-title">Recent Documents</h4>
+						
+						<table class="table table-bordered table-striped gp-table">
+							<thead>
+								<tr>
+									<td>
+										Agreement Name 
+									</td>
+									<td>
+										Agreement Status 
+									</td>
+									<td>
+									</td>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr>
+									<td>Agreement 1</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+								
+								<tr>
+									<td>Agreement 2</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+								
+								<tr>
+									<td>Agreement 3</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+							</tbody>
+
+						</table>
+					</div> 
+				</div> 
+			</div>         
+        </div>
+        <div class="modal-footer">         
+			<div class="btn-group gp-button-group">
+				<button type="button" class="btn btn-primary">Approve</button>
+				<button type="button" class="btn btn-secondary">Reject</button>
+			</div>
+        </div>
+    </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="auditTrail.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Audit Trail - Agreement 2</h4>
+    </div>
+    <form class="gp-firm-side-ui">
+        <div class="modal-body">
+			<div class="row">
+				<div class="col-lg-12">
+					<table class="table table-bordered table-striped gp-table">
+						<thead>
+							<tr>
+								<td>
+									Version 
+								</td>
+								<td>
+									Activity 
+								</td>
+								<td>
+									Status
+								</td>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr>
+								<td>V5</td>
+								<td>CSA signed by Nomura Bank International plc on "25-Sep-17 16:15".</td>
+								<td>Approved</td>
+							</tr>
+							
+							<tr>
+								<td>V4</td>
+								<td>CSA signed by Barclay Bank PLC on "25-Sep-17 16:00".</td>
+								<td>In Negotoation</td>
+							</tr>
+							
+							<tr>
+								<td>V4</td>
+								<td>UK Gilt replaced with USD by Barclay Bank PLC on "25-Sep-15:45" .</td>
+								<td>In Negotoation</td>
+							</tr>
+							
+							<tr>
+								<td>V3</td>
+								<td>UK Gilt replaced with USD by Barclay Bank PLC on "25-Sep-15:45" .</td>
+								<td>In Negotoation</td>
+							</tr>
+							
+							<tr>
+								<td>V2</td>
+								<td>UK Gilt added as Eligible Collateral by Nomura Bank International plc on "25-Sep-17 13:30"/td>
+								<td>In Negotoation</td>
+							</tr>
+							
+							<tr>
+								<td>V2</td>
+								<td>Threshold changed to 1,000,000 GBP by Nomura Bank International plc on "25-Sep-17 13:15"</td>
+								<td>In Negotoation</td>
+							</tr>
+							
+							<tr>
+								<td>V2</td>
+								<td>MTA changed to 50000 GBP by Nomura Bank International PLC on "25-Sep-17 13:15"</td>
+								<td>In Negotoation</td>
+							</tr>
+							
+							<tr>
+								<td>V2</td>
+								<td>MTA changed to 500,000 GBP by Nomura Bank International plc on "25-Sep-17 13:00"</td>
+								<td>In Negotoation</td>
+							</tr>
+							
+							<tr>
+								<td>V1</td>
+								<td>CSA dated 20 September 2017 created by Barclay Bank PLC for Nomura Bank International plc </td>
+								<td>In Negotoation</td>
+							</tr>
+						</tbody>
+					</table>
+				</div> 
+			</div>         
+        </div>
+        <div class="modal-footer">         
+			<div class="btn-group gp-button-group">
+				<button type="button" class="btn btn-secondary">Cancel</button>
+			</div>
+        </div>
+    </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="InitiateAgreementModal.html">
+    <div class="modal-header">
+        <h4 class="modal-title">New Agreement</h4>
+    </div>
+    <form class="gp-firm-side-ui">
+        <div class="modal-body">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="col-lg-6">
+						<div class="form-group">
+							<select class="form-control">
+							  <option> Agreement 1 </option>
+							  <option> Agreement 2 </option>
+							</select>
+						</div>           
+					
+						<h4 class="modal-title gp-inner-title">Agreement 1</h4>
+						
+						<div class="form-group">
+							<label for="value" class="control-label">Counter-party</label>
+								<select ng-model="modalInstance.form.counterparty" class="form-control" id="counterparty" ng-options="peer as peer for peer in modalInstance.peers">
+								</select>	
+								
+							<label for="value" class="control-label">Date:</label>
+							<input type="text" ng-model="modalInstance.form.name" class="form-control" id="name">
+							<label for="value" class="control-label">Address:</label>
+							<input type="text" ng-model="modalInstance.form.address" class="form-control" id="address">
+							<label for="value" class="control-label">Eligible Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.eligibleCollateral" class="form-control" id="eligibleCollateral">
+							<label for="value" class="control-label">Interest on Cash Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.threshold" class="form-control" id="threshold">
+							<label for="value" class="control-label">Threshold:</label>
+							<input type="text" ng-model="modalInstance.form.threshold" class="form-control" id="threshold">
+							<label for="value" class="control-label">MTA:</label>
+							<input type="text" ng-model="modalInstance.form.mta" class="form-control" id="mta">
+							<label for="value" class="control-label">Initial Margin Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.mta" class="form-control" id="mta">
+							<label for="value" class="control-label">Variation Margin Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.mta" class="form-control" id="mta">
+						</div> 
+					</div> 
+					<div class="col-lg-6">
+						<h4 class="modal-title">Recent Documents</h4>
+						<table class="table table-bordered table-striped gp-table">
+							<thead>
+								<tr>
+									<td>
+										Agreement Name 
+									</td>
+									<td>
+										Agreement Status 
+									</td>
+									<td>
+									</td>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr>
+									<td>Agreement 1</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+								
+								<tr>
+									<td>Agreement 2</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+								
+								<tr>
+									<td>Agreement 3</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+							</tbody>
+						</table>
+						
+						
+					</div>
+				</div> 
+			</div>         
+        </div>
+        <div class="modal-footer">         
+			<div class="btn-group gp-button-group">
+				<button type="button" ng-click="modalInstance.create()" class="btn btn-secondary">Submit</button>
+				<button type="button" ng-click="modalInstance.cancel()" class="btn btn-secondary">Cancel</button>
+			</div>
+        </div>
+    </form>
+    </div>
+</script>
+
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div ng-show="!demoApp.ious.length" class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">There are no recorded Contracts</h3>
+            </div>
+            <div class="panel-body">Use the "Create Contract" button to send a Contract to a peer.</div>
+        </div>
+        <div ng-show="demoApp.ious.length" class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Recorded Contracts:</h3>
+            </div>
+        </div>
+        <div ng-repeat="iou in demoApp.ious" class="panel panel-default">
+            <div class="panel-body">
+                <ul>
+                    <li>Sender: {{iou.sender}}</li>
+                    <li>Recipient: {{iou.recipient}}</li>
+                    <li>Name: {{iou.iou.name}}</li>
+					<li>Address: {{iou.iou.address}}</li>
+					<li>EligibleCollateral: {{iou.iou.eligibleCollateral}}</li>
+					<li>InterestCashCollateral: {{iou.iou.interestCashCollateral}}</li>
+					<li>Threshold: {{iou.iou.threshold}}</li>
+					<li>Mta: {{iou.iou.mta}}</li>
+					<li>InitialMarginCollateral: {{iou.iou.initialMarginCollateral}}</li>
+					<li>VariationMarginCollateral: {{iou.iou.variationMarginCollateral}}</li>
+					<li>Comments: {{iou.iou.comments}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+
 </body>
 </html>
