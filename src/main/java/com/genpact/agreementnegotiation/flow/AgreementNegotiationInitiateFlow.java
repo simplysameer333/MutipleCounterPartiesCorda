@@ -110,8 +110,8 @@ public class AgreementNegotiationInitiateFlow {
             txBuilder.setNotary(notary);
 
             // We create the transaction components.
-            AgreementNegotiationState outputState = new AgreementNegotiationState("name", new Date(),11.1,
-                    "collateral", getOurIdentity(), otherParty);
+            AgreementNegotiationState outputState = new AgreementNegotiationState(agrementName, new Date(),agreementValue,
+                    collateral, getOurIdentity(), otherParty);
             String outputContract = AgreementNegotiationContract.class.getName();
             StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
@@ -121,31 +121,28 @@ public class AgreementNegotiationInitiateFlow {
             // We add the items to the builder.
             txBuilder.withItems(outputContractAndState, cmd);
 
-            progressTracker.setCurrentStep(TX_VERIFICATION);
             // Verifying the transaction.
             txBuilder.verify(getServiceHub());
 
-            progressTracker.setCurrentStep(TX_SIGNING);
             // Signing the transaction.
             final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
 
             /// Creating a session with the other party.
             FlowSession otherpartySession = initiateFlow(otherParty);
 
-            progressTracker.setCurrentStep(SIGS_GATHERING);
             // Obtaining the counterparty's signature.
             SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(
                     signedTx, ImmutableList.of(otherpartySession), CollectSignaturesFlow.tracker()));
 
-            progressTracker.setCurrentStep(FINALISATION);
             // Finalising the transaction.
-            return subFlow(new FinalityFlow(signedTx));
+            subFlow(new FinalityFlow(fullySignedTx));
 
+            return null;
         }
     }
 
     @InitiatedBy(Initiator.class)
-    public static class Responder extends FlowLogic<SignedTransaction> {
+    public static class Responder extends FlowLogic<Void> {
         private FlowSession counterpartySession;
 
         public Responder(FlowSession counterpartySession) {
@@ -157,7 +154,7 @@ public class AgreementNegotiationInitiateFlow {
          */
         @Suspendable
         @Override
-        public SignedTransaction call() throws FlowException{
+        public Void call() throws FlowException{
 
             class SignTxFlow extends SignTransactionFlow {
                 private SignTxFlow(FlowSession otherPartySession, ProgressTracker progressTracker) {
@@ -176,7 +173,9 @@ public class AgreementNegotiationInitiateFlow {
                 }
             }
 
-            return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
-        }
+            subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
+
+
+            return null; }
     }
 }

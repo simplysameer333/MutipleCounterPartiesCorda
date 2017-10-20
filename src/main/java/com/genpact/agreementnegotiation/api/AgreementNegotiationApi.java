@@ -3,15 +3,20 @@ package com.genpact.agreementnegotiation.api;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
+import com.genpact.agreementnegotiation.model.Agreement;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.corda.core.contracts.StateAndRef;
+
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.messaging.FlowProgressHandle;
 import net.corda.core.node.NodeInfo;
 import net.corda.core.transactions.SignedTransaction;
 import static java.util.stream.Collectors.toList;
+import net.corda.core.identity.Party;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -51,36 +56,54 @@ public class AgreementNegotiationApi {
      * Accessible at /api/template/<party>/initFlow.
      */
     @PUT
-    @Path("{party}/initFlow")
+    @Path("initFlow/{partyName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startInitFlow(AgreementNegotiationState state, @PathParam("party") String partyName) {
+    public Response startInitFlow(Agreement agreement, @PathParam("partyName") String partyName) {
 
         try {
-        System.out.println("Initiate Flow :"+partyName);
-        //create state
-       // AgreementNegotiationParams agreementNegotiationParams = new AgreementNegotiationParams();
-        AgreementNegotiationState iouValue = new AgreementNegotiationState("name", new Date(), 10.0, "collateral",
-                rpcOps.nodeInfo().getLegalIdentities().get(0),
-                rpcOps.nodeInfo().getLegalIdentities().get(0));
+            /*if (partyName == null) {
+                return Response.status(BAD_REQUEST).entity("Query parameter 'partyName' missing or has wrong format.\n").build();
+            }
+            System.out.println("Starting Flow :"+agreement);
+            if(agreement == null) {
+                return Response.status(BAD_REQUEST).entity("Post data 'state' missing or has wrong format.\n").build();
+            }*/
+            CordaX500Name party = null;
+            Map<String, List<CordaX500Name>> p = getPeers();
+            for (Map.Entry<String, List<CordaX500Name>> entry : p.entrySet()) {
+                System.out.println("Item : " + entry.getKey() + " Count : " + entry.getValue());
+                party = entry.getValue().get(0);
+            }
+            final Party otherParty = rpcOps.wellKnownPartyFromX500Name(party);
+            if (otherParty == null) {
+                return Response.status(BAD_REQUEST).entity("Party named " + partyName + "cannot be found.\n").build();
+            }
+            System.out.println("Starting Flow :"+otherParty.toString());
+
+            //create state
+            // AgreementNegotiationParams agreementNegotiationParams = new AgreementNegotiationParams();
+            AgreementNegotiationState iouValue = new AgreementNegotiationState(agreement.getAgrementName(), new Date(), (double)agreement.getAgreementValue(), agreement.getCollateral(),
+                    rpcOps.nodeInfo().getLegalIdentities().get(0),
+                    otherParty);
             //rpcOps.partiesFromName("NodeA", true);
-        AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator("name",
-                new Date(), 10.0, "collateral",
-                iouValue.getCptyReciever());
+            AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator(iouValue.getAgrementName(),
+                    new Date(), iouValue.getAgreementValue(), iouValue.getCollateral(),
+                    iouValue.getCptyReciever());
 
-        FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, "name",
-                        new Date(), 10.0, "collateral", iouValue.getCptyReciever());
-        flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
+            FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
+                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, iouValue.getAgrementName(),
+                            new Date(), iouValue.getAgreementValue(), iouValue.getCollateral(), iouValue.getCptyReciever());
+            flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
-        // The line below blocks and waits for the flow to return.
-        final SignedTransaction result = flowHandle
-                .getReturnValue()
-                .get();
+            // The line below blocks and waits for the flow to return.
+            final SignedTransaction result = flowHandle
+                    .getReturnValue()
+                    .get();
 
-        final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
-        System.out.println("message"+msg);
+            final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
+            System.out.println("message"+msg);
 
-        return Response.ok("startInitFlow GET endpoint.").build();
+            return Response.ok("startInitFlow GET endpoint.").build();
         } catch (Throwable ex) {
             System.out.println("Exception"+ex.toString());
         }
@@ -88,9 +111,9 @@ public class AgreementNegotiationApi {
     }
 
     @GET
-    @Path("ious")
+    @Path("getAgreements")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StateAndRef<AgreementNegotiationState>> getIOUs() {
+    public List<StateAndRef<AgreementNegotiationState>> getAgreements() {
         return rpcOps.vaultQuery(AgreementNegotiationState.class).getStates();
     }
 
@@ -108,5 +131,15 @@ public class AgreementNegotiationApi {
                 .map(node -> node.getLegalIdentities().get(0).getName())
                 .filter(name -> !name.equals(myLegalName) && !serviceNames.contains(name.getOrganisation()))
                 .collect(toList()));
+    }
+
+    /**
+     * Returns the node's name.
+     */
+    @GET
+    @Path("me")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, CordaX500Name> whoami() {
+        return ImmutableMap.of("me", myLegalName);
     }
 }
