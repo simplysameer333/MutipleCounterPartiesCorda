@@ -112,6 +112,7 @@ public class AgreementNegotiationInitiateFlow {
             // We create the transaction components.
             AgreementNegotiationState outputState = new AgreementNegotiationState(agrementName, new Date(),agreementValue,
                     collateral, getOurIdentity(), otherParty);
+            outputState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
             String outputContract = AgreementNegotiationContract.class.getName();
             StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
@@ -135,14 +136,14 @@ public class AgreementNegotiationInitiateFlow {
                     signedTx, ImmutableList.of(otherpartySession), CollectSignaturesFlow.tracker()));
 
             // Finalising the transaction.
-            subFlow(new FinalityFlow(fullySignedTx));
+            return subFlow(new FinalityFlow(fullySignedTx));
 
-            return null;
+            //return null;
         }
     }
 
     @InitiatedBy(Initiator.class)
-    public static class Responder extends FlowLogic<Void> {
+    public static class Responder extends FlowLogic<SignedTransaction> {
         private FlowSession counterpartySession;
 
         public Responder(FlowSession counterpartySession) {
@@ -154,7 +155,7 @@ public class AgreementNegotiationInitiateFlow {
          */
         @Suspendable
         @Override
-        public Void call() throws FlowException{
+        public SignedTransaction call() throws FlowException{
 
             class SignTxFlow extends SignTransactionFlow {
                 private SignTxFlow(FlowSession otherPartySession, ProgressTracker progressTracker) {
@@ -173,9 +174,10 @@ public class AgreementNegotiationInitiateFlow {
                 }
             }
 
-            subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
+            return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
 
 
-            return null; }
+
+        }
     }
 }

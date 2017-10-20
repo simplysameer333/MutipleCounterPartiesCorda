@@ -33,18 +33,18 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @Column(name = "agreementValue ") private  Double  agreementValue;
         @Column(name = "collateral") private  String  collateral ;
         @Column(name = "negotiationState") private  String  negotiationState  ;
+        @Column(name = "linearId") private  UUID  linearId  ;
 
-
-
-        public PersistentIOU(String name, Date initialDate, Double value, String collateral)
+        public PersistentIOU(String name, Date initialDate, Double value, Date agrementLastAmendDate, Date agrementAgreedDate,
+                             String collateral,  AgreementNegotiationState.NegotiationStates negotiationStates, UUID linearId )
         {
             this.agrementName = name;
             this.agrementInitiationDate = initialDate;
-            this.agrementLastAmendDate = null;
             this.agrementAgreedDate = null;
             this.agreementValue= value;
             this.collateral=collateral;
-            this.negotiationState= AgreementNegotiationState.NegotiationStates.INITIAL.toString();
+            this.negotiationState= negotiationStates.toString();
+            this.linearId = linearId;
         }
 
         public String getAgrementName() {

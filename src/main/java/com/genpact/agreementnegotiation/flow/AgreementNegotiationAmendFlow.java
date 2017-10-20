@@ -126,7 +126,11 @@ public class AgreementNegotiationAmendFlow {
             QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
             Page<AgreementNegotiationState> results = getServiceHub().getVaultService().queryBy(AgreementNegotiationState.class, criteria);
             List<StateAndRef<AgreementNegotiationState>> previousStates = results.getStates();
-            AgreementNegotiationState previousState= previousStates.get(0).getState().getData();
+            StateAndRef<AgreementNegotiationState>  previousStatesAndRef= previousStates.get(0);;
+            AgreementNegotiationState previousState= previousStatesAndRef.getState().getData();
+
+            //previousState.setCptyInitiator(previousStatesAndRef.getState().getData().getCptyInitiator());
+            //previousState.setCptyReciever(previousStatesAndRef.getState().getData().getCptyReciever());
 
             progressTracker.setCurrentStep(TX_BUILDING);
             // We create a transaction builder.
@@ -135,12 +139,13 @@ public class AgreementNegotiationAmendFlow {
 
             progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
             // We create the transaction components.
-            AgreementNegotiationState outputState = new AgreementNegotiationState("name", new Date(),11.1, "collateral", getOurIdentity(), otherParty);
+            AgreementNegotiationState outputState = new AgreementNegotiationState(agrementName, new Date(),agreementValue,
+                    collateral, getOurIdentity(), otherParty);
             String outputContract = AgreementNegotiationContract.class.getName();
             StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
             StateAndContract inputContractAndState = new StateAndContract(previousState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
-            Command cmd = new Command<>(new AgreementNegotiationContract.Initiate(), requiredSigners);
+            Command cmd = new Command<>(new AgreementNegotiationContract.Amend(), requiredSigners);
 
             // We add the items to the builder.
             txBuilder.withItems(inputContractAndState,outputContractAndState,cmd );

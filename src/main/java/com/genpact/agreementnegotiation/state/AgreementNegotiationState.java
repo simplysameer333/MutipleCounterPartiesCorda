@@ -1,17 +1,31 @@
 package com.genpact.agreementnegotiation.state;
 
 import net.corda.core.contracts.ContractState;
+import net.corda.core.contracts.LinearState;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
+import net.corda.core.contracts.ContractState;
+import net.corda.core.contracts.LinearState;
+import net.corda.core.contracts.UniqueIdentifier;
+import net.corda.core.identity.AbstractParty;
+import net.corda.core.identity.Party;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
+import net.corda.core.schemas.MappedSchema;
+import net.corda.core.schemas.PersistentState;
+import net.corda.core.schemas.QueryableState;
 
 /**
  * Define your state object here.
  */
-public class AgreementNegotiationState implements ContractState {
+public class AgreementNegotiationState implements LinearState, QueryableState {
 
     private String agrementName = null;
     private Date agrementInitiationDate = null;
@@ -23,6 +37,8 @@ public class AgreementNegotiationState implements ContractState {
     private Party cptyInitiator;
     private Party cptyReciever;
 
+    private final UniqueIdentifier linearId;
+
     public AgreementNegotiationState(String name, Date initialDate, Double value, String collateral,
                                      Party cptyInitiator, Party cptyReciever) {
         this.agrementName = name;
@@ -31,9 +47,10 @@ public class AgreementNegotiationState implements ContractState {
         this.agrementAgreedDate = null;
         this.agreementValue= value;
         this.collateral=collateral;
-        this.negotiationState= NegotiationStates.INITIAL;
+        //this.negotiationState= NegotiationStates.INITIAL;
         this.cptyInitiator = cptyInitiator;
         this.cptyReciever = cptyReciever;
+        this.linearId = new UniqueIdentifier();
     }
 
 
@@ -56,7 +73,9 @@ public class AgreementNegotiationState implements ContractState {
         }
 
     }
-
+    public UniqueIdentifier getLinearId() {
+        return linearId;
+    }
     private NegotiationStates negotiationState ;
 
     public String getAgrementName() {
@@ -126,7 +145,13 @@ public class AgreementNegotiationState implements ContractState {
     }
 
 
+    public void setCptyInitiator(Party cptyInitiator) {
+        this.cptyInitiator = cptyInitiator;
+    }
 
+    public void setCptyReciever(Party cptyReciever) {
+        this.cptyReciever = cptyReciever;
+    }
 
     public Party getCptyInitiator() {
         return cptyInitiator;
@@ -139,5 +164,38 @@ public class AgreementNegotiationState implements ContractState {
     /** The public keys of the involved parties. */
     @Override public List<AbstractParty> getParticipants() { return ImmutableList.of(cptyInitiator, cptyReciever); }
 
+    @Override public PersistentState generateMappedObject(MappedSchema schema) {
+                if (schema instanceof AgreementNegotiationSchema) {
+                        return new AgreementNegotiationSchema.PersistentIOU(
+                                        this.agrementName.toString(),
+                                        this.agrementInitiationDate,
+                                        this.agreementValue,
+                                        this.agrementLastAmendDate,
+                                        this.agrementAgreedDate,
+                                        this.collateral,
+                                        this.negotiationState,
+                                        this.linearId.getId());
+                    } else {
+                        throw new IllegalArgumentException("Unrecognised schema $schema");
+                    }
+            }
 
+    @Override public Iterable<MappedSchema> supportedSchemas() {
+                return ImmutableList.of(new AgreementNegotiationSchema());
+            }
+
+            @Override
+    public String toString() {
+                return "AgreementNegotiationState{" +
+                                "agrementName='" + agrementName + '\'' +
+                                ", agrementInitiationDate=" + agrementInitiationDate +
+                                ", agrementLastAmendDate=" + agrementLastAmendDate +
+                                ", agrementAgreedDate=" + agrementAgreedDate +
+                                ", agreementValue=" + agreementValue +
+                                ", collateral='" + collateral + '\'' +
+                                ", cptyInitiator=" + cptyInitiator +
+                                ", cptyReciever=" + cptyReciever +
+                                ", negotiationState=" + negotiationState +
+                                '}';
+            }
 }

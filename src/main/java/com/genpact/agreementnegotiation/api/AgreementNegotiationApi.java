@@ -1,7 +1,7 @@
 package com.genpact.agreementnegotiation.api;
 
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
-
+import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.genpact.agreementnegotiation.model.Agreement;
 
@@ -109,6 +109,49 @@ public class AgreementNegotiationApi {
         }
         return Response.ok("ERROR  GET endpoint.").build();
     }
+
+
+    /**
+     * Accessible at /api/template/<party>/amendFlow.
+     */
+    @PUT
+    @Path("amendFlow/{partyName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response startAmendFlow(Agreement agreement, @PathParam("partyName") String partyName) {
+        try {
+            CordaX500Name otherPartyName = getPeers().values().iterator().next().get(0);
+            final Party otherParty = rpcOps.wellKnownPartyFromX500Name(otherPartyName);
+
+            //create state
+            AgreementNegotiationState iouValue = new AgreementNegotiationState(agreement.getAgrementName(), new Date(), (double)agreement.getAgreementValue(), agreement.getCollateral(),
+                    rpcOps.nodeInfo().getLegalIdentities().get(0),
+                    otherParty);
+
+         /*   AgreementNegotiationAmendFlow.Initiator flow = new AgreementNegotiationAmendFlow.Initiator("name",
+                    new Date(), 11.1, "collateral");
+*/
+            FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
+                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, iouValue,
+                            rpcOps.nodeInfo().getLegalIdentities().get(0));
+            flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
+
+            // The line below blocks and waits for the flow to return.
+            final SignedTransaction result = flowHandle
+                    .getReturnValue()
+                    .get();
+
+            final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
+            System.out.println("message"+msg);
+
+            return Response.ok("amendFlow GET endpoint.").build();
+        } catch (Throwable ex) {
+            System.out.println("Exception"+ex.toString());
+        }
+        return Response.ok("ERROR  GET endpoint.").build();
+
+    }
+
+
 
     @GET
     @Path("getAgreements")
