@@ -1,17 +1,3 @@
-<!--
---------
-WARNING:
---------
-
-THIS CODE IS ONLY MADE AVAILABLE FOR DEMONSTRATION PURPOSES AND IS NOT SECURE! DO NOT USE IN PRODUCTION!
-
-FOR SECURITY REASONS, USING A JAVASCRIPT WEB APP HOSTED VIA THE CORDA NODE IS NOT THE RECOMMENDED WAY TO INTERFACE
-WITH CORDA NODES! HOWEVER, FOR THIS PRE-ALPHA RELEASE IT'S A USEFUL WAY TO EXPERIMENT WITH THE PLATFORM AS IT ALLOWS
-YOU TO QUICKLY BUILD A UI FOR DEMONSTRATION PURPOSES.
-
-GOING FORWARD WE RECOMMEND IMPLEMENTING A STANDALONE WEB SERVER THAT AUTHORISES VIA THE NODE'S RPC INTERFACE. IN THE
-COMING WEEKS WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,7 +12,7 @@ COMING WEEKS WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
     <script src="js/corda.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body ng-app="demoAppModule" ng-controller="DemoAppController as demoApp">
+<body ng-app="demoAppModule" ng-controller="AgreementController as demoApp">
 
 <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -34,15 +20,126 @@ COMING WEEKS WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
             <a class="navbar-brand" href="#">{{demoApp.thisNode}}</a>
         </div>
         <button ng-click="demoApp.openModal()" type="button" class="btn btn-primary navbar-btn">Initiate Agreement</button>
-        <button ng-click="demoApp.getIOUs()" title="See all Contracts" type="button" class="btn btn-default navbar-btn">
-			<span class="glyphicon glyphicon-book">
-		</span></button>
+        <button ng-click="demoApp.getAgreements()" title="See all Agreements" type="button" class="btn btn-default navbar-btn">
+			<span class="glyphicon glyphicon-book"></span>
+		</button>
     </div>
 </nav>
 
+
+<script type="text/ng-template" id="initiateAgreementModal.html">
+    <div class="modal-header">
+        <h4 class="modal-title">New Agreement</h4>
+    </div>
+	<form class="gp-firm-side-ui">
+        <div class="modal-body">
+			
+			
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label for="sel1">Select Template:</label>
+							<select class="form-control">
+								<option>Agreement Template 1</option>
+								<option>Agreement Template 2</option>
+							</select>
+						</div>           
+					
+						<h4 class="modal-title gp-inner-title">Agreement 1</h4>
+						
+						<div class="form-group">
+							<label for="value" class="control-label">CPTY:</label>
+							<select ng-model="modalInstance.form.counterparty" class="form-control" id="counterparty" ng-options="peer as peer for peer in modalInstance.peers">
+							</select>
+							<label for="value" class="control-label">Agreement Name:</label>
+							<input type="text" ng-model="modalInstance.form.agrementName" class="form-control" id="address">
+							<label for="value" class="control-label">Agreement Value:</label>
+							<input type="text" ng-model="modalInstance.form.agreementValue" class="form-control" id="address">
+							<label for="value" class="control-label">Agreement Initiation Date:</label>
+							<input type="text" ng-model="modalInstance.form.agrementInitiationDate" class="form-control">
+							<label for="value" class="control-label">Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.collateral" class="form-control" id="eligibleCollateral">
+						</div>
+					</div> 
+					<div class="col-lg-6">
+						<h4 class="modal-title">Recent Documents</h4>
+						<table class="table table-bordered table-striped gp-table">
+							<thead>
+								<tr>
+									<td>
+										Agreement Name 
+									</td>
+									<td>
+										Agreement Status 
+									</td>
+									<td>
+									</td>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr>
+									<td>Agreement 1</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+								
+								<tr>
+									<td>Agreement 2</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+								
+								<tr>
+									<td>Agreement 3</td>
+									<td>In Negotiation</td>
+									<td><a>Audit Trail</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div> 
+			</div> 
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+            
+            <div ng-show="modalInstance.formError" class="form-group">
+                <div class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Error:</span>
+                    Enter valid Contract parameters
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button ng-click="modalInstance.create()" type="button" class="btn btn-primary">Submit</button>
+			<button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
+        </div>
+    </form>
+    
+	
+	
+	
+	
+    </div>
+</script>
+
+
+
 <script type="text/ng-template" id="demoAppModal1.html">
     <div class="modal-header">
-        <h4 class="modal-title">Initiate Agreement</h4>
+        <h4 class="modal-title">Add new Contract</h4>
     </div>
     <form>
         <div class="modal-body">
@@ -92,7 +189,7 @@ COMING WEEKS WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
 </script>
 <script type="text/ng-template" id="messageContent.html">
     <div class="modal-body" id="modal-body">
-        {{ modalInstanceTwo.message }}
+        {{ modalInstanceTwo.message? modalInstanceTwo.message:"Success" }}
     </div>
 </script>
 
@@ -448,98 +545,7 @@ COMING WEEKS WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
     </div>
 </script>
 
-<script type="text/ng-template" id="InitiateAgreementModal.html">
-    <div class="modal-header">
-        <h4 class="modal-title">New Agreement</h4>
-    </div>
-    <form class="gp-firm-side-ui">
-        <div class="modal-body">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="col-lg-6">
-						<div class="form-group">
-							<select class="form-control">
-							  <option> Agreement 1 </option>
-							  <option> Agreement 2 </option>
-							</select>
-						</div>           
-					
-						<h4 class="modal-title gp-inner-title">Agreement 1</h4>
-						
-						<div class="form-group">
-							<label for="value" class="control-label">Counter-party</label>
-								<select ng-model="modalInstance.form.counterparty" class="form-control" id="counterparty" ng-options="peer as peer for peer in modalInstance.peers">
-								</select>	
-								
-							<label for="value" class="control-label">Date:</label>
-							<input type="text" ng-model="modalInstance.form.name" class="form-control" id="name">
-							<label for="value" class="control-label">Address:</label>
-							<input type="text" ng-model="modalInstance.form.address" class="form-control" id="address">
-							<label for="value" class="control-label">Eligible Collateral:</label>
-							<input type="text" ng-model="modalInstance.form.eligibleCollateral" class="form-control" id="eligibleCollateral">
-							<label for="value" class="control-label">Interest on Cash Collateral:</label>
-							<input type="text" ng-model="modalInstance.form.threshold" class="form-control" id="threshold">
-							<label for="value" class="control-label">Threshold:</label>
-							<input type="text" ng-model="modalInstance.form.threshold" class="form-control" id="threshold">
-							<label for="value" class="control-label">MTA:</label>
-							<input type="text" ng-model="modalInstance.form.mta" class="form-control" id="mta">
-							<label for="value" class="control-label">Initial Margin Collateral:</label>
-							<input type="text" ng-model="modalInstance.form.mta" class="form-control" id="mta">
-							<label for="value" class="control-label">Variation Margin Collateral:</label>
-							<input type="text" ng-model="modalInstance.form.mta" class="form-control" id="mta">
-						</div> 
-					</div> 
-					<div class="col-lg-6">
-						<h4 class="modal-title">Recent Documents</h4>
-						<table class="table table-bordered table-striped gp-table">
-							<thead>
-								<tr>
-									<td>
-										Agreement Name 
-									</td>
-									<td>
-										Agreement Status 
-									</td>
-									<td>
-									</td>
-								</tr>
-							</thead>
 
-							<tbody>
-								<tr>
-									<td>Agreement 1</td>
-									<td>In Negotiation</td>
-									<td><a>Audit Trail</a></td>
-								</tr>
-								
-								<tr>
-									<td>Agreement 2</td>
-									<td>In Negotiation</td>
-									<td><a>Audit Trail</a></td>
-								</tr>
-								
-								<tr>
-									<td>Agreement 3</td>
-									<td>In Negotiation</td>
-									<td><a>Audit Trail</a></td>
-								</tr>
-							</tbody>
-						</table>
-						
-						
-					</div>
-				</div> 
-			</div>         
-        </div>
-        <div class="modal-footer">         
-			<div class="btn-group gp-button-group">
-				<button type="button" ng-click="modalInstance.create()" class="btn btn-secondary">Submit</button>
-				<button type="button" ng-click="modalInstance.cancel()" class="btn btn-secondary">Cancel</button>
-			</div>
-        </div>
-    </form>
-    </div>
-</script>
 
 <div class="row">
     <div class="col-md-1"></div>
@@ -558,17 +564,14 @@ COMING WEEKS WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
         <div ng-repeat="iou in demoApp.ious" class="panel panel-default">
             <div class="panel-body">
                 <ul>
-                    <li>Sender: {{iou.sender}}</li>
-                    <li>Recipient: {{iou.recipient}}</li>
-                    <li>Name: {{iou.iou.name}}</li>
-					<li>Address: {{iou.iou.address}}</li>
-					<li>EligibleCollateral: {{iou.iou.eligibleCollateral}}</li>
-					<li>InterestCashCollateral: {{iou.iou.interestCashCollateral}}</li>
-					<li>Threshold: {{iou.iou.threshold}}</li>
-					<li>Mta: {{iou.iou.mta}}</li>
-					<li>InitialMarginCollateral: {{iou.iou.initialMarginCollateral}}</li>
-					<li>VariationMarginCollateral: {{iou.iou.variationMarginCollateral}}</li>
-					<li>Comments: {{iou.iou.comments}}</li>
+                    <li>CptyInitiator: {{iou.cptyInitiator}}</li>
+					<li>CptyReciever: {{iou.cptyReciever}}</li>
+                    <li>AgreementName: {{iou.agrementName}}</li>
+					<li>Agreement Value: {{iou.agreementValue}}</li>
+					<li>Agreement Initiation Date: {{iou.agrementInitiationDate}}</li>
+					<li>Collateral: {{iou.collateral}}</li>
+					
+					
                 </ul>
             </div>
         </div>
