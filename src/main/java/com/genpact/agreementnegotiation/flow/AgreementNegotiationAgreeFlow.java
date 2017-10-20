@@ -2,7 +2,6 @@ package com.genpact.agreementnegotiation.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
-
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
@@ -79,7 +78,7 @@ public class AgreementNegotiationAgreeFlow {
             String outputContract = AgreementNegotiationContract.class.getName();
             StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
-            Command cmd = new Command<>(new AgreementNegotiationContract.Initiate(), requiredSigners);
+            Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Initiate(), requiredSigners);
 
 
             // We add the items to the builder.

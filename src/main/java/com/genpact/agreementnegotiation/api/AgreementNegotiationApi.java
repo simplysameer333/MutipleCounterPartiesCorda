@@ -1,12 +1,14 @@
 package com.genpact.agreementnegotiation.api;
 
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
+import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
 
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.identity.CordaX500Name;
+import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.messaging.FlowProgressHandle;
 import net.corda.core.node.NodeInfo;
@@ -53,23 +55,19 @@ public class AgreementNegotiationApi {
     @PUT
     @Path("{party}/initFlow")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startInitFlow(AgreementNegotiationState state, @PathParam("party") String partyName) {
+    public Response startInitFlow(AgreementNegotiationState state, @PathParam("party") CordaX500Name partyName) {
 
         try {
         System.out.println("Initiate Flow :"+partyName);
+        final Party otherParty = rpcOps.wellKnownPartyFromX500Name(partyName);
         //create state
        // AgreementNegotiationParams agreementNegotiationParams = new AgreementNegotiationParams();
         AgreementNegotiationState iouValue = new AgreementNegotiationState("name", new Date(), 10.0, "collateral",
                 rpcOps.nodeInfo().getLegalIdentities().get(0),
-                rpcOps.nodeInfo().getLegalIdentities().get(0));
-            //rpcOps.partiesFromName("NodeA", true);
-        AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator("name",
-                new Date(), 10.0, "collateral",
-                iouValue.getCptyReciever());
+                otherParty);
 
         FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, "name",
-                        new Date(), 10.0, "collateral", iouValue.getCptyReciever());
+                .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, iouValue, iouValue.getCptyReciever());
         flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
         // The line below blocks and waits for the flow to return.
@@ -80,7 +78,7 @@ public class AgreementNegotiationApi {
         final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
         System.out.println("message"+msg);
 
-        return Response.ok("startInitFlow GET endpoint.").build();
+        return Response.ok(msg).build();
         } catch (Throwable ex) {
             System.out.println("Exception"+ex.toString());
         }
@@ -108,5 +106,45 @@ public class AgreementNegotiationApi {
                 .map(node -> node.getLegalIdentities().get(0).getName())
                 .filter(name -> !name.equals(myLegalName) && !serviceNames.contains(name.getOrganisation()))
                 .collect(toList()));
+    }
+
+    /**
+     * Accessible at /api/template/amendFlow.
+     */
+    @GET
+    @Path("amendFlow")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response startAmendFlow() {
+
+        try {
+            CordaX500Name otherPartyName = getPeers().values().iterator().next().get(0);
+            final Party otherParty = rpcOps.wellKnownPartyFromX500Name(otherPartyName);
+
+            //create state
+            // AgreementNegotiationParams agreementNegotiationParams = new AgreementNegotiationParams();
+            AgreementNegotiationState iouValue = new AgreementNegotiationState("name", new Date(), 11.0,
+                    "collateral");
+
+         /*   AgreementNegotiationAmendFlow.Initiator flow = new AgreementNegotiationAmendFlow.Initiator("name",
+                    new Date(), 11.1, "collateral");
+*/
+            FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
+                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, iouValue,
+                            rpcOps.nodeInfo().getLegalIdentities().get(0));
+            flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
+
+            // The line below blocks and waits for the flow to return.
+            final SignedTransaction result = flowHandle
+                    .getReturnValue()
+                    .get();
+
+            final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
+            System.out.println("message"+msg);
+
+            return Response.ok("amendFlow GET endpoint.").build();
+        } catch (Throwable ex) {
+            System.out.println("Exception"+ex.toString());
+        }
+        return Response.ok("ERROR  GET endpoint.").build();
     }
 }

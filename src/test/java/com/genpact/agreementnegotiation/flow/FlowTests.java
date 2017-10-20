@@ -71,12 +71,9 @@ public class FlowTests {
     public void test() throws Exception {
         try {
 
+            AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState("name", new Date(), 11.1,"collateral");
 
-
-            AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator(
-                    "name", new Date(),11.1,
-                    "collateral",
-                    iouValue.getCptyReciever());
+            AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator(agreementNegotiationState, iouValue.getCptyReciever());
 
             FlowProgressHandle<SignedTransaction> flowHandle = a.getRpcOps()
                 .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, iouValue, iouValue.getCptyReciever());

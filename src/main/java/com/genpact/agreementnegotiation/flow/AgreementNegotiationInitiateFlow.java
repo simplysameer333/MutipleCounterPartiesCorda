@@ -31,25 +31,14 @@ public class AgreementNegotiationInitiateFlow {
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction> {
         private final Party otherParty;
-        private String agrementName = null;
-        private Date agrementInitiationDate = null;
-        private Date agrementLastAmendDate = null;
-        private Date agrementAgreedDate = null;
-        private Double agreementValue = null;
-        private String collateral = null;
+        private AgreementNegotiationState iouState;
 
         /**
          * The progress tracker provides checkpoints indicating the progress of the flow to observers.
          */
-        public Initiator(String name, Date initialDate, Double value, String collateral, Party otherParty) {
+        public Initiator(AgreementNegotiationState iouState, Party otherParty) {
 
-            this.agrementName = name;
-            this.agrementInitiationDate = initialDate;
-            this.agrementLastAmendDate = null;
-            this.agrementAgreedDate = null;
-            this.agreementValue= value;
-            this.collateral=collateral;
-
+            this.iouState = iouState;
             this.otherParty = otherParty;
         }
 
@@ -110,12 +99,11 @@ public class AgreementNegotiationInitiateFlow {
             txBuilder.setNotary(notary);
 
             // We create the transaction components.
-            AgreementNegotiationState outputState = new AgreementNegotiationState("name", new Date(),11.1,
-                    "collateral", getOurIdentity(), otherParty);
+
             String outputContract = AgreementNegotiationContract.class.getName();
-            StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
+            StateAndContract outputContractAndState = new StateAndContract(iouState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
-            Command cmd = new Command<>(new AgreementNegotiationContract.Initiate(), requiredSigners);
+            Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Initiate(), requiredSigners);
 
 
             // We add the items to the builder.
@@ -129,8 +117,12 @@ public class AgreementNegotiationInitiateFlow {
             // Signing the transaction.
             final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
 
+            System.out.println("otherParty================================>"+otherParty.getName());
+
             /// Creating a session with the other party.
             FlowSession otherpartySession = initiateFlow(otherParty);
+            System.out.println("otherpartySession================================>"+otherpartySession);
+
 
             progressTracker.setCurrentStep(SIGS_GATHERING);
             // Obtaining the counterparty's signature.
@@ -139,7 +131,7 @@ public class AgreementNegotiationInitiateFlow {
 
             progressTracker.setCurrentStep(FINALISATION);
             // Finalising the transaction.
-            return subFlow(new FinalityFlow(signedTx));
+            return subFlow(new FinalityFlow(fullySignedTx ));
 
         }
     }
