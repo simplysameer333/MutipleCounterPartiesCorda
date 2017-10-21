@@ -99,6 +99,5 @@ public class AgreementNegotiationContract implements Contract {
             }
             return null;
         });
->>>>>>> AI_Working_Copy
     }
 }
