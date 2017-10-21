@@ -102,8 +102,12 @@ public class AgreementNegotiationInitiateFlow {
             // We create the transaction components.
             /*AgreementNegotiationState outputState = new AgreementNegotiationState(agrementName, new Date(),agreementValue,
                     collateral, getOurIdentity(), otherParty);
+
             */
             iouState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
+
+            //outputState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
+
             String outputContract = AgreementNegotiationContract.class.getName();
             StateAndContract outputContractAndState = new StateAndContract(iouState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
@@ -129,7 +133,6 @@ public class AgreementNegotiationInitiateFlow {
             // Finalising the transaction.
             return subFlow(new FinalityFlow(fullySignedTx));
 
-            //return null;
         }
     }
 
@@ -164,7 +167,9 @@ public class AgreementNegotiationInitiateFlow {
                     });
                 }
             }
+
             return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
+
         }
     }
 }

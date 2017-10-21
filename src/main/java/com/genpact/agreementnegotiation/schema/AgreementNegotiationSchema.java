@@ -20,7 +20,7 @@ import java.util.UUID;
 @CordaSerializable
 public class AgreementNegotiationSchema extends MappedSchema {
     public AgreementNegotiationSchema() {
-        super(IOUSchema.class, 1, ImmutableList.of(PersistentIOU.class));
+        super(AgreementNegotiationSchema.class, 1, ImmutableList.of(PersistentIOU.class));
     }
 
     @Entity
@@ -36,13 +36,11 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @Column(name = "linearId") private  UUID  linearId  ;
 
 
-
         public PersistentIOU(String name, Date initialDate, Double value, Date agrementLastAmendDate, Date agrementAgreedDate,
                              String collateral,  AgreementNegotiationState.NegotiationStates negotiationStates, UUID linearId )
         {
             this.agrementName = name;
             this.agrementInitiationDate = initialDate;
-            this.agrementLastAmendDate = null;
             this.agrementAgreedDate = null;
             this.agreementValue= value;
             this.collateral=collateral;

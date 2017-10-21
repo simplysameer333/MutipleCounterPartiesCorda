@@ -118,6 +118,16 @@ public class AgreementNegotiationAmendFlow {
                 // We retrieve the notary identity from the network map.
                 final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
 
+/*            progressTracker.setCurrentStep(EXTRACTING_VAULT_STATES);
+            QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
+            Page<AgreementNegotiationState> results = getServiceHub().getVaultService().queryBy(AgreementNegotiationState.class, criteria);
+            List<StateAndRef<AgreementNegotiationState>> previousStates = results.getStates();
+            StateAndRef<AgreementNegotiationState>  previousStatesAndRef= previousStates.get(0);;
+            AgreementNegotiationState previousState= previousStatesAndRef.getState().getData();
+
+            //previousState.setCptyInitiator(previousStatesAndRef.getState().getData().getCptyInitiator());
+            //previousState.setCptyReciever(previousStatesAndRef.getState().getData().getCptyReciever());*/
+
                 progressTracker.setCurrentStep(EXTRACTING_VAULT_STATES);
                 QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
                 //TODO Change the field (agrementName) name with unique field name and "test" with value in new ioustate
@@ -125,7 +135,19 @@ public class AgreementNegotiationAmendFlow {
                 CriteriaExpression uniqueAttributeEXpression = Builder.equal(uniqueAttributeName, "test");
                 QueryCriteria customCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression);
 
+
                 QueryCriteria finalCriteria = criteria.and(customCriteria);
+
+            progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
+   /*         // We create the transaction components.
+            AgreementNegotiationState outputState = new AgreementNegotiationState(agrementName, new Date(),agreementValue,
+                    collateral, getOurIdentity(), otherParty);
+            String outputContract = AgreementNegotiationContract.class.getName();
+            StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
+            StateAndContract inputContractAndState = new StateAndContract(previousState, outputContract);
+            List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
+            Command cmd = new Command<>(new AgreementNegotiationContract.Amend(), requiredSigners);*/
+
 
                 Page<AgreementNegotiationState> results = getServiceHub().getVaultService().
                         queryBy(AgreementNegotiationState.class, finalCriteria);
@@ -135,8 +157,8 @@ public class AgreementNegotiationAmendFlow {
                 AgreementNegotiationState previousState= previousStatesAndRef.getState().getData();
 
 
-                iouState.setCptyInitiator(previousStatesAndRef.getState().getData().getCptyInitiator());
-                iouState.setCptyReciever(previousStatesAndRef.getState().getData().getCptyReciever());
+                //iouState.setCptyInitiator(previousStatesAndRef.getState().getData().getCptyInitiator());
+                //iouState.setCptyReciever(previousStatesAndRef.getState().getData().getCptyReciever());
 
                 progressTracker.setCurrentStep(TX_BUILDING);
                 // We create a transaction builder.
@@ -152,7 +174,7 @@ public class AgreementNegotiationAmendFlow {
                 List<PublicKey> requiredSigners = ImmutableList.of(otherParty.getOwningKey(), previousState.getCptyInitiator().getOwningKey());
                 Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Amend(), requiredSigners);
 
-                System.out.println ("previousState=========================================> "+previousState.toString());
+                //System.out.println ("previousState=========================================> "+previousState.toString());
 
                 // We add the items to the builder.
                 txBuilder.addOutputState(iouState, outputContract);

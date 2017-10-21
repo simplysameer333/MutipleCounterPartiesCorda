@@ -10,6 +10,18 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+
+import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
+import net.corda.core.contracts.ContractState;
+import net.corda.core.contracts.LinearState;
+import net.corda.core.contracts.UniqueIdentifier;
+import net.corda.core.identity.AbstractParty;
+import net.corda.core.identity.Party;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
+
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
@@ -39,7 +51,7 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         this.agrementAgreedDate = null;
         this.agreementValue= value;
         this.collateral=collateral;
-        this.negotiationState= NegotiationStates.INITIAL;
+        //this.negotiationState= NegotiationStates.INITIAL;
         this.cptyInitiator = cptyInitiator;
         this.cptyReciever = cptyReciever;
         this.linearId = new UniqueIdentifier();
@@ -57,9 +69,9 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         this.linearId = new UniqueIdentifier();
     }
 
-    @Override public UniqueIdentifier getLinearId() {
+    /*@Override public UniqueIdentifier getLinearId() {
         return linearId;
-    }
+    }*/
 
     public enum NegotiationStates
     {
@@ -80,7 +92,9 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         }
 
     }
-
+    public UniqueIdentifier getLinearId() {
+        return linearId;
+    }
     private NegotiationStates negotiationState ;
 
     public String getAgrementName() {
@@ -148,7 +162,6 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         }
         return false;
     }
-
 
 
 
