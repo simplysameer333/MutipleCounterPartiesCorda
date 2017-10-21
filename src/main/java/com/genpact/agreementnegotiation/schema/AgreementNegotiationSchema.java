@@ -50,6 +50,10 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.linearId = linearId;
         }
 
+        public PersistentIOU() {
+
+        }
+
         public String getAgrementName() {
             return agrementName;
         }

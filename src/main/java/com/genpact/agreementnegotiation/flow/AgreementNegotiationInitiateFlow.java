@@ -164,11 +164,7 @@ public class AgreementNegotiationInitiateFlow {
                     });
                 }
             }
-
             return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
-
-
-
         }
     }
 }
