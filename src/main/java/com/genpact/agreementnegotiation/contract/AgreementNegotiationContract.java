@@ -8,6 +8,10 @@ import net.corda.core.contracts.Contract;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.LedgerTransaction;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static net.corda.core.contracts.ContractsDSL.requireSingleCommand;
 import static net.corda.core.contracts.ContractsDSL.requireThat;
 /**
@@ -20,7 +24,19 @@ public class AgreementNegotiationContract implements Contract {
 
 
     public interface Commands extends CommandData {
-        class Action implements Commands {}
+        class Initiate implements Commands {
+            @Override
+            public boolean equals(Object obj) {
+                return obj instanceof Initiate;
+            }
+        }
+
+        class Amend implements Commands {
+            @Override
+            public boolean equals(Object obj) {
+                return obj instanceof Amend;
+            }
+        }
     }
 
     // Our Create commands.
@@ -33,6 +49,7 @@ public class AgreementNegotiationContract implements Contract {
      */
     @Override
     public void verify(LedgerTransaction tx) {
+
         final AgreementNegotiationState out = (AgreementNegotiationState) tx.getOutputs().get(0).getData();
         final Party cptyA = out.getCptyInitiator();
         final Party cptyB = out.getCptyReciever();
@@ -82,5 +99,6 @@ public class AgreementNegotiationContract implements Contract {
             }
             return null;
         });
+>>>>>>> AI_Working_Copy
     }
 }
