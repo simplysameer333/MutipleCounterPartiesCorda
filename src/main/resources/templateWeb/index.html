@@ -29,7 +29,7 @@
 
 <script type="text/ng-template" id="initiateAgreementModal.html">
     <div class="modal-header">
-        <h4 class="modal-title">New Agreement</h4>
+        <h4 class="modal-title">Amend Agreement</h4>
     </div>
 	<form class="gp-firm-side-ui">
         <div class="modal-body">
@@ -40,10 +40,7 @@
 					<div class="col-lg-6">
 						<div class="form-group">
 							<label for="sel1">Select Template:</label>
-							<select class="form-control">
-								<option>Agreement Template 1</option>
-								<option>Agreement Template 2</option>
-							</select>
+							<select ng-model="modalInstance.form.template" class="form-control" id="template" ng-options="peer as peer for peer in modalInstance.peers"></select>
 						</div>           
 					
 						<h4 class="modal-title gp-inner-title">Agreement 1</h4>
@@ -135,6 +132,114 @@
     </div>
 </script>
 
+
+<script type="text/ng-template" id="amendAgreementModal.html">
+	<div class="modal-header">
+		<h4 class="modal-title">New Agreement</h4>
+	</div>
+	<form class="gp-firm-side-ui">
+		<div class="modal-body">
+
+
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label for="sel1">Select Template:</label>
+							<select class="form-control">
+								<option>Agreement Template 1</option>
+								<option>Agreement Template 2</option>
+							</select>
+						</div>
+
+						<h4 class="modal-title gp-inner-title">Agreement 1</h4>
+
+						<div class="form-group">
+							<label for="value" class="control-label">CPTY:</label>
+							<select ng-model="modalInstance.form.counterparty" class="form-control" id="counterparty" ng-options="peer as peer for peer in modalInstance.peers">
+							</select>
+							<label for="value" class="control-label">Agreement Name:</label>
+							<input type="text" ng-model="modalInstance.form.agrementName" class="form-control" id="address">
+							<label for="value" class="control-label">Agreement Value:</label>
+							<input type="text" ng-model="modalInstance.form.agreementValue" class="form-control" id="address">
+							<label for="value" class="control-label">Agreement Initiation Date:</label>
+							<input type="text" ng-model="modalInstance.form.agrementInitiationDate" class="form-control">
+							<label for="value" class="control-label">Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.collateral" class="form-control" id="eligibleCollateral">
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<h4 class="modal-title">Recent Documents</h4>
+						<table class="table table-bordered table-striped gp-table">
+							<thead>
+							<tr>
+								<td>
+									Agreement Name
+								</td>
+								<td>
+									Agreement Status
+								</td>
+								<td>
+								</td>
+							</tr>
+							</thead>
+
+							<tbody>
+							<tr>
+								<td>Agreement 1</td>
+								<td>In Negotiation</td>
+								<td><a>Audit Trail</a></td>
+							</tr>
+
+							<tr>
+								<td>Agreement 2</td>
+								<td>In Negotiation</td>
+								<td><a>Audit Trail</a></td>
+							</tr>
+
+							<tr>
+								<td>Agreement 3</td>
+								<td>In Negotiation</td>
+								<td><a>Audit Trail</a></td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<div ng-show="modalInstance.formError" class="form-group">
+				<div class="alert alert-danger" role="alert">
+					<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+					<span class="sr-only">Error:</span>
+					Enter valid Contract parameters
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button ng-click="modalInstance.create()" type="button" class="btn btn-primary">Submit</button>
+			<button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
+		</div>
+	</form>
+
+
+
+
+
+	</div>
+</script>
 
 
 <script type="text/ng-template" id="demoAppModal1.html">
@@ -573,6 +678,7 @@
 					
 					
                 </ul>
+				<button ng-click="demoApp.openModalAmend()" type="button" class="btn btn-primary navbar-btn">Amend Agreement</button>
             </div>
         </div>
     </div>

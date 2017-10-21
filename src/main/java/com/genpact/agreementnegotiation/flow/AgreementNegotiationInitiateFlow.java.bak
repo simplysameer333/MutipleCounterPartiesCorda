@@ -138,7 +138,6 @@ public class AgreementNegotiationInitiateFlow {
             // Finalising the transaction.
             return subFlow(new FinalityFlow(fullySignedTx));
 
-            //return null;
         }
     }
 

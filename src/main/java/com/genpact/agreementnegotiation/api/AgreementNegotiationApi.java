@@ -82,17 +82,17 @@ public class AgreementNegotiationApi {
 
             //create state
             // AgreementNegotiationParams agreementNegotiationParams = new AgreementNegotiationParams();
-            AgreementNegotiationState iouValue = new AgreementNegotiationState(agreement.getAgrementName(), new Date(), (double)agreement.getAgreementValue(), agreement.getCollateral(),
+            AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState(agreement.getAgrementName(), new Date(), (double)agreement.getAgreementValue(), agreement.getCollateral(),
                     rpcOps.nodeInfo().getLegalIdentities().get(0),
                     otherParty);
             //rpcOps.partiesFromName("NodeA", true);
-            AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator(iouValue.getAgrementName(),
-                    new Date(), iouValue.getAgreementValue(), iouValue.getCollateral(),
-                    iouValue.getCptyReciever());
+            AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator(agreementNegotiationState.getAgrementName(),
+                    new Date(), agreementNegotiationState.getAgreementValue(), agreementNegotiationState.getCollateral(),
+                    agreementNegotiationState.getCptyReciever());
 
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, iouValue.getAgrementName(),
-                            new Date(), iouValue.getAgreementValue(), iouValue.getCollateral(), iouValue.getCptyReciever());
+                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreementNegotiationState.getAgrementName(),
+                            new Date(), agreementNegotiationState.getAgreementValue(), agreementNegotiationState.getCollateral(), agreementNegotiationState.getCptyReciever());
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
             // The line below blocks and waits for the flow to return.
@@ -123,15 +123,16 @@ public class AgreementNegotiationApi {
             final Party otherParty = rpcOps.wellKnownPartyFromX500Name(otherPartyName);
 
             //create state
-            AgreementNegotiationState iouValue = new AgreementNegotiationState(agreement.getAgrementName(), new Date(), (double)agreement.getAgreementValue(), agreement.getCollateral(),
+            AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState(agreement.getAgrementName(), new Date(), (double)agreement.getAgreementValue(), agreement.getCollateral(),
                     rpcOps.nodeInfo().getLegalIdentities().get(0),
                     otherParty);
 
-         /*   AgreementNegotiationAmendFlow.Initiator flow = new AgreementNegotiationAmendFlow.Initiator("name",
-                    new Date(), 11.1, "collateral");
-*/
+            AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator(agreementNegotiationState.getAgrementName(),
+                    new Date(), agreementNegotiationState.getAgreementValue(), agreementNegotiationState.getCollateral(),
+                    agreementNegotiationState.getCptyReciever());
+
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, iouValue,
+                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, agreementNegotiationState,
                             rpcOps.nodeInfo().getLegalIdentities().get(0));
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 

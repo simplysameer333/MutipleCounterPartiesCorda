@@ -29,6 +29,20 @@ app.controller('AgreementController', function($http, $location, $uibModal) {
         modalInstance.result.then(() => {}, () => {});
     };
 
+    demoApp.openModalAmend = () => {
+        const modalInstance = $uibModal.open({
+            templateUrl: 'initiateAgreementModal.html',
+            controller: 'ModalInstanceCtrl',
+            controllerAs: 'modalInstance',
+            resolve: {
+                apiBaseURL: () => apiBaseURL,
+                peers: () => peers
+            }
+        });
+
+        modalInstance.result.then(() => {}, () => {});
+    };
+
     demoApp.getAgreements = () => $http.get(apiBaseURL + "getAgreements")
         .then((response) => demoApp.ious = Object.keys(response.data)
             .map((key) => response.data[key].state.data)

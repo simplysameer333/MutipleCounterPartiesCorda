@@ -10,6 +10,9 @@ import net.corda.testing.driver.DriverParameters;
 import net.corda.testing.driver.NodeHandle;
 import net.corda.testing.driver.NodeParameters;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static java.util.Collections.*;
 import static net.corda.testing.driver.Driver.driver;
 
@@ -30,7 +33,9 @@ import static net.corda.testing.driver.Driver.driver;
 public class Main {
     public static void main(String[] args) {
         // No permissions required as we are not invoking flows.
-        final User user = new User("user1", "test", emptySet());
+        Set<String> permissions = new HashSet<String>();
+        permissions.add("StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow$Initiator");
+        final User user = new User("user1", "test", permissions );
         driver(new DriverParameters().setIsDebug(true), dsl -> {
                     dsl.startNode(new NodeParameters()
                             .setProvidedName(new CordaX500Name("Controller", "London", "GB"))
