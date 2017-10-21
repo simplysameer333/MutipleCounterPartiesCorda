@@ -1,30 +1,16 @@
 package com.genpact.agreementnegotiation.state;
 
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
-import net.corda.core.contracts.ContractState;
+import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.LinearState;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import com.google.common.collect.ImmutableList;
-
-import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
-import net.corda.core.contracts.ContractState;
-import net.corda.core.contracts.LinearState;
-import net.corda.core.contracts.UniqueIdentifier;
-import net.corda.core.identity.AbstractParty;
-import net.corda.core.identity.Party;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import com.google.common.collect.ImmutableList;
-
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Define your state object here.
@@ -69,9 +55,9 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         this.linearId = new UniqueIdentifier();
     }
 
-    /*@Override public UniqueIdentifier getLinearId() {
+    @Override public UniqueIdentifier getLinearId() {
         return linearId;
-    }*/
+    }
 
     public enum NegotiationStates
     {
@@ -92,9 +78,7 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         }
 
     }
-    public UniqueIdentifier getLinearId() {
-        return linearId;
-    }
+
     private NegotiationStates negotiationState ;
 
     public String getAgrementName() {
@@ -120,10 +104,6 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
     public String getCollateral() {
         return collateral;
     }
-
-    /*public void setAgrementInitiationDate(Date agrementInitiationDate) {
-        this.agrementInitiationDate = agrementInitiationDate;
-    }*/
 
     public void setAgrementAgreedDate(Date agrementAgreedDate) {
         this.agrementAgreedDate = agrementAgreedDate;
@@ -162,8 +142,6 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         }
         return false;
     }
-
-
 
     public Party getCptyInitiator() {
         return cptyInitiator;

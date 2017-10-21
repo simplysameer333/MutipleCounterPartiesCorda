@@ -2,7 +2,6 @@ package com.genpact.agreementnegotiation.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
-
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
@@ -13,9 +12,7 @@ import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
-
 import java.security.PublicKey;
-import java.util.Date;
 import java.util.List;
 
 import static net.corda.core.contracts.ContractsDSL.requireThat;

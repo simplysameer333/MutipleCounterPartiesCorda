@@ -6,7 +6,6 @@ import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.genpact.agreementnegotiation.api.AgreementNegotiationApi;
 import com.google.common.collect.ImmutableSet;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.webserver.services.WebServerPluginRegistry;

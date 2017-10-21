@@ -5,8 +5,6 @@ import com.google.common.collect.ImmutableList;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.serialization.CordaSerializable;
-
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
