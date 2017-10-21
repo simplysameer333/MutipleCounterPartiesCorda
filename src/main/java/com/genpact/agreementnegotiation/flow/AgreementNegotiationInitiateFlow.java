@@ -30,26 +30,16 @@ public class AgreementNegotiationInitiateFlow {
     @InitiatingFlow
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction> {
+
         private final Party otherParty;
-        private String agrementName = null;
-        private Date agrementInitiationDate = null;
-        private Date agrementLastAmendDate = null;
-        private Date agrementAgreedDate = null;
-        private Double agreementValue = null;
-        private String collateral = null;
+        private AgreementNegotiationState iouState;
 
         /**
          * The progress tracker provides checkpoints indicating the progress of the flow to observers.
          */
-        public Initiator(String name, Date initialDate, Double value, String collateral, Party otherParty) {
+        public Initiator(AgreementNegotiationState iouState, Party otherParty) {
 
-            this.agrementName = name;
-            this.agrementInitiationDate = initialDate;
-            this.agrementLastAmendDate = null;
-            this.agrementAgreedDate = null;
-            this.agreementValue= value;
-            this.collateral=collateral;
-
+            this.iouState = iouState;
             this.otherParty = otherParty;
         }
 
@@ -110,13 +100,14 @@ public class AgreementNegotiationInitiateFlow {
             txBuilder.setNotary(notary);
 
             // We create the transaction components.
-            AgreementNegotiationState outputState = new AgreementNegotiationState(agrementName, new Date(),agreementValue,
+            /*AgreementNegotiationState outputState = new AgreementNegotiationState(agrementName, new Date(),agreementValue,
                     collateral, getOurIdentity(), otherParty);
-            outputState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
+            */
+            iouState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
             String outputContract = AgreementNegotiationContract.class.getName();
-            StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
+            StateAndContract outputContractAndState = new StateAndContract(iouState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
-            Command cmd = new Command<>(new AgreementNegotiationContract.Initiate(), requiredSigners);
+            Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Initiate(), requiredSigners);
 
 
             // We add the items to the builder.
@@ -168,7 +159,7 @@ public class AgreementNegotiationInitiateFlow {
                         ContractState output = stx.getTx().getOutputs().get(0).getData();
                         require.using("This must be an Agreement Negotiation transaction.", output instanceof AgreementNegotiationState);
                         AgreementNegotiationState agreementNegotiationState = (AgreementNegotiationState) output;
-                        require.using("The IOU's value can't be too high.", agreementNegotiationState.isInitialized()==true);
+                        require.using("The IOU's value is not Initialized.", agreementNegotiationState.isInitialized()==false);
                         return null;
                     });
                 }

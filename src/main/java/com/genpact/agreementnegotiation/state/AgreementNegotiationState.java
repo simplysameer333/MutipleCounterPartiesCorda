@@ -174,7 +174,7 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
     @Override public PersistentState generateMappedObject(MappedSchema schema) {
         if (schema instanceof AgreementNegotiationSchema) {
             return new AgreementNegotiationSchema.PersistentIOU(
-                    this.agrementName.toString(),
+                    this.agrementName,
                     this.agrementInitiationDate,
                     this.agreementValue,
                     this.agrementLastAmendDate,

@@ -13,6 +13,8 @@ import net.corda.core.identity.CordaX500Name;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.messaging.FlowProgressHandle;
 import net.corda.core.node.NodeInfo;
+import net.corda.core.node.services.Vault;
+import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
 import static java.util.stream.Collectors.toList;
 import net.corda.core.identity.Party;
@@ -86,13 +88,11 @@ public class AgreementNegotiationApi {
                     rpcOps.nodeInfo().getLegalIdentities().get(0),
                     otherParty);
             //rpcOps.partiesFromName("NodeA", true);
-            AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator(iouValue.getAgrementName(),
-                    new Date(), iouValue.getAgreementValue(), iouValue.getCollateral(),
+            AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator(iouValue,
                     iouValue.getCptyReciever());
 
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, iouValue.getAgrementName(),
-                            new Date(), iouValue.getAgreementValue(), iouValue.getCollateral(), iouValue.getCptyReciever());
+                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, iouValue, iouValue.getCptyReciever());
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
             // The line below blocks and waits for the flow to return.
@@ -157,7 +157,10 @@ public class AgreementNegotiationApi {
     @Path("getAgreements")
     @Produces(MediaType.APPLICATION_JSON)
     public List<StateAndRef<AgreementNegotiationState>> getAgreements() {
-        return rpcOps.vaultQuery(AgreementNegotiationState.class).getStates();
+
+        QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
+        return rpcOps.vaultQueryByCriteria(criteria, AgreementNegotiationState.class).getStates();
+
     }
 
     /**
@@ -185,4 +188,45 @@ public class AgreementNegotiationApi {
     public Map<String, CordaX500Name> whoami() {
         return ImmutableMap.of("me", myLegalName);
     }
+
+    /**
+     * Accessible at /api/template/amendFlow.
+     */
+    @GET
+    @Path("amendFlow")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response startAmendFlow() {
+
+        try {
+            CordaX500Name otherPartyName = getPeers().values().iterator().next().get(0);
+            final Party otherParty = rpcOps.wellKnownPartyFromX500Name(otherPartyName);
+
+            //create state
+            // AgreementNegotiationParams agreementNegotiationParams = new AgreementNegotiationParams();
+            AgreementNegotiationState iouValue = new AgreementNegotiationState("name", new Date(), 11.0,
+                    "collateral");
+
+         /*   AgreementNegotiationAmendFlow.Initiator flow = new AgreementNegotiationAmendFlow.Initiator("name",
+                    new Date(), 11.1, "collateral");
+*/
+            FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
+                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, iouValue,
+                            rpcOps.nodeInfo().getLegalIdentities().get(0));
+            flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
+
+            // The line below blocks and waits for the flow to return.
+            final SignedTransaction result = flowHandle
+                    .getReturnValue()
+                    .get();
+
+            final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
+            System.out.println("message"+msg);
+
+            return Response.ok("amendFlow GET endpoint.").build();
+        } catch (Throwable ex) {
+            System.out.println("Exception"+ex.toString());
+        }
+        return Response.ok("ERROR  GET endpoint.").build();
+    }
+
 }

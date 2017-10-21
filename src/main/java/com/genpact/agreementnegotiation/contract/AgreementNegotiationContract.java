@@ -49,9 +49,6 @@ public class AgreementNegotiationContract implements Contract {
      */
     @Override
     public void verify(LedgerTransaction tx) {
-       // final CommandWithParties<Initiate> command = requireSingleCommand(tx.getCommands(), Initiate.class);
-       // final List<LedgerTransaction.InOutGroup<AgreementNegotiationState, AgreementNegotiationState>> groups
-         //       = tx.groupStates(AgreementNegotiationState.class, AgreementNegotiationState::withoutOwner);
 
 
         final List<CommandWithParties<CommandData>> commands = tx.getCommands().stream().filter(
@@ -59,10 +56,7 @@ public class AgreementNegotiationContract implements Contract {
         ).collect(Collectors.toList());
         final CommandWithParties<CommandData> command = onlyElementOf(commands);
 
-       /* for (final LedgerTransaction.InOutGroup<AgreementNegotiationState, AgreementNegotiationState> group : groups) {
-            final List<AgreementNegotiationState> inputs = group.getInputs();
-            final List<AgreementNegotiationState> outputs = group.getOutputs();
-         */   if (command.getValue() instanceof Commands.Initiate) {
+        if (command.getValue() instanceof Commands.Initiate) {
                 requireThat(check -> {
                     // Constraints on the shape of the transaction.
                     check.using("No inputs should be consumed when issuing an IOU.", tx.getInputs().isEmpty());
@@ -90,27 +84,6 @@ public class AgreementNegotiationContract implements Contract {
                     return null;
                 });
             }
-      //  }
-
-       /* requireThat(check -> {
-            // Constraints on the shape of the transaction.
-            check.using("No inputs should be consumed when issuing an IOU.", tx.getInputs().isEmpty());
-            check.using("There should be one output state of type AgreementNegotiationState.", tx.getOutputs().size() == 1);
-
-            // IOU-specific constraints.
-            final AgreementNegotiationState out = (AgreementNegotiationState) tx.getOutputs().get(0).getData();
-            final Party cptyA = out.getCptyInitiator();
-            final Party cptyB = out.getCptyReciever();
-         //   check.using("The Agreement Parameters's value must be Initialized.",out.getValue().isInitialized()==true);
-            check.using("The Initiator and the Reciever cannot be the same entity.", cptyA != cptyB);
-
-            // Constraints on the signers.
-            check.using("There must only be two signer.", command.getSigners().size() == 2);
-            check.using("The signer must be the cptyA.",  command.getSigners().containsAll(
-                    ImmutableList.of(cptyA.getOwningKey(), cptyB.getOwningKey())));
-
-            return null;
-        });*/
     }
 
     private static <T> T onlyElementOf(Iterable<T> iterable) {

@@ -139,12 +139,12 @@ public class AgreementNegotiationAmendFlow {
             System.out.println ("previousState=========================================> "+previousState.toString());
 
             // We add the items to the builder.
-            txBuilder.withItems(inputContractAndState, outputContractAndState, cmd);
+          //  txBuilder.withItems(inputContractAndState, outputContractAndState, cmd);
 
 
-         //   txBuilder.addOutputState(iouState, outputContract);
-          //  txBuilder.addInputState(previousStatesAndRef);
-           // txBuilder.addCommand(cmd);
+            txBuilder.addOutputState(iouState, outputContract);
+            txBuilder.addInputState(previousStatesAndRef);
+            txBuilder.addCommand(cmd);
 
             progressTracker.setCurrentStep(TX_VERIFICATION);
             // Verifying the transaction.
