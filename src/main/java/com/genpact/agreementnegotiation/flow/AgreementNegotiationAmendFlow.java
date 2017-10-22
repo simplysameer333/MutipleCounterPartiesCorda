@@ -111,7 +111,8 @@ public class AgreementNegotiationAmendFlow {
             QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
             //TODO Change the field (agrementName) name with unique field name and "test" with value in new ioustate
             Field uniqueAttributeName = AgreementNegotiationSchema.PersistentIOU.class.getDeclaredField("agrementName");
-            CriteriaExpression uniqueAttributeEXpression = Builder.equal(uniqueAttributeName, "TestAgmt");
+            System.out.println("agreementNegotiationState.getAgrementName() "+agreementNegotiationState.getAgrementName());
+            CriteriaExpression uniqueAttributeEXpression = Builder.equal(uniqueAttributeName, agreementNegotiationState.getAgrementName());
             QueryCriteria customCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression);
 
             QueryCriteria finalCriteria = criteria.and(customCriteria);
