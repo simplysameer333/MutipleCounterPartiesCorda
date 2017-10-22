@@ -22,6 +22,7 @@ import net.corda.core.utilities.ProgressTracker.Step;
 
 import java.lang.reflect.Field;
 import java.security.PublicKey;
+import java.util.Date;
 import java.util.List;
 
 
@@ -37,6 +38,12 @@ public class AgreementNegotiationAmendFlow {
     public static class Initiator extends FlowLogic<SignedTransaction> {
         private final Party otherParty;
         private final AgreementNegotiationState agreementNegotiationState;
+
+        public Initiator(AgreementNegotiationState state, Party otherParty) {
+
+            this.agreementNegotiationState = state;
+            this.otherParty = otherParty;
+        }
 
         /**
          * The progress tracker provides checkpoints indicating the progress of the flow to observers.
@@ -73,12 +80,6 @@ public class AgreementNegotiationAmendFlow {
                 TX_VERIFICATION,
                 SIGS_GATHERING,
                 FINALISATION);
-        public Initiator(AgreementNegotiationState state, Party otherParty) {
-
-            this.agreementNegotiationState = state;
-            this.otherParty = otherParty;
-        }
-
 
         @Override
         public ProgressTracker getProgressTracker() {
@@ -110,26 +111,23 @@ public class AgreementNegotiationAmendFlow {
             QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
             //TODO Change the field (agrementName) name with unique field name and "test" with value in new ioustate
             Field uniqueAttributeName = AgreementNegotiationSchema.PersistentIOU.class.getDeclaredField("agrementName");
-            CriteriaExpression uniqueAttributeEXpression = Builder.equal(uniqueAttributeName, "test");
+            CriteriaExpression uniqueAttributeEXpression = Builder.equal(uniqueAttributeName, "TestAgmt");
             QueryCriteria customCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression);
 
             QueryCriteria finalCriteria = criteria.and(customCriteria);
 
             progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
-   /*         // We create the transaction components.
-            AgreementNegotiationState outputState = new AgreementNegotiationState(agrementName, new Date(),agreementValue,
-                    collateral, getOurIdentity(), otherParty);
-            String outputContract = AgreementNegotiationContract.class.getName();
-            StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
-            StateAndContract inputContractAndState = new StateAndContract(previousState, outputContract);
-            List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
-            Command cmd = new Command<>(new AgreementNegotiationContract.Amend(), requiredSigners);*/
+            // We create the transaction components.
 
 
                 Page<AgreementNegotiationState> results = getServiceHub().getVaultService().
                         queryBy(AgreementNegotiationState.class, finalCriteria);
 
                 List<StateAndRef<AgreementNegotiationState>> previousStates = results.getStates();
+                if(previousStates.size()==0)
+                {
+                    throw new IllegalFlowLogicException(this.getClass(),"No previous stare that are unconsumed, cannot amend the agreement state");
+                }
                 StateAndRef<AgreementNegotiationState>  previousStatesAndRef= previousStates.get(0);
                 AgreementNegotiationState previousState= previousStatesAndRef.getState().getData();
 
@@ -144,6 +142,7 @@ public class AgreementNegotiationAmendFlow {
 
                 progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
                 // We create the transaction components.
+                agreementNegotiationState.setAgrementInitiationDate(new Date());
 
                 String outputContract = AgreementNegotiationContract.class.getName();
                 StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, outputContract);

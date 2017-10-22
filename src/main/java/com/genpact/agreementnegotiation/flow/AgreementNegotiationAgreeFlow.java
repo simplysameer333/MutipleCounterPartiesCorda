@@ -73,8 +73,8 @@ public class AgreementNegotiationAgreeFlow {
             txBuilder.setNotary(notary);
 
             // We create the transaction components.
-            AgreementNegotiationState outputState = new AgreementNegotiationState("name", new Date(),11.1,
-                    "collateral", getOurIdentity(), otherParty);
+            AgreementNegotiationState outputState = new AgreementNegotiationState("name",11.1,
+                    "collateral", AgreementNegotiationState.NegotiationStates.ACCEPT,getOurIdentity(), otherParty);
             String outputContract = AgreementNegotiationContract.class.getName();
             StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());

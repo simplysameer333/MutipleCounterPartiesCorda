@@ -42,7 +42,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.agrementAgreedDate = null;
             this.agreementValue= value;
             this.collateral=collateral;
-            this.negotiationState= negotiationStates.toString();
+            this.negotiationState= negotiationStates.name();
             this.linearId = linearId;
         }
 

@@ -29,20 +29,19 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
 
     private final UniqueIdentifier linearId;
 
-    public AgreementNegotiationState(String name, Date initialDate, Double value, String collateral,
+    public AgreementNegotiationState(String name, Double value, String collateral,NegotiationStates agreementState,
                                      Party cptyInitiator, Party cptyReciever) {
         this.agrementName = name;
-        this.agrementInitiationDate = initialDate;
         this.agrementLastAmendDate = null;
         this.agrementAgreedDate = null;
         this.agreementValue= value;
         this.collateral=collateral;
-        //this.negotiationState= NegotiationStates.INITIAL;
+        this.negotiationState= agreementState;
         this.cptyInitiator = cptyInitiator;
         this.cptyReciever = cptyReciever;
         this.linearId = new UniqueIdentifier();
     }
-
+/*
     public AgreementNegotiationState(String name, Date initialDate, Double value, String collateral
                                      ) {
         this.agrementName = name;
@@ -53,7 +52,7 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         this.collateral=collateral;
         this.negotiationState= NegotiationStates.INITIAL;
         this.linearId = new UniqueIdentifier();
-    }
+    }*/
 
     @Override public UniqueIdentifier getLinearId() {
         return linearId;
@@ -89,6 +88,12 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         return agrementInitiationDate;
     }
 
+    public void setAgrementInitiationDate(Date agrementInitiationDate) {
+        if(this.agrementInitiationDate==null) {
+            this.agrementInitiationDate = agrementInitiationDate;
+        }
+    }
+
     public Date getAgrementLastAmendDate() {
         return agrementLastAmendDate;
     }
@@ -106,11 +111,15 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
     }
 
     public void setAgrementAgreedDate(Date agrementAgreedDate) {
-        this.agrementAgreedDate = agrementAgreedDate;
+        if(this.agrementAgreedDate==null) {
+            this.agrementAgreedDate = agrementAgreedDate;
+        }
     }
 
     public void setAgrementLastAmendDate(Date agrementLastAmendDate) {
-        this.agrementLastAmendDate = agrementLastAmendDate;
+        if(this.agrementLastAmendDate==null) {
+            this.agrementLastAmendDate = agrementLastAmendDate;
+        }
     }
 
     public void setAgrementName(String agrementName) {
@@ -136,7 +145,7 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
 
     public boolean isInitialized()
     {
-        if(agrementName != null && agreementValue != null && agreementValue !=0 && collateral != null)
+        if(this.agrementName != null && this.agreementValue != null && this.agreementValue > 0.0 && this.collateral != null)
         {
             return  true;
         }
