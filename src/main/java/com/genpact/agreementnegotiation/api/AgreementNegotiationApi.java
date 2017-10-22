@@ -84,7 +84,7 @@ public class AgreementNegotiationApi {
 
             //create state
             // AgreementNegotiationParams agreementNegotiationParams = new AgreementNegotiationParams();
-            AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState(agreement.getAgrementName(), new Date(), (double)agreement.getAgreementValue(), agreement.getCollateral(),
+            AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState(agreement.getAgrementName(),(double)agreement.getAgreementValue(),  agreement.getCollateral(),AgreementNegotiationState.NegotiationStates.INITIAL,
                     rpcOps.nodeInfo().getLegalIdentities().get(0),
                     otherParty);
             //rpcOps.partiesFromName("NodeA", true);
@@ -126,7 +126,7 @@ public class AgreementNegotiationApi {
 
             //create state
 
-            AgreementNegotiationState iouValue = new AgreementNegotiationState(agreement.getAgrementName(), new Date(), (double)agreement.getAgreementValue(), agreement.getCollateral(),
+            AgreementNegotiationState iouValue = new AgreementNegotiationState(agreement.getAgrementName(), (double)agreement.getAgreementValue(), agreement.getCollateral(), AgreementNegotiationState.NegotiationStates.AMEND,
                     rpcOps.nodeInfo().getLegalIdentities().get(0),
                     otherParty);
 
@@ -203,12 +203,10 @@ public class AgreementNegotiationApi {
 
             //create state
             // AgreementNegotiationParams agreementNegotiationParams = new AgreementNegotiationParams();
-            AgreementNegotiationState iouValue = new AgreementNegotiationState("name", new Date(), 11.0,
-                    "collateral");
+            AgreementNegotiationState iouValue = new AgreementNegotiationState("name", 11.11 , "bond",  AgreementNegotiationState.NegotiationStates.AMEND,rpcOps.nodeInfo().getLegalIdentities().get(0),
+                    otherParty);
 
-         /*   AgreementNegotiationAmendFlow.Initiator flow = new AgreementNegotiationAmendFlow.Initiator("name",
-                    new Date(), 11.1, "collateral");
-*/
+
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
                     .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, iouValue,
                             rpcOps.nodeInfo().getLegalIdentities().get(0));

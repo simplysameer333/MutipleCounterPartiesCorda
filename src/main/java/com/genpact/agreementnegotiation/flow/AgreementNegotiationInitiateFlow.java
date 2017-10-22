@@ -2,7 +2,6 @@ package com.genpact.agreementnegotiation.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
-
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
@@ -13,7 +12,6 @@ import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
-
 import java.security.PublicKey;
 import java.util.Date;
 import java.util.List;
@@ -32,14 +30,14 @@ public class AgreementNegotiationInitiateFlow {
     public static class Initiator extends FlowLogic<SignedTransaction> {
 
         private final Party otherParty;
-        private AgreementNegotiationState iouState;
+        private AgreementNegotiationState agreementNegotiationState;
 
         /**
-         * The progress tracker provides checkpoints indicating the progress of the flow to observers.
+         * Constructor.
          */
-        public Initiator(AgreementNegotiationState iouState, Party otherParty) {
+        public Initiator(AgreementNegotiationState agreementNegotiationState, Party otherParty) {
 
-            this.iouState = iouState;
+            this.agreementNegotiationState = agreementNegotiationState;
             this.otherParty = otherParty;
         }
 
@@ -90,6 +88,7 @@ public class AgreementNegotiationInitiateFlow {
         @Suspendable
         @Override public SignedTransaction call() throws FlowException{
 
+
             progressTracker.setCurrentStep(ID_OTHER_NODES);
             // We retrieve the notary identity from the network map.
             final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
@@ -100,18 +99,14 @@ public class AgreementNegotiationInitiateFlow {
             txBuilder.setNotary(notary);
 
             // We create the transaction components.
-            /*AgreementNegotiationState outputState = new AgreementNegotiationState(agrementName, new Date(),agreementValue,
-                    collateral, getOurIdentity(), otherParty);
-
-            */
-            iouState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
+            agreementNegotiationState.setAgrementInitiationDate(new Date());
 
             //outputState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
 
             String outputContract = AgreementNegotiationContract.class.getName();
-            StateAndContract outputContractAndState = new StateAndContract(iouState, outputContract);
+            StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
-            Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Initiate(), requiredSigners);
+            Command cmd = new Command<>(new AgreementNegotiationContract.Initiate(), requiredSigners);
 
 
             // We add the items to the builder.
@@ -162,7 +157,7 @@ public class AgreementNegotiationInitiateFlow {
                         ContractState output = stx.getTx().getOutputs().get(0).getData();
                         require.using("This must be an Agreement Negotiation transaction.", output instanceof AgreementNegotiationState);
                         AgreementNegotiationState agreementNegotiationState = (AgreementNegotiationState) output;
-                        require.using("The IOU's value is not Initialized.", agreementNegotiationState.isInitialized()==false);
+                        require.using("The Agreement State Object is not Initialized.", agreementNegotiationState.isInitialized()==true);
                         return null;
                     });
                 }

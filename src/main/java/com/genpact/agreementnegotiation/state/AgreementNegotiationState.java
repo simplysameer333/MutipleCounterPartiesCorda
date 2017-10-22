@@ -1,30 +1,16 @@
 package com.genpact.agreementnegotiation.state;
 
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
-import net.corda.core.contracts.ContractState;
+import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.LinearState;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import com.google.common.collect.ImmutableList;
-
-import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
-import net.corda.core.contracts.ContractState;
-import net.corda.core.contracts.LinearState;
-import net.corda.core.contracts.UniqueIdentifier;
-import net.corda.core.identity.AbstractParty;
-import net.corda.core.identity.Party;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import com.google.common.collect.ImmutableList;
-
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Define your state object here.
@@ -43,20 +29,19 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
 
     private final UniqueIdentifier linearId;
 
-    public AgreementNegotiationState(String name, Date initialDate, Double value, String collateral,
+    public AgreementNegotiationState(String name, Double value, String collateral,NegotiationStates agreementState,
                                      Party cptyInitiator, Party cptyReciever) {
         this.agrementName = name;
-        this.agrementInitiationDate = initialDate;
         this.agrementLastAmendDate = null;
         this.agrementAgreedDate = null;
         this.agreementValue= value;
         this.collateral=collateral;
-        //this.negotiationState= NegotiationStates.INITIAL;
+        this.negotiationState= agreementState;
         this.cptyInitiator = cptyInitiator;
         this.cptyReciever = cptyReciever;
         this.linearId = new UniqueIdentifier();
     }
-
+/*
     public AgreementNegotiationState(String name, Date initialDate, Double value, String collateral
                                      ) {
         this.agrementName = name;
@@ -67,11 +52,11 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         this.collateral=collateral;
         this.negotiationState= NegotiationStates.INITIAL;
         this.linearId = new UniqueIdentifier();
-    }
-
-    /*@Override public UniqueIdentifier getLinearId() {
-        return linearId;
     }*/
+
+    @Override public UniqueIdentifier getLinearId() {
+        return linearId;
+    }
 
     public enum NegotiationStates
     {
@@ -92,9 +77,7 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         }
 
     }
-    public UniqueIdentifier getLinearId() {
-        return linearId;
-    }
+
     private NegotiationStates negotiationState ;
 
     public String getAgrementName() {
@@ -103,6 +86,12 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
 
     public Date getAgrementInitiationDate() {
         return agrementInitiationDate;
+    }
+
+    public void setAgrementInitiationDate(Date agrementInitiationDate) {
+        if(this.agrementInitiationDate==null) {
+            this.agrementInitiationDate = agrementInitiationDate;
+        }
     }
 
     public Date getAgrementLastAmendDate() {
@@ -121,16 +110,16 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         return collateral;
     }
 
-    /*public void setAgrementInitiationDate(Date agrementInitiationDate) {
-        this.agrementInitiationDate = agrementInitiationDate;
-    }*/
-
     public void setAgrementAgreedDate(Date agrementAgreedDate) {
-        this.agrementAgreedDate = agrementAgreedDate;
+        if(this.agrementAgreedDate==null) {
+            this.agrementAgreedDate = agrementAgreedDate;
+        }
     }
 
     public void setAgrementLastAmendDate(Date agrementLastAmendDate) {
-        this.agrementLastAmendDate = agrementLastAmendDate;
+        if(this.agrementLastAmendDate==null) {
+            this.agrementLastAmendDate = agrementLastAmendDate;
+        }
     }
 
     public void setAgrementName(String agrementName) {
@@ -156,14 +145,12 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
 
     public boolean isInitialized()
     {
-        if(agrementName != null && agreementValue != null && agreementValue !=0 && collateral != null)
+        if(this.agrementName != null && this.agreementValue != null && this.agreementValue > 0.0 && this.collateral != null)
         {
             return  true;
         }
         return false;
     }
-
-
 
     public Party getCptyInitiator() {
         return cptyInitiator;
