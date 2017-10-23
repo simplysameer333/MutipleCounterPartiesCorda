@@ -9,6 +9,8 @@ import net.corda.core.identity.Party;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -17,17 +19,21 @@ import java.util.List;
  */
 public class AgreementNegotiationState implements LinearState, QueryableState {
 
+    private static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
+
     private String agrementName = null;
     private Date agrementInitiationDate = null;
     private Date agrementLastAmendDate = null;
     private Date agrementAgreedDate = null;
     private Double agreementValue = null;
     private String collateral = null;
+    private Party lastUpdatedBy = null;
+
 
     private Party cptyInitiator;
     private Party cptyReciever;
 
-    private final UniqueIdentifier linearId;
+    private UniqueIdentifier linearId;
 
     public AgreementNegotiationState(String name, Double value, String collateral,NegotiationStates agreementState,
                                      Party cptyInitiator, Party cptyReciever) {
@@ -39,23 +45,15 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         this.negotiationState= agreementState;
         this.cptyInitiator = cptyInitiator;
         this.cptyReciever = cptyReciever;
-        this.linearId = new UniqueIdentifier();
     }
-/*
-    public AgreementNegotiationState(String name, Date initialDate, Double value, String collateral
-                                     ) {
-        this.agrementName = name;
-        this.agrementInitiationDate = initialDate;
-        this.agrementLastAmendDate = null;
-        this.agrementAgreedDate = null;
-        this.agreementValue= value;
-        this.collateral=collateral;
-        this.negotiationState= NegotiationStates.INITIAL;
-        this.linearId = new UniqueIdentifier();
-    }*/
 
-    @Override public UniqueIdentifier getLinearId() {
+    @Override
+    public UniqueIdentifier getLinearId() {
         return linearId;
+    }
+
+    public void setLinearId(UniqueIdentifier linearId) {
+        this.linearId = linearId;
     }
 
     public enum NegotiationStates
@@ -84,8 +82,12 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         return agrementName;
     }
 
-    public Date getAgrementInitiationDate() {
-        return agrementInitiationDate;
+    public String getAgrementInitiationDate() {
+        if (agrementInitiationDate != null) {
+            String dateStr = FORMAT.format(agrementInitiationDate);
+            return dateStr;
+        }
+        return "";
     }
 
     public void setAgrementInitiationDate(Date agrementInitiationDate) {
@@ -94,12 +96,32 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
         }
     }
 
-    public Date getAgrementLastAmendDate() {
-        return agrementLastAmendDate;
+    public Date getInitiateDate() {
+        return agrementInitiationDate;
     }
 
-    public Date getAgrementAgreedDate() {
-        return agrementAgreedDate;
+    public String getAgrementLastAmendDate() {
+        if (agrementLastAmendDate != null) {
+            String dateStr = FORMAT.format(agrementLastAmendDate);
+            return dateStr;
+        }
+        return "";
+    }
+
+    public String getAgrementAgreedDate() {
+        if (agrementAgreedDate != null) {
+            String dateStr = FORMAT.format(agrementAgreedDate);
+            return dateStr;
+        }
+        return "";
+    }
+
+    public Party getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(Party lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
     }
 
     public double getAgreementValue() {
@@ -181,7 +203,11 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
                     this.agrementAgreedDate,
                     this.collateral,
                     this.negotiationState,
-                    this.linearId.getId());
+                    this.linearId.getId(),
+                    this.lastUpdatedBy.getName().getCommonName(),
+                    this.cptyInitiator.getName().getCommonName(),
+                    this.cptyReciever.getName().getCommonName()
+            );
         } else {
             throw new IllegalArgumentException("Unrecognised schema $schema");
         }
