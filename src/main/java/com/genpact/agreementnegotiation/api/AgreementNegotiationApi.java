@@ -2,6 +2,7 @@ package com.genpact.agreementnegotiation.api;
 
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
+import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.genpact.agreementnegotiation.model.Agreement;
 
@@ -20,16 +21,16 @@ import static java.util.stream.Collectors.toList;
 import net.corda.core.identity.Party;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import net.corda.core.node.services.vault.Builder;
+import net.corda.core.node.services.vault.CriteriaExpression;
+import java.lang.reflect.Field;
+import java.util.*;
 
 // This API is accessible from /api/template. The endpoint paths specified below are relative to it.
 @Path("template")
@@ -225,6 +226,38 @@ public class AgreementNegotiationApi {
             System.out.println("Exception"+ex.toString());
         }
         return Response.ok("ERROR  GET endpoint.").build();
+    }
+
+    @GET
+    @Path("audit")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<StateAndRef<AgreementNegotiationState>> getAudit(@QueryParam("agreementName") String agreementName) {
+
+        try {
+            Field uniqueAttributeName = AgreementNegotiationSchema.PersistentIOU.class.getDeclaredField("agrementName");
+            CriteriaExpression uniqueAttributeEXpression = Builder.equal(uniqueAttributeName, agreementName);
+            QueryCriteria customCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression,
+                    Vault.StateStatus.CONSUMED);
+
+            Set<Class<AgreementNegotiationState>> contractStateTypes = new HashSet
+                    (Collections.singletonList(AgreementNegotiationState.class));
+
+            QueryCriteria vaultCriteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED, contractStateTypes);
+
+            Vault.Page<AgreementNegotiationState> results = rpcOps.vaultQueryByCriteria(vaultCriteria, AgreementNegotiationState.class);
+            Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class);
+
+            results1.getStates().addAll(results.getStates());
+            System.out.println("===================================================>>>>>>>>>>>." +results1.getStates().size());
+            return results1.getStates();
+        }
+        catch (Exception ex) {
+            System.out.println("Exception" + ex.toString());
+            ex.printStackTrace();
+        }
+
+        return null;
+
     }
 
 }
