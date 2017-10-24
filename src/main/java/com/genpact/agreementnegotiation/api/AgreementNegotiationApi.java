@@ -71,6 +71,7 @@ public class AgreementNegotiationApi {
                     rpcOps.nodeInfo().getLegalIdentities().get(0),
                     otherParty);
 
+            //Shouldn't these be set inside the respective flows?  These are not user inputs.
             agreementNegotiationState.setAgrementInitiationDate(new Date());
             agreementNegotiationState.setLinearId(new UniqueIdentifier());
             agreementNegotiationState.setAgrementLastAmendDate(new Date());

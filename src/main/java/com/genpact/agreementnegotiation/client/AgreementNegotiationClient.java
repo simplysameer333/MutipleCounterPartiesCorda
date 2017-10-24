@@ -7,6 +7,7 @@ import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import net.corda.client.rpc.CordaRPCClient;
 import net.corda.client.rpc.CordaRPCClientConfiguration;
 import net.corda.core.contracts.StateAndRef;
+import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.messaging.FlowProgressHandle;
@@ -75,6 +76,7 @@ public class AgreementNegotiationClient {
         {
             System.out.println("Initiating Initiate Flow for Parameters" + args[3]);
             AgreementNegotiationState initiateNegotiationState = new AgreementNegotiationState(agreementParams.get(0), new Double(agreementParams.get(1)),agreementParams.get(2), AgreementNegotiationState.NegotiationStates.INITIAL, cptyInitiator, cptyReciever);
+            initiateNegotiationState.setLinearId(new UniqueIdentifier());
             flowHandle= proxy.startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, initiateNegotiationState, cptyReciever);
 
         }
