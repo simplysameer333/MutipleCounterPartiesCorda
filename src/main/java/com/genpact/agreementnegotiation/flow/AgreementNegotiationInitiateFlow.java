@@ -101,6 +101,7 @@ public class AgreementNegotiationInitiateFlow {
 
             // We create the transaction components.
             agreementNegotiationState.setAgrementInitiationDate(new Date());
+            agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
 
             //outputState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
 

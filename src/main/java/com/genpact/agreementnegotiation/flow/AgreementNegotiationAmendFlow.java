@@ -21,6 +21,7 @@ import net.corda.core.utilities.ProgressTracker.Step;
 
 import java.lang.reflect.Field;
 import java.security.PublicKey;
+import java.util.Date;
 import java.util.List;
 
 
@@ -129,6 +130,8 @@ public class AgreementNegotiationAmendFlow {
                 agreementNegotiationState.setCptyReciever(previousState.getCptyReciever());
                 agreementNegotiationState.setCptyInitiator(previousState.getCptyInitiator());
                 agreementNegotiationState.setLinearId(previousState.getLinearId());
+                agreementNegotiationState.setAgrementLastAmendDate(new Date());
+                agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
 
                 String outputContract = AgreementNegotiationContract.class.getName();
                 List<PublicKey> requiredSigners = ImmutableList.of(otherParty.getOwningKey(), previousState.getCptyInitiator().getOwningKey());
