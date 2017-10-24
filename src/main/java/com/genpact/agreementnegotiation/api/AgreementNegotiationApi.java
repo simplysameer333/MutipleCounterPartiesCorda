@@ -1,36 +1,34 @@
 package com.genpact.agreementnegotiation.api;
 
-import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
+import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
+import com.genpact.agreementnegotiation.model.Agreement;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
-import com.genpact.agreementnegotiation.model.Agreement;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.corda.core.contracts.StateAndRef;
-
+import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.CordaX500Name;
+import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.messaging.FlowProgressHandle;
 import net.corda.core.node.NodeInfo;
 import net.corda.core.node.services.Vault;
+import net.corda.core.node.services.vault.Builder;
+import net.corda.core.node.services.vault.CriteriaExpression;
 import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
-import static java.util.stream.Collectors.toList;
-import net.corda.core.identity.Party;
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import net.corda.core.node.services.vault.Builder;
-import net.corda.core.node.services.vault.CriteriaExpression;
-import java.lang.reflect.Field;
-import java.util.*;
+import static java.util.stream.Collectors.toList;
 
 // This API is accessible from /api/template. The endpoint paths specified below are relative to it.
 @Path("template")
@@ -61,37 +59,22 @@ public class AgreementNegotiationApi {
     @PUT
     @Path("initFlow/{partyName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startInitFlow(Agreement agreement, @PathParam("partyName") String partyName) {
+    public Response startInitFlow(Agreement agreement, @PathParam("partyName") CordaX500Name partyName) {
 
         try {
-            /*if (partyName == null) {
-                return Response.status(BAD_REQUEST).entity("Query parameter 'partyName' missing or has wrong format.\n").build();
-            }
-            System.out.println("Starting Flow :"+agreement);
-            if(agreement == null) {
-                return Response.status(BAD_REQUEST).entity("Post data 'state' missing or has wrong format.\n").build();
-            }*/
-            CordaX500Name party = null;
-            Map<String, List<CordaX500Name>> p = getPeers();
-            for (Map.Entry<String, List<CordaX500Name>> entry : p.entrySet()) {
-                System.out.println("Item : " + entry.getKey() + " Count : " + entry.getValue());
-                party = entry.getValue().get(0);
-            }
-            final Party otherParty = rpcOps.wellKnownPartyFromX500Name(party);
-            if (otherParty == null) {
-                return Response.status(BAD_REQUEST).entity("Party named " + partyName + "cannot be found.\n").build();
-            }
-            System.out.println("Starting Flow :"+otherParty.toString());
+            final Party otherParty = rpcOps.wellKnownPartyFromX500Name(partyName);
 
             //create state
             // AgreementNegotiationParams agreementNegotiationParams = new AgreementNegotiationParams();
-            AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState(agreement.getAgrementName(),(double)agreement.getAgreementValue(),  agreement.getCollateral(),AgreementNegotiationState.NegotiationStates.INITIAL,
+            AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState(agreement.getAgrementName(), (double) agreement.getAgreementValue(),
+                    agreement.getCollateral(), AgreementNegotiationState.NegotiationStates.INITIAL,
                     rpcOps.nodeInfo().getLegalIdentities().get(0),
                     otherParty);
-            //rpcOps.partiesFromName("NodeA", true);
 
-            AgreementNegotiationInitiateFlow.Initiator flow = new AgreementNegotiationInitiateFlow.Initiator(agreementNegotiationState,
-                    agreementNegotiationState.getCptyReciever());
+            agreementNegotiationState.setAgrementInitiationDate(new Date());
+            agreementNegotiationState.setLinearId(new UniqueIdentifier());
+            agreementNegotiationState.setAgrementLastAmendDate(new Date());
+            agreementNegotiationState.setLastUpdatedBy(rpcOps.nodeInfo().getLegalIdentities().get(0));
 
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
                     .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreementNegotiationState, agreementNegotiationState.getCptyReciever());
@@ -127,9 +110,13 @@ public class AgreementNegotiationApi {
 
             //create state
 
-            AgreementNegotiationState iouValue = new AgreementNegotiationState(agreement.getAgrementName(), (double)agreement.getAgreementValue(), agreement.getCollateral(), AgreementNegotiationState.NegotiationStates.AMEND,
+            AgreementNegotiationState iouValue = new AgreementNegotiationState(agreement.getAgrementName(),
+                    (double) agreement.getAgreementValue(), agreement.getCollateral(),
+                    AgreementNegotiationState.NegotiationStates.AMEND,
                     rpcOps.nodeInfo().getLegalIdentities().get(0),
                     otherParty);
+            iouValue.setAgrementLastAmendDate(new Date());
+            iouValue.setLastUpdatedBy(rpcOps.nodeInfo().getLegalIdentities().get(0));
 
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
                     .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, iouValue,
@@ -239,10 +226,7 @@ public class AgreementNegotiationApi {
             QueryCriteria customCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression,
                     Vault.StateStatus.CONSUMED);
 
-            Set<Class<AgreementNegotiationState>> contractStateTypes = new HashSet
-                    (Collections.singletonList(AgreementNegotiationState.class));
-
-            QueryCriteria vaultCriteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED, contractStateTypes);
+            QueryCriteria vaultCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression, Vault.StateStatus.UNCONSUMED);
 
             Vault.Page<AgreementNegotiationState> results = rpcOps.vaultQueryByCriteria(vaultCriteria, AgreementNegotiationState.class);
             Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class);
