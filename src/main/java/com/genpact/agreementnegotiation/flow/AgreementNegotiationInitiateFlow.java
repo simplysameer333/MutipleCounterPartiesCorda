@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndContract;
+import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
@@ -100,10 +101,14 @@ public class AgreementNegotiationInitiateFlow {
             txBuilder.setNotary(notary);
 
             // We create the transaction components.
+            agreementNegotiationState.setLinearId(new UniqueIdentifier());
             agreementNegotiationState.setAgrementInitiationDate(new Date());
             agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
 
             //outputState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
+            //agreementNegotiationState.setAgrementLastAmendDate(new Date());
+            //agreementNegotiationState.setLastUpdatedBy(agreementNegotiationState.getCptyInitiator());
+            agreementNegotiationState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
 
             String outputContract = AgreementNegotiationContract.class.getName();
             StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, outputContract);
