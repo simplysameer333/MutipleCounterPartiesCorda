@@ -161,7 +161,6 @@ public class AgreementNegotiationContract implements Contract {
         }
     }
 
-
     private static <T> T onlyElementOf(Iterable<T> iterable) {
         Iterator<T> iter = iterable.iterator();
         T item = iter.next();
@@ -169,6 +168,5 @@ public class AgreementNegotiationContract implements Contract {
             throw new IllegalArgumentException("Iterable has more than one element!");
         }
         return item;
-
     }
 }

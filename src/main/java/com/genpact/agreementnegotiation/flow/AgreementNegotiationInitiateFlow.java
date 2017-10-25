@@ -12,6 +12,7 @@ import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
+
 import java.security.PublicKey;
 import java.util.Date;
 import java.util.List;
@@ -100,13 +101,14 @@ public class AgreementNegotiationInitiateFlow {
 
             // We create the transaction components.
             agreementNegotiationState.setAgrementInitiationDate(new Date());
+            agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
 
             //outputState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
 
             String outputContract = AgreementNegotiationContract.class.getName();
             StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, outputContract);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
-            Command cmd = new Command<>(new AgreementNegotiationContract.Initiate(), requiredSigners);
+            Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Initiate(), requiredSigners);
 
 
             // We add the items to the builder.

@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.serialization.CordaSerializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -32,10 +33,17 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @Column(name = "collateral") private  String  collateral ;
         @Column(name = "negotiationState") private  String  negotiationState  ;
         @Column(name = "linearId") private  UUID  linearId  ;
+        @Column(name = "lastUpdatedBy")
+        private String lastUpdatedBy;
+        @Column(name = "cptyInitiator")
+        private String cptyInitiator;
+        @Column(name = "cptyReciever")
+        private String cptyReciever;
 
 
         public PersistentIOU(String name, Date initialDate, Double value, Date agrementLastAmendDate, Date agrementAgreedDate,
-                             String collateral,  AgreementNegotiationState.NegotiationStates negotiationStates, UUID linearId )
+                             String collateral, AgreementNegotiationState.NegotiationStates negotiationStates, UUID linearId,
+                             String lastUpdatedBy, String cptyInitiator, String cptyReciever)
         {
             this.agrementName = name;
             this.agrementInitiationDate = initialDate;
@@ -44,6 +52,9 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.collateral=collateral;
             this.negotiationState= negotiationStates.name();
             this.linearId = linearId;
+            this.lastUpdatedBy = lastUpdatedBy;
+            this.cptyInitiator = cptyInitiator;
+            this.cptyReciever = cptyReciever;
         }
 
         public PersistentIOU() {
@@ -102,7 +113,6 @@ public class AgreementNegotiationSchema extends MappedSchema {
             return negotiationState;
         }
 
-
         public void setNegotiationState(String negotiationState) {
             this.negotiationState = negotiationState;
         }
@@ -116,5 +126,12 @@ public class AgreementNegotiationSchema extends MappedSchema {
             return false;
         }
 
+        public String getLastUpdatedBy() {
+            return lastUpdatedBy;
+        }
+
+        public void setLastUpdatedBy(String lastUpdatedBy) {
+            this.lastUpdatedBy = lastUpdatedBy;
+        }
     }
 }
