@@ -5,7 +5,7 @@ import net.corda.core.concurrent.CordaFuture;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.node.services.transactions.ValidatingNotaryService;
 import net.corda.nodeapi.User;
-import net.corda.nodeapi.internal.*;
+import net.corda.nodeapi.internal.ServiceInfo;
 import net.corda.testing.driver.DriverParameters;
 import net.corda.testing.driver.NodeHandle;
 import net.corda.testing.driver.NodeParameters;
@@ -13,7 +13,7 @@ import net.corda.testing.driver.NodeParameters;
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.util.Collections.*;
+import static java.util.Collections.singleton;
 import static net.corda.testing.driver.Driver.driver;
 
 /**
@@ -35,6 +35,7 @@ public class Main {
         // No permissions required as we are not invoking flows.
         Set<String> permissions = new HashSet<String>();
         permissions.add("StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow$Initiator");
+        permissions.add("StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow$Initiator");
         final User user = new User("user1", "test", permissions );
         driver(new DriverParameters().setIsDebug(true), dsl -> {
                     dsl.startNode(new NodeParameters()
@@ -47,10 +48,14 @@ public class Main {
                     CordaFuture<NodeHandle> nodeB = dsl.startNode(new NodeParameters()
                             .setProvidedName(new CordaX500Name("PartyB", "New York", "US"))
                             .setRpcUsers(ImmutableList.of(user)));
+            CordaFuture<NodeHandle> nodeC = dsl.startNode(new NodeParameters()
+                    .setProvidedName(new CordaX500Name("PartyC", "New Delhi", "IN"))
+                    .setRpcUsers(ImmutableList.of(user)));
 
                     try {
                         dsl.startWebserver(nodeAFuture.get());
                         dsl.startWebserver(nodeB.get());
+                        dsl.startWebserver(nodeC.get());
                     } catch (Throwable e) {
                         System.err.println("Encountered exception in node startup: " + e.getMessage());
                         e.printStackTrace();

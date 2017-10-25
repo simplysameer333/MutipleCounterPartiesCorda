@@ -1,24 +1,25 @@
 package com.genpact.agreementnegotiation.model;
-import net.corda.core.serialization.CordaSerializable;
 
-import java.util.Date;
+import net.corda.core.serialization.CordaSerializable;
 
 @CordaSerializable
 public class Agreement {
     private String agrementName = null;
-    private Date agrementInitiationDate = null;
+    private String agrementInitiationDate = null;
     private int agreementValue;
     private String collateral = null;
 
     public String getAgrementName() { return agrementName; }
 
-    public Date getAgrementInitiationDate() { return agrementInitiationDate; }
+    public String getAgrementInitiationDate() {
+        return agrementInitiationDate;
+    }
 
     public int getAgreementValue() { return agreementValue; }
 
     public String getCollateral() { return collateral; }
 
-    public Agreement(String _agrementName, Date _agrementInitiationDate, int _agreementValue, String _collateral) {
+    public Agreement(String _agrementName, String _agrementInitiationDate, int _agreementValue, String _collateral) {
         this.agrementName = _agrementName;
         this.agrementInitiationDate = _agrementInitiationDate;
         this.agreementValue = _agreementValue;

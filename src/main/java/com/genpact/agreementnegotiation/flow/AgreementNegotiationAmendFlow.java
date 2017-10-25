@@ -1,50 +1,28 @@
 package com.genpact.agreementnegotiation.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
-
-
 import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
-import com.google.common.collect.ImmutableList;
-import net.corda.core.contracts.*;
-import net.corda.core.flows.*;
-
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
+import com.google.common.collect.ImmutableList;
+import net.corda.core.contracts.Command;
+import net.corda.core.contracts.StateAndRef;
+import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
+import net.corda.core.node.services.Vault;
+import net.corda.core.node.services.Vault.Page;
 import net.corda.core.node.services.vault.Builder;
 import net.corda.core.node.services.vault.CriteriaExpression;
 import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
-import co.paralleluniverse.fibers.Suspendable;
-import net.corda.core.flows.FlowException;
-import net.corda.core.flows.FlowLogic;
-import net.corda.core.flows.FlowSession;
-import net.corda.core.flows.InitiatedBy;
-import net.corda.core.flows.SignTransactionFlow;
-import net.corda.core.transactions.SignedTransaction;
-import net.corda.core.utilities.ProgressTracker;
-import static net.corda.core.contracts.ContractsDSL.requireThat;
+import net.corda.core.utilities.ProgressTracker.Step;
 
 import java.lang.reflect.Field;
 import java.security.PublicKey;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import net.corda.core.utilities.ProgressTracker;
-import net.corda.core.utilities.ProgressTracker.Step;
-import net.corda.core.contracts.ContractState;
-import net.corda.core.flows.FlowException;
-import net.corda.core.flows.FlowLogic;
-import net.corda.core.flows.FlowSession;
-import net.corda.core.flows.InitiatedBy;
-import net.corda.core.flows.SignTransactionFlow;
-import net.corda.core.transactions.SignedTransaction;
-import net.corda.core.utilities.ProgressTracker;
-import net.corda.core.node.services.Vault;
-import net.corda.core.node.services.Vault.Page;
-import net.corda.core.node.services.vault.QueryCriteria.VaultQueryCriteria;
 
 
 /**
@@ -58,7 +36,13 @@ public class AgreementNegotiationAmendFlow {
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction> {
         private final Party otherParty;
-        private final AgreementNegotiationState iouState;
+        private final AgreementNegotiationState agreementNegotiationState;
+
+        public Initiator(AgreementNegotiationState state, Party otherParty) {
+
+            this.agreementNegotiationState = state;
+            this.otherParty = otherParty;
+        }
 
         /**
          * The progress tracker provides checkpoints indicating the progress of the flow to observers.
@@ -95,12 +79,6 @@ public class AgreementNegotiationAmendFlow {
                 TX_VERIFICATION,
                 SIGS_GATHERING,
                 FINALISATION);
-        public Initiator(AgreementNegotiationState iouState, Party otherParty) {
-
-            this.iouState = iouState;
-            this.otherParty = otherParty;
-        }
-
 
         @Override
         public ProgressTracker getProgressTracker() {
@@ -118,47 +96,28 @@ public class AgreementNegotiationAmendFlow {
                 // We retrieve the notary identity from the network map.
                 final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
 
-/*            progressTracker.setCurrentStep(EXTRACTING_VAULT_STATES);
-            QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
-            Page<AgreementNegotiationState> results = getServiceHub().getVaultService().queryBy(AgreementNegotiationState.class, criteria);
-            List<StateAndRef<AgreementNegotiationState>> previousStates = results.getStates();
-            StateAndRef<AgreementNegotiationState>  previousStatesAndRef= previousStates.get(0);;
-            AgreementNegotiationState previousState= previousStatesAndRef.getState().getData();
-
-            //previousState.setCptyInitiator(previousStatesAndRef.getState().getData().getCptyInitiator());
-            //previousState.setCptyReciever(previousStatesAndRef.getState().getData().getCptyReciever());*/
-
                 progressTracker.setCurrentStep(EXTRACTING_VAULT_STATES);
                 QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
                 //TODO Change the field (agrementName) name with unique field name and "test" with value in new ioustate
                 Field uniqueAttributeName = AgreementNegotiationSchema.PersistentIOU.class.getDeclaredField("agrementName");
-                CriteriaExpression uniqueAttributeEXpression = Builder.equal(uniqueAttributeName, "test");
+                System.out.println("agreementNegotiationState.getAgrementName() " + agreementNegotiationState.getAgrementName());
+                CriteriaExpression uniqueAttributeEXpression = Builder.equal(uniqueAttributeName, agreementNegotiationState.getAgrementName());
                 QueryCriteria customCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression);
-
 
                 QueryCriteria finalCriteria = criteria.and(customCriteria);
 
-            progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
-   /*         // We create the transaction components.
-            AgreementNegotiationState outputState = new AgreementNegotiationState(agrementName, new Date(),agreementValue,
-                    collateral, getOurIdentity(), otherParty);
-            String outputContract = AgreementNegotiationContract.class.getName();
-            StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
-            StateAndContract inputContractAndState = new StateAndContract(previousState, outputContract);
-            List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
-            Command cmd = new Command<>(new AgreementNegotiationContract.Amend(), requiredSigners);*/
-
-
+                progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
+                // We create the transaction components.
                 Page<AgreementNegotiationState> results = getServiceHub().getVaultService().
                         queryBy(AgreementNegotiationState.class, finalCriteria);
 
                 List<StateAndRef<AgreementNegotiationState>> previousStates = results.getStates();
+                if(previousStates.size()==0)
+                {
+                    throw new IllegalFlowLogicException(this.getClass(),"No previous stare that are unconsumed, cannot amend the agreement state");
+                }
                 StateAndRef<AgreementNegotiationState>  previousStatesAndRef= previousStates.get(0);
                 AgreementNegotiationState previousState= previousStatesAndRef.getState().getData();
-
-
-                //iouState.setCptyInitiator(previousStatesAndRef.getState().getData().getCptyInitiator());
-                //iouState.setCptyReciever(previousStatesAndRef.getState().getData().getCptyReciever());
 
                 progressTracker.setCurrentStep(TX_BUILDING);
                 // We create a transaction builder.
@@ -167,17 +126,19 @@ public class AgreementNegotiationAmendFlow {
 
                 progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
                 // We create the transaction components.
+                agreementNegotiationState.setAgrementInitiationDate(previousState.getInitiateDate());
+                agreementNegotiationState.setCptyReciever(previousState.getCptyReciever());
+                agreementNegotiationState.setCptyInitiator(previousState.getCptyInitiator());
+                agreementNegotiationState.setLinearId(previousState.getLinearId());
+                agreementNegotiationState.setAgrementLastAmendDate(new Date());
+                agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
 
                 String outputContract = AgreementNegotiationContract.class.getName();
-                StateAndContract outputContractAndState = new StateAndContract(iouState, outputContract);
-                StateAndContract inputContractAndState = new StateAndContract(previousState, outputContract);
                 List<PublicKey> requiredSigners = ImmutableList.of(otherParty.getOwningKey(), previousState.getCptyInitiator().getOwningKey());
                 Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Amend(), requiredSigners);
 
-                //System.out.println ("previousState=========================================> "+previousState.toString());
-
                 // We add the items to the builder.
-                txBuilder.addOutputState(iouState, outputContract);
+                txBuilder.addOutputState(agreementNegotiationState, outputContract);
                 txBuilder.addInputState(previousStatesAndRef);
                 txBuilder.addCommand(cmd);
 

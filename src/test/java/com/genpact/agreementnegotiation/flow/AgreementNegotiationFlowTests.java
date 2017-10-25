@@ -48,8 +48,8 @@ public class AgreementNegotiationFlowTests {
         }
         network.runNetwork();
 
-         iouValue = new AgreementNegotiationState("name", new Date(),11.1,
-                "collateral",
+         iouValue = new AgreementNegotiationState("name", 11.1,
+                "collateral", AgreementNegotiationState.NegotiationStates.INITIAL,
                 a.getInfo().getLegalIdentities().get(0),
                 b.getInfo().getLegalIdentities().get(0));
     }
