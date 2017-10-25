@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Define your flow here.
  */
-public class AgreementNegotiationAmendFlow {
+public class AgreementNegotiationAcceptFlow {
     /**
      * You can add a constructor to each FlowLogic subclass to pass objects into the flow.
      */
@@ -84,11 +84,13 @@ public class AgreementNegotiationAmendFlow {
         public ProgressTracker getProgressTracker() {
             return progressTracker;
         }
+
         /**
          * Define the initiator's flow logic here.
          */
         @Suspendable
-        @Override public SignedTransaction call() throws FlowException{
+        @Override
+        public SignedTransaction call() throws FlowException {
 
             try {
                 progressTracker.setCurrentStep(ID_OTHER_NODES);
@@ -112,12 +114,12 @@ public class AgreementNegotiationAmendFlow {
                         queryBy(AgreementNegotiationState.class, finalCriteria);
 
                 List<StateAndRef<AgreementNegotiationState>> previousStates = results.getStates();
-                if(previousStates.size()==0)
-                {
-                    throw new IllegalFlowLogicException(this.getClass(),"No previous stare that are unconsumed, cannot amend the agreement state");
+                if (previousStates.size() == 0) {
+                    throw new IllegalFlowLogicException(this.getClass(), "No previous stare that are unconsumed," +
+                            " cannot accept the agreement state");
                 }
-                StateAndRef<AgreementNegotiationState>  previousStatesAndRef= previousStates.get(0);
-                AgreementNegotiationState previousState= previousStatesAndRef.getState().getData();
+                StateAndRef<AgreementNegotiationState> previousStatesAndRef = previousStates.get(0);
+                AgreementNegotiationState previousState = previousStatesAndRef.getState().getData();
 
                 progressTracker.setCurrentStep(TX_BUILDING);
                 // We create a transaction builder.
@@ -125,23 +127,27 @@ public class AgreementNegotiationAmendFlow {
                 txBuilder.setNotary(notary);
 
                 progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
-                // We create the transaction components.
+                // We create the transaction components - restore all data from previous state
                 agreementNegotiationState.setAgrementInitiationDate(previousState.getInitiateDate());
                 agreementNegotiationState.setCptyReciever(previousState.getCptyReciever());
                 agreementNegotiationState.setCptyInitiator(previousState.getCptyInitiator());
                 agreementNegotiationState.setLinearId(previousState.getLinearId());
+                agreementNegotiationState.setAgrementName(previousState.getAgrementName());
+                agreementNegotiationState.setCollateral(previousState.getCollateral());
+                agreementNegotiationState.setAgreementValue(previousState.getAgreementValue());
+
+                //Update transaction data
                 agreementNegotiationState.setAgrementLastAmendDate(new Date());
-                agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
-
-                agreementNegotiationState.setNegotiationState(AgreementNegotiationState.NegotiationStates.AMEND);
-
-                //agreementNegotiationState.setAgrementLastAmendDate(new Date());
-                //agreementNegotiationState.setLastUpdatedBy(otherParty);
-
+                agreementNegotiationState.setLastUpdatedBy(otherParty);
+                agreementNegotiationState.setNegotiationState(AgreementNegotiationState.NegotiationStates.PARTIAL_ACCEPTED);
+                if (previousState.getNegotiationState() == AgreementNegotiationState.NegotiationStates.PARTIAL_ACCEPTED) {
+                    agreementNegotiationState.setNegotiationState(AgreementNegotiationState.NegotiationStates.FULLY_ACCEPTED);
+                }
 
                 String outputContract = AgreementNegotiationContract.class.getName();
                 List<PublicKey> requiredSigners = ImmutableList.of(otherParty.getOwningKey(), previousState.getCptyInitiator().getOwningKey());
-                Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Amend(), requiredSigners);
+
+                Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Accept(), requiredSigners);
 
                 // We add the items to the builder.
                 txBuilder.addOutputState(agreementNegotiationState, outputContract);
@@ -164,12 +170,12 @@ public class AgreementNegotiationAmendFlow {
                 SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(
                         twiceSignedTx, ImmutableList.of(otherPartySession), SIGS_GATHERING.childProgressTracker()));
 
-                 progressTracker.setCurrentStep(FINALISATION);
+                progressTracker.setCurrentStep(FINALISATION);
 
-                 // Finalising the transaction.
+                // Finalising the transaction.
                 return subFlow(new FinalityFlow(fullySignedTx));
             } catch (Exception ex) {
-                System.out.println("Exception"+ex.toString());
+                System.out.println("Exception" + ex.toString());
                 ex.printStackTrace();
             }
             return null;
@@ -183,6 +189,7 @@ public class AgreementNegotiationAmendFlow {
         public Responder(FlowSession counterpartySession) {
             this.counterpartySession = counterpartySession;
         }
+
         /**
          * The progress tracker provides checkpoints indicating the progress of the flow to observers.
          */
@@ -190,12 +197,13 @@ public class AgreementNegotiationAmendFlow {
 
         private final ProgressTracker progressTracker = new ProgressTracker(
                 TX_SIGNING);
+
         /**
          * Define the acceptor's flow logic here.
          */
         @Suspendable
         @Override
-        public SignedTransaction call() throws FlowException{
+        public SignedTransaction call() throws FlowException {
 
             class SignTxFlow extends SignTransactionFlow {
                 private SignTxFlow(FlowSession otherPartySession, ProgressTracker progressTracker) {

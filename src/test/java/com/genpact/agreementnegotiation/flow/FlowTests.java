@@ -2,11 +2,6 @@ package com.genpact.agreementnegotiation.flow;
 
 
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
-import com.google.common.collect.ImmutableList;
-import net.corda.core.concurrent.CordaFuture;
-import net.corda.core.contracts.ContractState;
-import net.corda.core.contracts.TransactionState;
-import net.corda.core.identity.Party;
 import net.corda.node.internal.StartedNode;
 import net.corda.testing.node.MockNetwork;
 import org.junit.After;
@@ -14,11 +9,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import net.corda.core.transactions.SignedTransaction;
-import net.corda.core.messaging.FlowProgressHandle;
-
-import java.util.Date;
-import java.util.List;
 
 public class FlowTests {
     private MockNetwork network;
@@ -40,14 +30,6 @@ public class FlowTests {
             node.registerInitiatedFlow(AgreementNegotiationInitiateFlow.Responder.class);
         }
         network.runNetwork();
-
-        //create state
-
-        AgreementNegotiationState outputState = new AgreementNegotiationState("name", 11.1,
-                "collateral", AgreementNegotiationState.NegotiationStates.INITIAL,
-                a.getInfo().getLegalIdentities().get(0),
-                b.getInfo().getLegalIdentities().get(0)
-        );
 
 
     }
