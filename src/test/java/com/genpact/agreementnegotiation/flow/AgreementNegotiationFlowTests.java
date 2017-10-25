@@ -1,14 +1,6 @@
 package com.genpact.agreementnegotiation.flow;
 
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
-import com.google.common.collect.ImmutableList;
-import net.corda.core.concurrent.CordaFuture;
-import net.corda.core.contracts.ContractState;
-import net.corda.core.contracts.StateAndRef;
-import net.corda.core.contracts.TransactionState;
-import net.corda.core.contracts.TransactionVerificationException;
-import net.corda.core.messaging.FlowProgressHandle;
-import net.corda.core.transactions.SignedTransaction;
 import net.corda.node.internal.StartedNode;
 import net.corda.testing.node.MockNetwork;
 import net.corda.testing.node.MockNetwork.BasketOfNodes;
@@ -19,20 +11,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Date;
-import java.util.List;
-
 import static net.corda.testing.CoreTestUtils.setCordappPackages;
 import static net.corda.testing.CoreTestUtils.unsetCordappPackages;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
 
 public class AgreementNegotiationFlowTests {
     private MockNetwork network;
     private StartedNode<MockNode> a;
     private StartedNode<MockNode> b;
     private StartedNode<MockNode> c;
-    AgreementNegotiationState iouValue;
+    private AgreementNegotiationState iouValue;
     @Before
     public void setup() {
         setCordappPackages("com.genpact.agreementnegotiaton.contract");
@@ -49,9 +36,8 @@ public class AgreementNegotiationFlowTests {
         network.runNetwork();
 
          iouValue = new AgreementNegotiationState("name", 11.1,
-                "collateral", AgreementNegotiationState.NegotiationStates.INITIAL,
-                a.getInfo().getLegalIdentities().get(0),
-                b.getInfo().getLegalIdentities().get(0));
+                 "collateral", a.getInfo().getLegalIdentities().get(0), b.getInfo().getLegalIdentities().get(0));
+        iouValue.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
     }
 
     @After

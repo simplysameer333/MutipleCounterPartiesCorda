@@ -145,8 +145,10 @@ public class AgreementNegotiationContract implements Contract {
                 }
 
                 //Accept will always output state, so need to test nul check
-                if (out.getNegotiationState() == AgreementNegotiationState.NegotiationStates.AMEND) {
+                if (out.getNegotiationState() == AgreementNegotiationState.NegotiationStates.FULLY_ACCEPTED) {
                     //checks  for AMEND state tx rules as output state
+                } else if (out.getNegotiationState() == AgreementNegotiationState.NegotiationStates.PARTIAL_ACCEPTED) {
+
                 }
                 //input can either be INITIAL OR AMEND
                 else if (in != null) {
@@ -154,12 +156,15 @@ public class AgreementNegotiationContract implements Contract {
                         //checks for INITIAL state tx rules as input state
                     } else if (in.getNegotiationState() == AgreementNegotiationState.NegotiationStates.AMEND) {
                         //checks  for AMEND state tx rules as input state
+                    } else if (in.getNegotiationState() == AgreementNegotiationState.NegotiationStates.PARTIAL_ACCEPTED) {
+
                     }
                 }
                 return null;
             });
         }
     }
+
 
     private static <T> T onlyElementOf(Iterable<T> iterable) {
         Iterator<T> iter = iterable.iterator();
@@ -168,5 +173,6 @@ public class AgreementNegotiationContract implements Contract {
             throw new IllegalArgumentException("Iterable has more than one element!");
         }
         return item;
+
     }
 }

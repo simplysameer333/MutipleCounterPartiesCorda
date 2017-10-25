@@ -31,19 +31,22 @@ app.controller('AgreementController', function($http, $location, $uibModal) {
     };
 	
 	demoApp.viewAgreement = (agreement) => {
-        const modalInstance = $uibModal.open({
-            templateUrl: 'viewAgreementModal.html',
-            controller: 'AgreementCtrl',
-            controllerAs: 'AgreementCtrl',
-            resolve: {
-                apiBaseURL: () => apiBaseURL,
-                agreement: () => agreement
-            }
-        });
-
-        modalInstance.result.then(() => {}, () => {});
+		$http.get(apiBaseURL + "getAgreement/"+agreement.agrementName)
+		.then(function(response) {
+			var newAgreement = response.data.state.data;
+			const modalInstance = $uibModal.open({
+				templateUrl: 'viewAgreementModal.html',
+				controller: 'AgreementCtrl',
+				controllerAs: 'AgreementCtrl',
+				resolve: {
+					apiBaseURL: () => apiBaseURL,
+					agreement: () => newAgreement
+				}
+			});
+			modalInstance.result.then(() => {}, () => {});
+		});
     };
-	
+
 	demoApp.amendAgreement = (agreement) => {
         const modalInstance = $uibModal.open({
             templateUrl: 'amendAgreementModal.html',
@@ -57,8 +60,8 @@ app.controller('AgreementController', function($http, $location, $uibModal) {
 
         modalInstance.result.then(() => {}, () => {});
     };
-	
-	
+
+
 	demoApp.viewAudit = (agreement) => {
         $http.get(apiBaseURL + "audit?agreementName=" + agreement.agrementName)
         .then(function(response) {
@@ -92,12 +95,12 @@ app.controller('ModalInstanceCtrl', function ($scope, $http, $location, $uibModa
             const agreement = {
                 agrementName: modalInstance.form.agrementName,
 				agreementValue: modalInstance.form.agreementValue,
-				agrementInitiationDate: modalInstance.form.agrementInitiationDate,
-				collateral: modalInstance.form.collateral
+				collateral: modalInstance.form.collateral,
+				counterparty: modalInstance.form.counterparty
             };
 
             $uibModalInstance.close();
-			
+
             const createIOUEndpoint = apiBaseURL + "initFlow/" +modalInstance.form.counterparty;
 
             // Create PO and handle success / fail responses.
@@ -129,20 +132,27 @@ app.controller('ModalInstanceCtrl', function ($scope, $http, $location, $uibModa
     }
 });
 
-app.controller('AgreementCtrl', function ($scope, $http, $location, $uibModalInstance, $uibModal, apiBaseURL, agreement) {
+app.controller('AgreementCtrl', function ($scope, $http, $location, $uibModalInstance, $uibModal, apiBaseURL, agreement)
+{
     const modalInstance = this;
-	$scope.agreement = agreement;	
+	$scope.agreement = agreement;
     // Validate and create IOU.
     $scope.agree = (agreement) => {
-		console.log('Called Create '+agreement);
-		
+		console.log('Called acceptFlow '+agreement);
+		var updAgreement ={
+			agrementName: agreement.agrementName,
+			agreementValue: agreement.agreementValue,
+			collateral: agreement.collateral
+		}
 
 		$uibModalInstance.close();
-		const createIOUEndpoint = apiBaseURL + "initFlow/" +modalInstance.form.counterparty;
+
+		const createIOUEndpoint = apiBaseURL + "acceptFlow";
+
 		// Create PO and handle success / fail responses.
-		$http.put(createIOUEndpoint, angular.toJson(agreement)).then(
-			(result) => modalInstance.displayMessage(result),
-			(result) => modalInstance.displayMessage(result)
+		$http.put(createIOUEndpoint, angular.toJson(updAgreement)).then(
+			(result) => $scope.displayMessage(result),
+			(result) => $scope.displayMessage(result)
 		);
 		//$scope.cancel();
     };
@@ -165,14 +175,13 @@ app.controller('AgreementCtrl', function ($scope, $http, $location, $uibModalIns
 
 app.controller('AmendAgreementCtrl', function ($scope, $http, $location, $uibModalInstance, $uibModal, apiBaseURL, agreement) {
     const modalInstance = this;
-	$scope.agreement = agreement;	
+	$scope.agreement = agreement;
     // Validate and create IOU.
     $scope.amendAgreement = (agreement) => {
-		console.log('Called Create '+agreement);
+		console.log('Called Amend '+agreement);
 		const updatedAgreement = {
 			agrementName: agreement.agrementName,
 			agreementValue: agreement.agreementValue,
-			agrementInitiationDate: agreement.agrementInitiationDate,
 			collateral: agreement.collateral
 		};
 
@@ -180,8 +189,8 @@ app.controller('AmendAgreementCtrl', function ($scope, $http, $location, $uibMod
 		const createIOUEndpoint = apiBaseURL + "amendFlow/" +$scope.agreement.cptyReciever;
 		// Create PO and handle success / fail responses.
 		$http.put(createIOUEndpoint, angular.toJson(updatedAgreement)).then(
-			(result) => modalInstance.displayMessage(result),
-			(result) => modalInstance.displayMessage(result)
+			(result) => $scope.displayMessage(result),
+			(result) => $scope.displayMessage(result)
 		);
 		//$scope.cancel();
     };

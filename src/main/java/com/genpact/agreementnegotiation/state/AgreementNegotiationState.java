@@ -28,21 +28,22 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
     private Double agreementValue = null;
     private String collateral = null;
     private Party lastUpdatedBy = null;
-
-
-    private Party cptyInitiator;
-    private Party cptyReciever;
+    private Party cptyInitiator = null;
+    private Party cptyReciever = null;
 
     private UniqueIdentifier linearId;
 
-    public AgreementNegotiationState(String name, Double value, String collateral,NegotiationStates agreementState,
+    public AgreementNegotiationState() {
+    }
+
+    public AgreementNegotiationState(String name, Double value, String collateral,
                                      Party cptyInitiator, Party cptyReciever) {
         this.agrementName = name;
         this.agrementLastAmendDate = null;
         this.agrementAgreedDate = null;
         this.agreementValue= value;
         this.collateral=collateral;
-        this.negotiationState= agreementState;
+        this.negotiationState = NegotiationStates.INITIAL;
         this.cptyInitiator = cptyInitiator;
         this.cptyReciever = cptyReciever;
     }
@@ -58,7 +59,7 @@ public class AgreementNegotiationState implements LinearState, QueryableState {
 
     public enum NegotiationStates
     {
-        INITIAL("INITIAL"), AMEND("AMEND"), ACCEPT("ACCEPT");
+        INITIAL("INITIAL"), AMEND("AMEND"), PARTIAL_ACCEPTED("PARTIAL ACCEPTED"), FULLY_ACCEPTED("FULLY ACCEPTED");
         private final String name;
 
         private NegotiationStates(String s) {
