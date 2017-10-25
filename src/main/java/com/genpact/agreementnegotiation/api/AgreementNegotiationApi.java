@@ -24,6 +24,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -150,6 +151,39 @@ public class AgreementNegotiationApi {
         QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
         return rpcOps.vaultQueryByCriteria(criteria, AgreementNegotiationState.class).getStates();
 
+    }
+
+    @GET
+    @Path("getAgreement/{agreementName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public StateAndRef<AgreementNegotiationState> getAgreement(@PathParam("agreementName") String agreementName) {
+        List<StateAndRef<AgreementNegotiationState>> result = new ArrayList<StateAndRef<AgreementNegotiationState>>();
+        try {
+            //QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
+            Field uniqueAttributeName = AgreementNegotiationSchema.PersistentIOU.class.getDeclaredField("agrementName");
+
+            CriteriaExpression uniqueAttributeEXpression = Builder.equal(uniqueAttributeName, agreementName);
+            QueryCriteria customCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression);
+            result = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class).getStates();
+            if(result.size() > 0)
+            {
+                return result.get(0);
+            }
+
+        } catch (Exception ex) {
+            System.out.println("Exception"+ex.toString());
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    @PUT
+    @Path("acceptFlow")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response acceptFlow(Agreement agreement) {
+        //TODO - agreement accept
+        String response = "Accepted Agreement";
+        return Response.ok(response, MediaType.APPLICATION_JSON).build();
     }
 
     /**

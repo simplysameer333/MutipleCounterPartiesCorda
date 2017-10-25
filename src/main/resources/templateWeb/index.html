@@ -37,8 +37,6 @@
     </div>
 	<form class="gp-firm-side-ui">
         <div class="modal-body">
-			
-			
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="col-lg-6">
@@ -60,27 +58,12 @@
 							<input type="text" ng-model="modalInstance.form.agrementName" class="form-control" id="address">
 							<label for="value" class="control-label">Agreement Value:</label>
 							<input type="number" ng-model="modalInstance.form.agreementValue" class="form-control" id="address">
-							<label for="value" class="control-label">Agreement Initiation Date:</label>
-							<input type="date" ng-model="modalInstance.form.agrementInitiationDate" class="form-control">
 							<label for="value" class="control-label">Collateral:</label>
 							<input type="text" ng-model="modalInstance.form.collateral" class="form-control" id="eligibleCollateral">
 						</div>
 					</div> 
 				</div> 
 			</div> 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-            
             <div ng-show="modalInstance.formError" class="form-group">
                 <div class="alert alert-danger" role="alert">
                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -94,12 +77,6 @@
 			<button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
         </div>
     </form>
-    
-	
-	
-	
-	
-    </div>
 </script>
 
 
@@ -185,7 +162,7 @@
 						<label for="value" class="control-label">Agreement Name:</label>
 						<input disabled type="text" ng-model="agreement.agrementName" class="form-control" id="address">
 						<label for="value" class="control-label">Agreement Value:</label>
-						<input type="text" ng-model="agreement.agreementValue" class="form-control" id="address">
+						<input type="number" ng-model="agreement.agreementValue" class="form-control" id="address">
 						<label for="value" class="control-label">Agreement Initiation Date:</label>
 						<input disabled type="text" ng-model="agreement.agrementInitiationDate" class="form-control">
 						<label for="value" class="control-label">Collateral:</label>
