@@ -193,14 +193,6 @@ public class AgreementNegotiationApi {
     }
 
 
-    @PUT
-    @Path("acceptFlow")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response acceptFlow(Agreement agreement) {
-        //TODO - agreement accept
-        String response = "Accepted Agreement";
-        return Response.ok(response, MediaType.APPLICATION_JSON).build();
-    }
 
     /**
      * Returns all parties registered with the [NetworkMapService]. These names can be used to look up identities
