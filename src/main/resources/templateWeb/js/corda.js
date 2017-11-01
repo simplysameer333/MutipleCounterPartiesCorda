@@ -84,6 +84,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $http, $location, $uibModa
 
     modalInstance.peers = peers;
     modalInstance.form = {};
+    modalInstance.agreement = {};
     modalInstance.formError = false;
 
     // Validate and create IOU.
@@ -94,18 +95,12 @@ app.controller('ModalInstanceCtrl', function ($scope, $http, $location, $uibModa
         } else {
             modalInstance.formError = false;
 
-            const agreement = {
-                agrementName: modalInstance.form.agrementName,
-				agreementValue: modalInstance.form.agreementValue,
-				collateral: modalInstance.form.collateral
-            };
-
             $uibModalInstance.close();
 			
             const createIOUEndpoint = apiBaseURL + "initFlow/" +modalInstance.form.counterparty;
 
             // Create PO and handle success / fail responses.
-            $http.put(createIOUEndpoint, angular.toJson(agreement)).then(
+            $http.put(createIOUEndpoint, angular.toJson(modalInstance.form)).then(
                 (result) => modalInstance.displayMessage(result),
                 (result) => modalInstance.displayMessage(result)
             );

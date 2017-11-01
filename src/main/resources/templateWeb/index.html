@@ -40,26 +40,63 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="col-lg-6">
-						<div class="form-group">
+						<!--div class="form-group">
 							<label for="sel1">Select Template:</label>
 							<select class="form-control">
 								<option>Agreement Template 1</option>
 								<option>Agreement Template 2</option>
 							</select>
-						</div>           
+						</div -->           
 					
-						<h4 class="modal-title gp-inner-title">Agreement 1</h4>
+						<h4 class="modal-title gp-inner-title">Agreement</h4>
 						
 						<div class="form-group">
-							<label for="value" class="control-label">CPTY:</label>
+							<label for="value" class="control-label">Counterparty:</label>
 							<select ng-model="modalInstance.form.counterparty" class="form-control" id="counterparty" ng-options="peer as peer for peer in modalInstance.peers">
 							</select>
-							<label for="value" class="control-label">Agreement Name:</label>
-							<input type="text" ng-model="modalInstance.form.agrementName" class="form-control" id="address">
-							<label for="value" class="control-label">Agreement Value:</label>
-							<input type="number" ng-model="modalInstance.form.agreementValue" class="form-control" id="address">
-							<label for="value" class="control-label">Collateral:</label>
-							<input type="text" ng-model="modalInstance.form.collateral" class="form-control" id="eligibleCollateral">
+							<label for="value" class="control-label">Base Currency:</label>
+							<input type="text" ng-model="modalInstance.form.baseCurrency" class="form-control" id="address">
+							<label for="value" class="control-label">Eligible Currency:</label>
+							<select ng-model="modalInstance.form.eligibleCurrency" class="form-control">
+								<option>GBP</option>
+								<option>EUR</option>
+								<option>USD</option>
+							</select>
+							<label for="value" class="control-label">Delivery Amount:</label>
+							<input type="number" ng-model="modalInstance.form.deliveryAmount" class="form-control" id="eligibleCollateral">
+							<label for="value" class="control-label">Return Amount:</label>
+							<input type="number" ng-model="modalInstance.form.returnAmount" class="form-control" id="address">
+							<label for="value" class="control-label">Credit Support Amount:</label>
+							<input type="number" ng-model="modalInstance.form.creditSupportAmount" class="form-control" id="address">
+							<label for="value" class="control-label">Eligible Collateral:</label>
+							<input type="text" ng-model="modalInstance.form.eligibleCollateral" class="form-control" id="address">
+							<label for="value" class="control-label">Valuation Percentage:</label>
+							<input type="number" min="1" max="100" ng-model="modalInstance.form.valuationPercentage" class="form-control" id="address">
+							<label for="value" class="control-label">Independent Amount:</label>
+							<input type="number" ng-model="modalInstance.form.independentAmount" class="form-control" id="address">
+							<label for="value" class="control-label">Threshold - Rating:</label>
+							<input type="text" ng-model="modalInstance.form.thresholdRating" class="form-control" id="address">
+							<label for="value" class="control-label">Threshold:</label>
+							<input type="number" ng-model="modalInstance.form.threshold" class="form-control" id="address">
+							<label for="value" class="control-label">Minimum Transfer Amount:</label>
+							<input type="number" ng-model="modalInstance.form.minimumTransferAmount" class="form-control" id="address">
+							<label for="value" class="control-label">Valuation Agent:</label>
+							<input type="text" ng-model="modalInstance.form.valuationAgent" class="form-control" id="address">
+							<label for="value" class="control-label">Valuation Date:</label>
+							<input type="date" ng-model="modalInstance.form.valuationDate" class="form-control" id="address">
+							<label for="value" class="control-label">Valuation Time:</label>
+							<input type="time" ng-model="modalInstance.form.valuationTime" class="form-control" id="address">
+							<label for="value" class="control-label">Notification Time:</label>
+							<input type="time" ng-model="modalInstance.form.notificationTime" class="form-control" id="address">
+							<label for="value" class="control-label">Specified Condition:</label>
+							<input type="text" ng-model="modalInstance.form.specifiedCondition" class="form-control" id="address">
+							<label for="value" class="control-label">Substitution Date:</label>
+							<input type="date" ng-model="modalInstance.form.substitutionDate" class="form-control" id="address">
+							<label for="value" class="control-label">Consent:</label>
+							<select ng-model="modalInstance.form.consent" class="form-control">
+								<option>yes</option>
+								<option>no</option>
+							</select>
 						</div>
 					</div> 
 				</div> 
