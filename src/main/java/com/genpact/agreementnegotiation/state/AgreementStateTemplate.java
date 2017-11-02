@@ -3,6 +3,7 @@ package com.genpact.agreementnegotiation.state;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.LinearState;
 import net.corda.core.contracts.UniqueIdentifier;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +23,7 @@ public class AgreementStateTemplate implements LinearState {
     private Party lastUpdatedBy = null;
     private Date agrementLastAmendDate = null;
     private AgreementEnumState status;
-    private String attachmentHash;
+    private List<SecureHash> attachmentHash;
 
     public AgreementStateTemplate() {
     }
@@ -109,11 +110,11 @@ public class AgreementStateTemplate implements LinearState {
         this.status = status;
     }
 
-    public String getAttachmentHash() {
+    public List<SecureHash> getAttachmentHash() {
         return attachmentHash;
     }
 
-    public void setAttachmentHash(String attachmentHash) {
+    public void setAttachmentHash(List<SecureHash> attachmentHash) {
         this.attachmentHash = attachmentHash;
     }
 

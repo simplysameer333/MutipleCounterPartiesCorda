@@ -55,6 +55,9 @@ public class AgreementNegotiationContract implements Contract {
                     final Party cptyA = out.getCptyInitiator();
                     final Party cptyB = out.getCptyReciever();
 
+                    System.out.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> cptyA " + cptyA);
+                    System.out.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> cptyB " + cptyB);
+
                     //   check.using("The Agreement Parameters's value must be Initialized.",out.getValue().isInitialized()==true);
                     check.using("The Initiator and the Reciever cannot be the same entity.", cptyA != cptyB);
 
@@ -62,6 +65,8 @@ public class AgreementNegotiationContract implements Contract {
                     check.using("There must only be two signer.", command.getSigners().size() == 2);
                     check.using("The signer must be the cptyA.", command.getSigners().containsAll(
                             ImmutableList.of(cptyA.getOwningKey(), cptyB.getOwningKey())));
+
+                    checkMandatoryFields(out);
 
                 } else {
                     check.using("The Initiator and the Reciever cannot be the same entity.", false);
@@ -81,9 +86,9 @@ public class AgreementNegotiationContract implements Contract {
 
                 //Amend will always output state, so need to test nul check
                 if (out.getStatus() == AgreementEnumState.AMEND) {
-                    //checks  for AMEND state tx rules as output state
+                    checkMandatoryFields(out);
                 }
-                //input can either be INITIAL OR ANMEND
+                //input can either be INITIAL OR AMEND
                 else if (in != null) {
                     if (in.getStatus() == AgreementEnumState.INITIAL) {
                         //checks all for INITIAL state tx rules as input state
@@ -199,5 +204,20 @@ public class AgreementNegotiationContract implements Contract {
                 return obj instanceof Attach;
             }
         }
+    }
+
+    private void checkMandatoryFields(AgreementNegotiationState out) {
+        requireThat(check -> {
+
+            check.using("Base Currency cannot be empty", out.getBaseCurrency() != null);
+            check.using("Delivery Amount cannot be empty", out.getDeliveryAmount() != null);
+            check.using("Return Amount cannot be empty", out.getReturnAmount() != null);
+            check.using("Eligible Collateral cannot be empty", out.getEligibleCollateral() != null);
+            check.using("Valuation Percentage cannot be less than 0", out.getValuationPercentage() != -99);
+            check.using("Independent Amount Amount cannot be empty", out.getIndependentAmount().signum() != -99);
+            check.using("Minimum Transfer Amount cannot be empty", out.getMinimumTransferAmount() != null);
+
+            return null;
+        });
     }
 }

@@ -1,6 +1,8 @@
 package com.genpact.agreementnegotiation.state;
 
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
+import com.genpact.agreementnegotiation.utils.AgreementUtil;
+import com.google.common.collect.ImmutableList;
 import net.corda.core.identity.Party;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
@@ -10,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Define your state object here.
@@ -18,22 +21,22 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
 
-    private BigDecimal baseCurrency;
-    private BigDecimal eligibleCurrency;
-    private BigDecimal deliveryAmount;
-    private BigDecimal returnAmount;
-    private BigDecimal creditSupportAmount;
+    private String baseCurrency;
+    private List<String> eligibleCurrency;
+    private String deliveryAmount;
+    private String returnAmount;
+    private String creditSupportAmount;
     private String eligibleCollateral;
-    private double valuationPercentage;
-    private BigDecimal independentAmount;
+    private double valuationPercentage = -99;
+    private BigDecimal independentAmount = new BigDecimal(-99);
     private String thresholdRating;
-    private BigDecimal threshold;
+    private String threshold;
     private BigDecimal minimumTransferAmount;
     private String valuationAgent;
-    private Date valuationDate;
+    private String valuationDate;
     private Date valuationTime;
     private Date notificationTime;
-    private String specifiedCondition;
+    private List<String> specifiedCondition;
     private Date substitutionDate;
     private Boolean consent;
 
@@ -41,12 +44,12 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         super();
     }
 
-    public AgreementNegotiationState(BigDecimal baseCurrency, BigDecimal eligibleCurrency,
-                                     BigDecimal deliveryAmount, BigDecimal returnAmount, BigDecimal creditSupportAmount,
+    public AgreementNegotiationState(String baseCurrency, List<String> eligibleCurrency,
+                                     String deliveryAmount, String returnAmount, String creditSupportAmount,
                                      String eligibleCollateral, double valuationPercentage, BigDecimal independentAmount,
-                                     String thresholdRating, BigDecimal threshold, BigDecimal minimumTransferAmount,
-                                     String valuationAgent, Date valuationDate, Date valuationTime, Date notificationTime,
-                                     String specifiedCondition, Date substitutionDate, Boolean consent,
+                                     String thresholdRating, String threshold, BigDecimal minimumTransferAmount,
+                                     String valuationAgent, String valuationDate, Date valuationTime, Date notificationTime,
+                                     List<String> specifiedCondition, Date substitutionDate, Boolean consent,
                                      String agrementName, Date agrementInitiationDate,
                                      Date agrementAgreedDate, Party cptyInitiator, Party cptyReciever, Party lastUpdatedBy,
                                      Date agrementLastAmendDate, AgreementEnumState status) {
@@ -74,43 +77,43 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.consent = consent;
     }
 
-    public BigDecimal getBaseCurrency() {
+    public String getBaseCurrency() {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(BigDecimal baseCurrency) {
+    public void setBaseCurrency(String baseCurrency) {
         this.baseCurrency = baseCurrency;
     }
 
-    public BigDecimal getEligibleCurrency() {
+    public List<String> getEligibleCurrency() {
         return eligibleCurrency;
     }
 
-    public void setEligibleCurrency(BigDecimal eligibleCurrency) {
+    public void setEligibleCurrency(List<String> eligibleCurrency) {
         this.eligibleCurrency = eligibleCurrency;
     }
 
-    public BigDecimal getDeliveryAmount() {
+    public String getDeliveryAmount() {
         return deliveryAmount;
     }
 
-    public void setDeliveryAmount(BigDecimal deliveryAmount) {
+    public void setDeliveryAmount(String deliveryAmount) {
         this.deliveryAmount = deliveryAmount;
     }
 
-    public BigDecimal getReturnAmount() {
+    public String getReturnAmount() {
         return returnAmount;
     }
 
-    public void setReturnAmount(BigDecimal returnAmount) {
+    public void setReturnAmount(String returnAmount) {
         this.returnAmount = returnAmount;
     }
 
-    public BigDecimal getCreditSupportAmount() {
+    public String getCreditSupportAmount() {
         return creditSupportAmount;
     }
 
-    public void setCreditSupportAmount(BigDecimal creditSupportAmount) {
+    public void setCreditSupportAmount(String creditSupportAmount) {
         this.creditSupportAmount = creditSupportAmount;
     }
 
@@ -146,11 +149,11 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.thresholdRating = thresholdRating;
     }
 
-    public BigDecimal getThreshold() {
+    public String getThreshold() {
         return threshold;
     }
 
-    public void setThreshold(BigDecimal threshold) {
+    public void setThreshold(String threshold) {
         this.threshold = threshold;
     }
 
@@ -170,11 +173,11 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.valuationAgent = valuationAgent;
     }
 
-    public Date getValuationDate() {
+    public String getValuationDate() {
         return valuationDate;
     }
 
-    public void setValuationDate(Date valuationDate) {
+    public void setValuationDate(String valuationDate) {
         this.valuationDate = valuationDate;
     }
 
@@ -194,11 +197,11 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.notificationTime = notificationTime;
     }
 
-    public String getSpecifiedCondition() {
+    public List<String> getSpecifiedCondition() {
         return specifiedCondition;
     }
 
-    public void setSpecifiedCondition(String specifiedCondition) {
+    public void setSpecifiedCondition(List<String> specifiedCondition) {
         this.specifiedCondition = specifiedCondition;
     }
 
@@ -221,7 +224,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     @NotNull
     @Override
     public Iterable<MappedSchema> supportedSchemas() {
-        return null;
+        return ImmutableList.of(new AgreementNegotiationSchema());
     }
 
     @NotNull
@@ -239,7 +242,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
                     this.getCptyInitiator().getName().getCommonName(),
                     this.getCptyReciever().getName().getCommonName(),
                     this.baseCurrency,
-                    this.eligibleCurrency,
+                    AgreementUtil.getDelimiterSepratedStringFromList(this.eligibleCurrency, ","),
                     this.deliveryAmount,
                     this.returnAmount,
                     this.creditSupportAmount,
@@ -253,7 +256,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
                     this.valuationDate,
                     this.valuationTime,
                     this.notificationTime,
-                    this.specifiedCondition,
+                    AgreementUtil.getDelimiterSepratedStringFromList(this.specifiedCondition, ","),
                     this.substitutionDate,
                     this.consent
             );

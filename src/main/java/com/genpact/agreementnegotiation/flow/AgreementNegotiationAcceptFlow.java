@@ -67,7 +67,6 @@ public class AgreementNegotiationAcceptFlow {
                 return CollectSignaturesFlow.tracker();
             }
         };
-        private static final Step VERIFYING_SIGS = new Step("Verifying a transaction's signatures.");
         private static final Step FINALISATION = new Step("Finalising a transaction.") {
             @Override
             public ProgressTracker childProgressTracker() {
@@ -152,7 +151,6 @@ public class AgreementNegotiationAcceptFlow {
                     agreementNegotiationState.setStatus(AgreementEnumState.FULLY_ACCEPTED);
                 }
 
-                String outputContract = AgreementNegotiationContract.class.getName();
                 List<PublicKey> requiredSigners = ImmutableList.of(otherParty.getOwningKey(), previousState.getCptyInitiator().getOwningKey());
 
                 Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Accept(), requiredSigners);
@@ -160,13 +158,6 @@ public class AgreementNegotiationAcceptFlow {
                 StateAndContract outputSateAndContract = new StateAndContract(agreementNegotiationState, TEMPLATE_CONTRACT_ID);
 
                 txBuilder.withItems(previousStatesAndRef, outputSateAndContract, cmd);
-
-                // We add the items to the builder.
-                //  txBuilder.addOutputState(agreementNegotiationState, TEMPLATE_CONTRACT_ID);
-                // txBuilder.addInputState(previousStatesAndRef);
-                //txBuilder.addCommand(cmd);
-
-                progressTracker.setCurrentStep(TX_VERIFICATION);
 
                 progressTracker.setCurrentStep(TX_SIGNING);
                 // Signing the transaction.

@@ -1,9 +1,10 @@
 package com.genpact.agreementnegotiation.api;
 
+import com.genpact.agreementnegotiation.dummydata.DummyData;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAcceptFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
-import com.genpact.agreementnegotiation.flow.AgreementNegotiationAttachFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
+import com.genpact.agreementnegotiation.model.Agreement;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
@@ -64,53 +65,38 @@ public class AgreementNegotiationApi {
     @PUT
     @Path("initFlow/{partyName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startInitFlow(AgreementNegotiationState agreement, @PathParam("partyName") CordaX500Name partyName) {
+    public Response startInitFlow(Agreement agreement, @PathParam("partyName") CordaX500Name partyName) {
 
         try {
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
+            AgreementNegotiationState agreementDummy = DummyData.getDummyDataForAgreementNegotiationState();
+            agreementDummy.setCptyInitiator(rpcOps.wellKnownPartyFromX500Name(myLegalName));
+
+            if (agreement.getAttachmentHash() != null && !agreement.getAttachmentHash().isEmpty()) {
+                List<SecureHash> attachmentHashes = new ArrayList<SecureHash>();
+                for (String url : agreement.getAttachmentHash()) {
+                    SecureHash ourAttachmentHash = null;
+                    try {
+                        InputStream inputStream = new FileInputStream(new File(
+                                "C:\\Users\\hamesam\\Downloads\\tomcat.zip"));
+                        ourAttachmentHash = rpcOps.uploadAttachment(inputStream);
+                        attachmentHashes.add(ourAttachmentHash);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                        //TODO add handling
+                    }
+                }
+                if (!attachmentHashes.isEmpty()) {
+                    agreementDummy.setAttachmentHash(attachmentHashes);
+                }
+            }
+
+
 
             //get the attachment path
-            SecureHash ourAttachmentHash = null;
-            try {
-                InputStream inputStream = new FileInputStream(new File("G:\\cordapp-template-java-release-V1.zip"));
-                ourAttachmentHash = rpcOps.uploadAttachment(inputStream);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                //TODO add handling
-            }
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationAttachFlow.Initiator.class, agreement,
-                            agreement.getCptyReciever(), ourAttachmentHash);
-
-            flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
-
-            // The line below blocks and waits for the flow to return.
-            final SignedTransaction result = flowHandle.getReturnValue().get();
-
-            final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
-            System.out.println("message " + msg);
-
-            return Response.ok("startInitFlow GET endpoint.").build();
-        } catch (Throwable ex) {
-            System.out.println("Exception"+ex.toString());
-        }
-        return Response.ok("ERROR  GET endpoint.").build();
-    }
-
-    /**
-     * Accessible at /api/template/<party>/initFlow.
-     */
-    @PUT
-    @Path("initFlow2/{partyName}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response startAttachFlow(AgreementNegotiationState agreement, @PathParam("partyName") CordaX500Name partyName) {
-
-        try {
-            final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
-
-            FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreement,
-                            agreement.getCptyReciever());
+                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreementDummy,
+                            rpcOps.wellKnownPartyFromX500Name(agreement.getCounterparty()));
 
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 

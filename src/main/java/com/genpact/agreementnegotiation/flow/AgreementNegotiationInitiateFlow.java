@@ -8,6 +8,8 @@ import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndContract;
+import net.corda.core.contracts.UniqueIdentifier;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
@@ -62,7 +64,6 @@ public class AgreementNegotiationInitiateFlow {
                 return CollectSignaturesFlow.tracker();
             }
         };
-        private static final ProgressTracker.Step VERIFYING_SIGS = new ProgressTracker.Step("Verifying a transaction's signatures.");
         private static final ProgressTracker.Step FINALISATION = new ProgressTracker.Step("Finalising a transaction.") {
             @Override
             public ProgressTracker childProgressTracker() {
@@ -101,9 +102,11 @@ public class AgreementNegotiationInitiateFlow {
             txBuilder.setNotary(notary);
 
             // We create the transaction components.
+            agreementNegotiationState.setLinearId(new UniqueIdentifier());
             agreementNegotiationState.setAgrementLastAmendDate(new Date());
-            agreementNegotiationState.setLastUpdatedBy(agreementNegotiationState.getCptyInitiator());
+            agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
             agreementNegotiationState.setStatus(AgreementEnumState.INITIAL);
+            agreementNegotiationState.setCptyReciever(otherParty);
 
             StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, TEMPLATE_CONTRACT_ID);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
@@ -111,6 +114,12 @@ public class AgreementNegotiationInitiateFlow {
 
             // We add the items to the builder.
             txBuilder.withItems(outputContractAndState, cmd);
+            if (agreementNegotiationState.getAttachmentHash() != null &&
+                    !agreementNegotiationState.getAttachmentHash().isEmpty()) {
+                for (SecureHash secureHasId : agreementNegotiationState.getAttachmentHash()) {
+                    txBuilder.addAttachment(secureHasId);
+                }
+            }
 
             // Verifying the transaction.
             progressTracker.setCurrentStep(TX_VERIFICATION);
@@ -164,10 +173,7 @@ public class AgreementNegotiationInitiateFlow {
                     });
                 }
             }
-
-
             return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
-
         }
     }
 }

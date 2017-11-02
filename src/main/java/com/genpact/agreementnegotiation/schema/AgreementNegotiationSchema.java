@@ -3,7 +3,6 @@ package com.genpact.agreementnegotiation.schema;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
-import net.corda.core.schemas.PersistentStateRef;
 import net.corda.core.serialization.CordaSerializable;
 
 import javax.persistence.Column;
@@ -54,19 +53,19 @@ public class AgreementNegotiationSchema extends MappedSchema {
         private String cptyReciever;
 
         @Column(name = "baseCurrency")
-        private BigDecimal baseCurrency;
+        private String baseCurrency;
 
         @Column(name = "eligibleCurrency")
-        private BigDecimal eligibleCurrency;
+        private String eligibleCurrency;
 
         @Column(name = "deliveryAmount")
-        private BigDecimal deliveryAmount;
+        private String deliveryAmount;
 
         @Column(name = "returnAmount")
-        private BigDecimal returnAmount;
+        private String returnAmount;
 
         @Column(name = "creditSupportAmount")
-        private BigDecimal creditSupportAmount;
+        private String creditSupportAmount;
 
         @Column(name = "eligibleCollateral")
         private String eligibleCollateral;
@@ -81,7 +80,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
         private String thresholdRating;
 
         @Column(name = "threshold")
-        private BigDecimal threshold;
+        private String threshold;
 
         @Column(name = "minimumTransferAmount")
         private BigDecimal minimumTransferAmount;
@@ -90,7 +89,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
         private String valuationAgent;
 
         @Column(name = "valuationDate")
-        private Date valuationDate;
+        private String valuationDate;
 
         @Column(name = "valuationTime")
         private Date valuationTime;
@@ -107,20 +106,29 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @Column(name = "consent")
         private Boolean consent;
 
-        public PersistentIOU(UUID id, String agrementName, Date agrementInitiationDate, Date agrementAgreedDate, String commonName, Date agrementLastAmendDate, String s, String name, String commonName1, BigDecimal baseCurrency, BigDecimal eligibleCurrency, BigDecimal deliveryAmount, BigDecimal returnAmount, BigDecimal creditSupportAmount, String eligibleCollateral, double valuationPercentage, BigDecimal independentAmount, String thresholdRating, BigDecimal threshold, BigDecimal minimumTransferAmount, String valuationAgent, Date valuationDate, Date valuationTime, Date notificationTime, String specifiedCondition, Date substitutionDate, Boolean consent) {
+        /*  public PersistentIOU(UUID id, String agrementName,
+                               Date agrementInitiationDate, Date agrementAgreedDate,
+                               String commonName, Date agrementLastAmendDate, String s,
+                               String name, String commonName1, BigDecimal baseCurrency,
+                               BigDecimal eligibleCurrency, BigDecimal deliveryAmount, BigDecimal
+                                       returnAmount, BigDecimal creditSupportAmount, String eligibleCollateral,
+                               double valuationPercentage, BigDecimal independentAmount, String thresholdRating,
+                               BigDecimal threshold, BigDecimal minimumTransferAmount, String valuationAgent,
+                               Date valuationDate, Date valuationTime, Date notificationTime,
+                               String specifiedCondition, Date substitutionDate, Boolean consent) {
 
-        }
-
-        public PersistentIOU(PersistentStateRef stateRef, UUID linearId, String agrementName,
+          }
+  */
+        public PersistentIOU(UUID linearId, String agrementName,
                              Date agrementInitiationDate, Date agrementAgreedDate, String lastUpdatedBy,
                              Date agrementLastAmendDate, String negotiationState, String cptyInitiator,
-                             String cptyReciever, BigDecimal baseCurrency, BigDecimal eligibleCurrency,
-                             BigDecimal deliveryAmount, BigDecimal returnAmount, BigDecimal creditSupportAmount,
+                             String cptyReciever, String baseCurrency, String eligibleCurrency,
+                             String deliveryAmount, String returnAmount, String creditSupportAmount,
                              String eligibleCollateral, double valuationPercentage, BigDecimal independentAmount,
-                             String thresholdRating, BigDecimal threshold, BigDecimal minimumTransferAmount,
-                             String valuationAgent, Date valuationDate, Date valuationTime, Date notificationTime,
+                             String thresholdRating, String threshold, BigDecimal minimumTransferAmount,
+                             String valuationAgent, String valuationDate, Date valuationTime, Date notificationTime,
                              String specifiedCondition, Date substitutionDate, Boolean consent) {
-            super(stateRef);
+
             this.linearId = linearId;
             this.agrementName = agrementName;
             this.agrementInitiationDate = agrementInitiationDate;
@@ -222,43 +230,43 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.cptyReciever = cptyReciever;
         }
 
-        public BigDecimal getBaseCurrency() {
+        public String getBaseCurrency() {
             return baseCurrency;
         }
 
-        public void setBaseCurrency(BigDecimal baseCurrency) {
+        public void setBaseCurrency(String baseCurrency) {
             this.baseCurrency = baseCurrency;
         }
 
-        public BigDecimal getEligibleCurrency() {
+        public String getEligibleCurrency() {
             return eligibleCurrency;
         }
 
-        public void setEligibleCurrency(BigDecimal eligibleCurrency) {
+        public void setEligibleCurrency(String eligibleCurrency) {
             this.eligibleCurrency = eligibleCurrency;
         }
 
-        public BigDecimal getDeliveryAmount() {
+        public String getDeliveryAmount() {
             return deliveryAmount;
         }
 
-        public void setDeliveryAmount(BigDecimal deliveryAmount) {
+        public void setDeliveryAmount(String deliveryAmount) {
             this.deliveryAmount = deliveryAmount;
         }
 
-        public BigDecimal getReturnAmount() {
+        public String getReturnAmount() {
             return returnAmount;
         }
 
-        public void setReturnAmount(BigDecimal returnAmount) {
+        public void setReturnAmount(String returnAmount) {
             this.returnAmount = returnAmount;
         }
 
-        public BigDecimal getCreditSupportAmount() {
+        public String getCreditSupportAmount() {
             return creditSupportAmount;
         }
 
-        public void setCreditSupportAmount(BigDecimal creditSupportAmount) {
+        public void setCreditSupportAmount(String creditSupportAmount) {
             this.creditSupportAmount = creditSupportAmount;
         }
 
@@ -294,11 +302,11 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.thresholdRating = thresholdRating;
         }
 
-        public BigDecimal getThreshold() {
+        public String getThreshold() {
             return threshold;
         }
 
-        public void setThreshold(BigDecimal threshold) {
+        public void setThreshold(String threshold) {
             this.threshold = threshold;
         }
 
@@ -318,11 +326,11 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.valuationAgent = valuationAgent;
         }
 
-        public Date getValuationDate() {
+        public String getValuationDate() {
             return valuationDate;
         }
 
-        public void setValuationDate(Date valuationDate) {
+        public void setValuationDate(String valuationDate) {
             this.valuationDate = valuationDate;
         }
 

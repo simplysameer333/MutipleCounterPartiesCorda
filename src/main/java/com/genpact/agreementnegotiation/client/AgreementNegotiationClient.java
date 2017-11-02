@@ -3,7 +3,6 @@ package com.genpact.agreementnegotiation.client;
 import com.genpact.agreementnegotiation.dummydata.DummyData;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAcceptFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
-import com.genpact.agreementnegotiation.flow.AgreementNegotiationAttachFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
@@ -76,20 +75,13 @@ public class AgreementNegotiationClient {
             flowHandle = proxy.startTrackedFlowDynamic(AgreementNegotiationAcceptFlow.Initiator.class,
                     agreeNegotiationState, cptyReciever);
 
-        }
-        else if(args[2].equals( "INITIAL")) {
+        } else if (args[2].equals("INITIAL")) {
             System.out.println("Initiating Initiate Flow for Parameters" + args[3]);
 
             AgreementNegotiationState initiateNegotiationState = DummyData.getDummyDataForAgreementNegotiationState();
             initiateNegotiationState.setStatus(AgreementEnumState.INITIAL);
 
             flowHandle= proxy.startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, initiateNegotiationState, cptyReciever);
-
-        } else if (args[2].equals("ATTACH")) {
-            AgreementNegotiationState initiateNegotiationState = DummyData.getDummyDataForAgreementNegotiationState();
-            initiateNegotiationState.setStatus(AgreementEnumState.INITIAL);
-
-            flowHandle = proxy.startTrackedFlowDynamic(AgreementNegotiationAttachFlow.Initiator.class, initiateNegotiationState, cptyReciever);
 
         } else {
 

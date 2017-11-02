@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AgreementUtil {
     public static <T> void copyAllFields(T to, T from) {
@@ -29,6 +30,13 @@ public class AgreementUtil {
             aClass = aClass.getSuperclass();
         } while (aClass != null);
         return fields;
+    }
+
+    public static String getDelimiterSepratedStringFromList(List<String> list, String delimiter) {
+        if (list != null) {
+            return list.stream().map(Object::toString).collect(Collectors.joining(delimiter));
+        }
+        return null;
     }
 
 }
