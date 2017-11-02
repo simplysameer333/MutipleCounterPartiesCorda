@@ -1,5 +1,7 @@
 package com.genpact.agreementnegotiation.flow;
 
+import com.genpact.agreementnegotiation.dummydata.DummyData;
+import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import net.corda.node.internal.StartedNode;
 import net.corda.testing.node.MockNetwork;
@@ -32,12 +34,12 @@ public class AgreementNegotiationFlowTests {
         for (StartedNode<MockNode> node : nodes.getPartyNodes()) {
             node.registerInitiatedFlow(AgreementNegotiationInitiateFlow.Responder.class);
             node.registerInitiatedFlow(AgreementNegotiationAmendFlow.Responder.class);
+            node.registerInitiatedFlow(AgreementNegotiationAttachFlow.Responder.class);
         }
         network.runNetwork();
 
-         iouValue = new AgreementNegotiationState("name", 11.1,
-                 "collateral", a.getInfo().getLegalIdentities().get(0), b.getInfo().getLegalIdentities().get(0));
-        iouValue.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
+        iouValue = DummyData.getDummyDataForAgreementNegotiationState();
+        iouValue.setStatus(AgreementEnumState.INITIAL);
     }
 
     @After

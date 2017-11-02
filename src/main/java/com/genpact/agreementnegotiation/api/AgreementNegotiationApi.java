@@ -2,13 +2,14 @@ package com.genpact.agreementnegotiation.api;
 
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAcceptFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
+import com.genpact.agreementnegotiation.flow.AgreementNegotiationAttachFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
-import com.genpact.agreementnegotiation.model.Agreement;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.corda.core.contracts.StateAndRef;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
@@ -19,12 +20,16 @@ import net.corda.core.node.services.vault.Builder;
 import net.corda.core.node.services.vault.CriteriaExpression;
 import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -59,19 +64,23 @@ public class AgreementNegotiationApi {
     @PUT
     @Path("initFlow/{partyName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startInitFlow(Agreement agreement, @PathParam("partyName") CordaX500Name partyName) {
+    public Response startInitFlow(AgreementNegotiationState agreement, @PathParam("partyName") CordaX500Name partyName) {
 
         try {
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
 
-            //create state
-
-            AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState(agreement.getAgrementName(),
-                    (double) agreement.getAgreementValue(), agreement.getCollateral(), otherParty,
-                    rpcOps.wellKnownPartyFromX500Name(agreement.getCounterparty()));
-
+            //get the attachment path
+            SecureHash ourAttachmentHash = null;
+            try {
+                InputStream inputStream = new FileInputStream(new File("G:\\cordapp-template-java-release-V1.zip"));
+                ourAttachmentHash = rpcOps.uploadAttachment(inputStream);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                //TODO add handling
+            }
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreementNegotiationState, agreementNegotiationState.getCptyReciever());
+                    .startTrackedFlowDynamic(AgreementNegotiationAttachFlow.Initiator.class, agreement,
+                            agreement.getCptyReciever(), ourAttachmentHash);
 
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
@@ -88,6 +97,35 @@ public class AgreementNegotiationApi {
         return Response.ok("ERROR  GET endpoint.").build();
     }
 
+    /**
+     * Accessible at /api/template/<party>/initFlow.
+     */
+    @PUT
+    @Path("initFlow2/{partyName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response startAttachFlow(AgreementNegotiationState agreement, @PathParam("partyName") CordaX500Name partyName) {
+
+        try {
+            final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
+
+            FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
+                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreement,
+                            agreement.getCptyReciever());
+
+            flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
+
+            // The line below blocks and waits for the flow to return.
+            final SignedTransaction result = flowHandle.getReturnValue().get();
+
+            final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
+            System.out.println("message " + msg);
+
+            return Response.ok("startInitFlow GET endpoint.").build();
+        } catch (Throwable ex) {
+            System.out.println("Exception" + ex.toString());
+        }
+        return Response.ok("ERROR  GET endpoint.").build();
+    }
 
     /**
      * Accessible at /api/template/<party>/amendFlow.
@@ -95,17 +133,17 @@ public class AgreementNegotiationApi {
     @PUT
     @Path("amendFlow/{partyName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startAmendFlow(Agreement agreement, @PathParam("partyName") String partyName) {
+    public Response startAmendFlow(AgreementNegotiationState agreement, @PathParam("partyName") String partyName) {
         try {
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
 
             //create state
-            AgreementNegotiationState iouValue = new AgreementNegotiationState(agreement.getAgrementName(),
+            /*AgreementNegotiationState iouValue = new AgreementNegotiationState(agreement.getAgrementName(),
                     (double) agreement.getAgreementValue(), agreement.getCollateral(),
                     rpcOps.nodeInfo().getLegalIdentities().get(0), otherParty);
-
+            */
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, iouValue,
+                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, agreement,
                             rpcOps.nodeInfo().getLegalIdentities().get(0));
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
@@ -129,17 +167,17 @@ public class AgreementNegotiationApi {
     @PUT
     @Path("acceptFlow")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response accept(Agreement agreement) {
+    public Response accept(AgreementNegotiationState agreement) {
         try {
 
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
 
             //create state
-            AgreementNegotiationState iouValue = new AgreementNegotiationState();
+          /*  AgreementNegotiationState iouValue = new AgreementNegotiationState();
             iouValue.setAgrementName(agreement.getAgrementName());
-
+*/
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationAcceptFlow.Initiator.class, iouValue,
+                    .startTrackedFlowDynamic(AgreementNegotiationAcceptFlow.Initiator.class, agreement,
                             otherParty);
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
@@ -190,16 +228,6 @@ public class AgreementNegotiationApi {
             ex.printStackTrace();
         }
         return null;
-    }
-
-
-    @PUT
-    @Path("acceptFlow")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response acceptFlow(Agreement agreement) {
-        //TODO - agreement accept
-        String response = "Accepted Agreement";
-        return Response.ok(response, MediaType.APPLICATION_JSON).build();
     }
 
     /**

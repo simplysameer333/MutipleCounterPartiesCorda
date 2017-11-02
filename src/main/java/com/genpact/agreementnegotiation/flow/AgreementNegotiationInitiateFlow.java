@@ -2,12 +2,12 @@ package com.genpact.agreementnegotiation.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
+import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndContract;
-import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
@@ -18,6 +18,7 @@ import java.security.PublicKey;
 import java.util.Date;
 import java.util.List;
 
+import static com.genpact.agreementnegotiation.contract.AgreementNegotiationContract.TEMPLATE_CONTRACT_ID;
 import static net.corda.core.contracts.ContractsDSL.requireThat;
 
 /**
@@ -90,7 +91,6 @@ public class AgreementNegotiationInitiateFlow {
         @Suspendable
         @Override public SignedTransaction call() throws FlowException{
 
-
             progressTracker.setCurrentStep(ID_OTHER_NODES);
             // We retrieve the notary identity from the network map.
             final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
@@ -101,25 +101,19 @@ public class AgreementNegotiationInitiateFlow {
             txBuilder.setNotary(notary);
 
             // We create the transaction components.
-            agreementNegotiationState.setLinearId(new UniqueIdentifier());
-            agreementNegotiationState.setAgrementInitiationDate(new Date());
-            agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
+            agreementNegotiationState.setAgrementLastAmendDate(new Date());
+            agreementNegotiationState.setLastUpdatedBy(agreementNegotiationState.getCptyInitiator());
+            agreementNegotiationState.setStatus(AgreementEnumState.INITIAL);
 
-            //outputState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
-            //agreementNegotiationState.setAgrementLastAmendDate(new Date());
-            //agreementNegotiationState.setLastUpdatedBy(agreementNegotiationState.getCptyInitiator());
-            agreementNegotiationState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
-
-            String outputContract = AgreementNegotiationContract.class.getName();
-            StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, outputContract);
+            StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, TEMPLATE_CONTRACT_ID);
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
             Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Initiate(), requiredSigners);
-
 
             // We add the items to the builder.
             txBuilder.withItems(outputContractAndState, cmd);
 
             // Verifying the transaction.
+            progressTracker.setCurrentStep(TX_VERIFICATION);
             txBuilder.verify(getServiceHub());
 
             // Signing the transaction.
@@ -159,16 +153,18 @@ public class AgreementNegotiationInitiateFlow {
                 }
 
                 @Override
-                protected void checkTransaction(SignedTransaction stx) {
+                protected void checkTransaction(SignedTransaction stx) throws FlowException {
+
                     requireThat(require -> {
                         ContractState output = stx.getTx().getOutputs().get(0).getData();
                         require.using("This must be an Agreement Negotiation transaction.", output instanceof AgreementNegotiationState);
-                        AgreementNegotiationState agreementNegotiationState = (AgreementNegotiationState) output;
-                        require.using("The Agreement State Object is not Initialized.", agreementNegotiationState.isInitialized()==true);
+                        //  AgreementNegotiationState agreementNegotiationState = (AgreementNegotiationState) output;
+                        // require.using("The Agreement State Object is not Initialized.", agreementNegotiationState.isInitialized());
                         return null;
                     });
                 }
             }
+
 
             return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
 

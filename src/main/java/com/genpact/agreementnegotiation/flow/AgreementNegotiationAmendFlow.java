@@ -3,7 +3,9 @@ package com.genpact.agreementnegotiation.flow;
 import co.paralleluniverse.fibers.Suspendable;
 import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
+import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
+import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndRef;
@@ -21,7 +23,6 @@ import net.corda.core.utilities.ProgressTracker.Step;
 
 import java.lang.reflect.Field;
 import java.security.PublicKey;
-import java.util.Date;
 import java.util.List;
 
 
@@ -119,6 +120,7 @@ public class AgreementNegotiationAmendFlow {
                 StateAndRef<AgreementNegotiationState>  previousStatesAndRef= previousStates.get(0);
                 AgreementNegotiationState previousState= previousStatesAndRef.getState().getData();
 
+
                 progressTracker.setCurrentStep(TX_BUILDING);
                 // We create a transaction builder.
                 final TransactionBuilder txBuilder = new TransactionBuilder();
@@ -126,14 +128,15 @@ public class AgreementNegotiationAmendFlow {
 
                 progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
                 // We create the transaction components.
-                agreementNegotiationState.setAgrementInitiationDate(previousState.getInitiateDate());
+               /* agreementNegotiationState.setAgrementInitiationDate(previousState.getInitiateDate());
                 agreementNegotiationState.setCptyReciever(previousState.getCptyReciever());
                 agreementNegotiationState.setCptyInitiator(previousState.getCptyInitiator());
                 agreementNegotiationState.setLinearId(previousState.getLinearId());
                 agreementNegotiationState.setAgrementLastAmendDate(new Date());
-                agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
+                agreementNegotiationState.setLastUpdatedBy(getOurIdentity());*/
 
-                agreementNegotiationState.setNegotiationState(AgreementNegotiationState.NegotiationStates.AMEND);
+                AgreementUtil.copyAllFields(agreementNegotiationState, previousState);
+                agreementNegotiationState.setStatus(AgreementEnumState.AMEND);
 
                 //agreementNegotiationState.setAgrementLastAmendDate(new Date());
                 //agreementNegotiationState.setLastUpdatedBy(otherParty);

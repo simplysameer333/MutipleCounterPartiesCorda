@@ -2,11 +2,13 @@ package com.genpact.agreementnegotiation.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
+import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndContract;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
@@ -22,69 +24,100 @@ import static net.corda.core.contracts.ContractsDSL.requireThat;
 /**
  * Define your flow here.
  */
-public class AgreementNegotiationAgreeFlow {
+public class AgreementNegotiationAttachFlow {
     /**
      * You can add a constructor to each FlowLogic subclass to pass objects into the flow.
      */
     @InitiatingFlow
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction> {
-       // private final AgreementNegotiationParams agreementParams;
-
-        private final Party otherParty;
-        private String agrementName = null;
-        private Date agrementInitiationDate = null;
-        private Date agrementLastAmendDate = null;
-        private Date agrementAgreedDate = null;
-        private Double agreementValue = null;
-        private String collateral = null;
 
         /**
          * The progress tracker provides checkpoints indicating the progress of the flow to observers.
          */
-        private final ProgressTracker progressTracker = new ProgressTracker();
-        public Initiator(String name, Date initialDate, Double value, String collateral, Party otherParty) {
+        private static final ProgressTracker.Step ID_OTHER_NODES = new ProgressTracker.Step("Identifying other nodes on the network.");
+        private static final ProgressTracker.Step SENDING_AND_RECEIVING_DATA = new ProgressTracker.Step("Sending data between parties.");
+        private static final ProgressTracker.Step EXTRACTING_VAULT_STATES = new ProgressTracker.Step("Extracting states from the vault.");
+        private static final ProgressTracker.Step OTHER_TX_COMPONENTS = new ProgressTracker.Step("Gathering a transaction's other components.");
+        private static final ProgressTracker.Step TX_BUILDING = new ProgressTracker.Step("Building a transaction.");
+        private static final ProgressTracker.Step TX_SIGNING = new ProgressTracker.Step("Signing a transaction.");
+        private static final ProgressTracker.Step TX_VERIFICATION = new ProgressTracker.Step("Verifying a transaction.");
+        private static final ProgressTracker.Step SIGS_GATHERING = new ProgressTracker.Step("Gathering a transaction's signatures.") {
+            // Wiring up a child progress tracker allows us to see the subflow progress steps in our flow's progress tracker.
+            @Override
+            public ProgressTracker childProgressTracker() {
+                return CollectSignaturesFlow.tracker();
+            }
+        };
+        private static final ProgressTracker.Step VERIFYING_SIGS = new ProgressTracker.Step("Verifying a transaction's signatures.");
+        private static final ProgressTracker.Step FINALISATION = new ProgressTracker.Step("Finalising a transaction.") {
+            @Override
+            public ProgressTracker childProgressTracker() {
+                return FinalityFlow.tracker();
+            }
+        };
+        private final Party otherParty;
+        private final ProgressTracker progressTracker = new ProgressTracker(
+                ID_OTHER_NODES,
+                SENDING_AND_RECEIVING_DATA,
+                EXTRACTING_VAULT_STATES,
+                OTHER_TX_COMPONENTS,
+                TX_BUILDING,
+                TX_SIGNING,
+                TX_VERIFICATION,
+                SIGS_GATHERING,
+                FINALISATION);
+        private AgreementNegotiationState agreementNegotiationState;
+        private SecureHash attachId;
 
-            this.agrementName = name;
-            this.agrementInitiationDate = initialDate;
-            this.agrementLastAmendDate = null;
-            this.agrementAgreedDate = null;
-            this.agreementValue= value;
-            this.collateral=collateral;
+        /**
+         * Constructor.
+         */
+        public Initiator(AgreementNegotiationState agreementNegotiationState, Party otherParty, SecureHash hash) {
 
+            this.agreementNegotiationState = agreementNegotiationState;
             this.otherParty = otherParty;
+            this.attachId = hash;
         }
 
         @Override
         public ProgressTracker getProgressTracker() {
             return progressTracker;
         }
+
         /**
          * Define the initiator's flow logic here.
          */
         @Suspendable
-        @Override public SignedTransaction call() throws FlowException{
-
+        @Override
+        public SignedTransaction call() throws FlowException {
+            progressTracker.setCurrentStep(ID_OTHER_NODES);
             // We retrieve the notary identity from the network map.
             final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
 
+            progressTracker.setCurrentStep(TX_BUILDING);
             // We create a transaction builder.
             final TransactionBuilder txBuilder = new TransactionBuilder();
             txBuilder.setNotary(notary);
 
             // We create the transaction components.
-            AgreementNegotiationState outputState = new AgreementNegotiationState("name",11.1,
-                    "collateral", AgreementNegotiationState.NegotiationStates.ACCEPT,getOurIdentity(), otherParty);
-            String outputContract = AgreementNegotiationContract.class.getName();
-            StateAndContract outputContractAndState = new StateAndContract(outputState, outputContract);
+            agreementNegotiationState.setAgrementInitiationDate(new Date());
+            agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
+
+            agreementNegotiationState.setStatus(AgreementEnumState.INITIAL);
+            StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, AgreementNegotiationContract.TEMPLATE_CONTRACT_ID);
+
+            //get public keys of parties
             List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
             Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Initiate(), requiredSigners);
-
 
             // We add the items to the builder.
             txBuilder.withItems(outputContractAndState, cmd);
 
+            txBuilder.addAttachment(attachId);
+
             // Verifying the transaction.
+            progressTracker.setCurrentStep(VERIFYING_SIGS);
             txBuilder.verify(getServiceHub());
 
             // Signing the transaction.
@@ -98,7 +131,7 @@ public class AgreementNegotiationAgreeFlow {
                     signedTx, ImmutableList.of(otherpartySession), CollectSignaturesFlow.tracker()));
 
             // Finalising the transaction.
-            return subFlow(new FinalityFlow(signedTx));
+            return subFlow(new FinalityFlow(fullySignedTx));
 
         }
     }
@@ -116,7 +149,7 @@ public class AgreementNegotiationAgreeFlow {
          */
         @Suspendable
         @Override
-        public SignedTransaction call() throws FlowException{
+        public SignedTransaction call() throws FlowException {
 
             class SignTxFlow extends SignTransactionFlow {
                 private SignTxFlow(FlowSession otherPartySession, ProgressTracker progressTracker) {
@@ -128,15 +161,11 @@ public class AgreementNegotiationAgreeFlow {
                     requireThat(require -> {
                         ContractState output = stx.getTx().getOutputs().get(0).getData();
                         require.using("This must be an Agreement Negotiation transaction.", output instanceof AgreementNegotiationState);
-                        AgreementNegotiationState agreementNegotiationState = (AgreementNegotiationState) output;
-                        require.using("The IOU's value can't be too high.", agreementNegotiationState.isInitialized()==true);
                         return null;
                     });
                 }
             }
-
             return subFlow(new SignTxFlow(counterpartySession, SignTransactionFlow.Companion.tracker()));
-
-         }
+        }
     }
 }
