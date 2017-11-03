@@ -7,15 +7,12 @@ public enum AgreementEnumState {
     FULLY_ACCEPTED("FULLY ACCEPTED");
 
     private final String name;
-
     private AgreementEnumState(String s) {
         name = s;
     }
-
     public boolean equalsName(String otherName) {
         return name.equals(otherName);
     }
-
     public String toString() {
         return this.name;
     }

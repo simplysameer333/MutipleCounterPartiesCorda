@@ -10,7 +10,9 @@ import net.corda.core.schemas.QueryableState;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -91,6 +93,12 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
     public void setEligibleCurrency(List<String> eligibleCurrency) {
         this.eligibleCurrency = eligibleCurrency;
+    }
+
+    public void setEligibleCurrency(String eligibleCurrency) {
+        List<String> eligibleCurrencyList = new ArrayList<String>();
+        eligibleCurrencyList.add(eligibleCurrency);
+        this.eligibleCurrency = eligibleCurrencyList;
     }
 
     public String getDeliveryAmount() {
@@ -181,16 +189,32 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.valuationDate = valuationDate;
     }
 
-    public Date getValuationTime() {
-        return valuationTime;
+    public String getValuationTime() {
+        if (valuationTime != null) {
+            String dateStr = FORMAT.format(valuationTime);
+            return dateStr;
+        }
+        return "";
     }
 
     public void setValuationTime(Date valuationTime) {
         this.valuationTime = valuationTime;
     }
 
-    public Date getNotificationTime() {
-        return notificationTime;
+    public void setValuationTime(String valuationTime) {
+        try {
+            this.valuationTime = FORMAT.parse(valuationTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getNotificationTime() {
+        if (notificationTime != null) {
+            String dateStr = FORMAT.format(notificationTime);
+            return dateStr;
+        }
+        return "";
     }
 
     public void setNotificationTime(Date notificationTime) {
@@ -205,8 +229,20 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.specifiedCondition = specifiedCondition;
     }
 
-    public Date getSubstitutionDate() {
-        return substitutionDate;
+    public void setSpecifiedCondition(String specifiedCondition) {
+        List<String> specifiedConditionList = new ArrayList<String>();
+        specifiedConditionList.add(specifiedCondition);
+        this.specifiedCondition = specifiedConditionList;
+    }
+
+
+    public String getSubstitutionDate() {
+        if (substitutionDate != null) {
+            String dateStr = FORMAT.format(substitutionDate);
+            return dateStr;
+        }
+        return "";
+
     }
 
     public void setSubstitutionDate(Date substitutionDate) {
@@ -231,39 +267,42 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     @Override
     public PersistentState generateMappedObject(MappedSchema schema) {
         if (schema instanceof AgreementNegotiationSchema) {
-            return new AgreementNegotiationSchema.PersistentIOU(
-                    this.getLinearId().getId(),
-                    this.getAgrementName(),
-                    this.getAgrementInitiationDate(),
-                    this.getAgrementAgreedDate(),
-                    this.getLastUpdatedBy().getName().getCommonName(),
-                    this.getAgrementLastAmendDate(),
-                    this.getStatus().toString(),
-                    this.getCptyInitiator().getName().getCommonName(),
-                    this.getCptyReciever().getName().getCommonName(),
-                    this.baseCurrency,
-                    AgreementUtil.getDelimiterSepratedStringFromList(this.eligibleCurrency, ","),
-                    this.deliveryAmount,
-                    this.returnAmount,
-                    this.creditSupportAmount,
-                    this.eligibleCollateral,
-                    this.valuationPercentage,
-                    this.independentAmount,
-                    this.thresholdRating,
-                    this.threshold,
-                    this.minimumTransferAmount,
-                    this.valuationAgent,
-                    this.valuationDate,
-                    this.valuationTime,
-                    this.notificationTime,
-                    AgreementUtil.getDelimiterSepratedStringFromList(this.specifiedCondition, ","),
-                    this.substitutionDate,
-                    this.consent
-            );
+            try {
+                return new AgreementNegotiationSchema.PersistentIOU(
+                        this.getLinearId().getId(),
+                        this.getAgrementName(),
+                        this.getAgrementInitiationDate(),
+                        this.getAgrementAgreedDate(),
+                        this.getLastUpdatedBy().getName().getCommonName(),
+                        this.getAgrementLastAmendDate(),
+                        this.getStatus().toString(),
+                        this.getCptyInitiator().getName().getCommonName(),
+                        this.getCptyReciever().getName().getCommonName(),
+                        this.baseCurrency,
+                        AgreementUtil.getDelimiterSepratedStringFromList(this.eligibleCurrency, ","),
+                        this.deliveryAmount,
+                        this.returnAmount,
+                        this.creditSupportAmount,
+                        this.eligibleCollateral,
+                        this.valuationPercentage,
+                        this.independentAmount,
+                        this.thresholdRating,
+                        this.threshold,
+                        this.minimumTransferAmount,
+                        this.valuationAgent,
+                        this.valuationDate,
+                        this.valuationTime,
+                        this.notificationTime,
+                        AgreementUtil.getDelimiterSepratedStringFromList(this.specifiedCondition, ","),
+                        this.substitutionDate,
+                        this.consent
+                );
+            } catch (ParseException e) {
+                e.printStackTrace();
+                throw new IllegalArgumentException("Unrecognised schema $schema");
+            }
         } else {
             throw new IllegalArgumentException("Unrecognised schema $schema");
         }
     }
-
-
 }

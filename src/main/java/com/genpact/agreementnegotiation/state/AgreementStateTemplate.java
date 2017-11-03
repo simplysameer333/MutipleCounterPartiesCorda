@@ -8,10 +8,13 @@ import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 public class AgreementStateTemplate implements LinearState {
+
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
 
     private UniqueIdentifier linearId;
 
@@ -54,16 +57,24 @@ public class AgreementStateTemplate implements LinearState {
         this.agrementName = agrementName;
     }
 
-    public Date getAgrementInitiationDate() {
-        return agrementInitiationDate;
+    public String getAgrementInitiationDate() {
+        if (agrementInitiationDate != null) {
+            String dateStr = FORMAT.format(agrementInitiationDate);
+            return dateStr;
+        }
+        return "";
     }
 
     public void setAgrementInitiationDate(Date agrementInitiationDate) {
         this.agrementInitiationDate = agrementInitiationDate;
     }
 
-    public Date getAgrementAgreedDate() {
-        return agrementAgreedDate;
+    public String getAgrementAgreedDate() {
+        if (agrementAgreedDate != null) {
+            String dateStr = FORMAT.format(agrementAgreedDate);
+            return dateStr;
+        }
+        return "";
     }
 
     public void setAgrementAgreedDate(Date agrementAgreedDate) {
@@ -94,8 +105,13 @@ public class AgreementStateTemplate implements LinearState {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public Date getAgrementLastAmendDate() {
-        return agrementLastAmendDate;
+    public String getAgrementLastAmendDate() {
+        if (agrementLastAmendDate != null) {
+            String dateStr = FORMAT.format(agrementAgreedDate);
+            return dateStr;
+        }
+        return "";
+
     }
 
     public void setAgrementLastAmendDate(Date agrementLastAmendDate) {

@@ -1,12 +1,12 @@
 package com.genpact.agreementnegotiation.api;
 
-import com.genpact.agreementnegotiation.dummydata.DummyData;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAcceptFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.genpact.agreementnegotiation.model.Agreement;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
+import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.corda.core.contracts.StateAndRef;
@@ -69,8 +69,9 @@ public class AgreementNegotiationApi {
 
         try {
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
-            AgreementNegotiationState agreementDummy = DummyData.getDummyDataForAgreementNegotiationState();
-            agreementDummy.setCptyInitiator(rpcOps.wellKnownPartyFromX500Name(myLegalName));
+            AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
+            agreementNegotiationState.setCptyReciever(rpcOps.wellKnownPartyFromX500Name(agreement.getCounterparty()));
+            agreementNegotiationState.setCptyInitiator(rpcOps.wellKnownPartyFromX500Name(myLegalName));
 
             if (agreement.getAttachmentHash() != null && !agreement.getAttachmentHash().isEmpty()) {
                 List<SecureHash> attachmentHashes = new ArrayList<SecureHash>();
@@ -87,7 +88,7 @@ public class AgreementNegotiationApi {
                     }
                 }
                 if (!attachmentHashes.isEmpty()) {
-                    agreementDummy.setAttachmentHash(attachmentHashes);
+                    agreementNegotiationState.setAttachmentHash(attachmentHashes);
                 }
             }
 
@@ -95,7 +96,7 @@ public class AgreementNegotiationApi {
 
             //get the attachment path
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreementDummy,
+                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreementNegotiationState,
                             rpcOps.wellKnownPartyFromX500Name(agreement.getCounterparty()));
 
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));

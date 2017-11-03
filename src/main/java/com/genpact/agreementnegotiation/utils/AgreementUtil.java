@@ -1,6 +1,10 @@
 package com.genpact.agreementnegotiation.utils;
 
+import com.genpact.agreementnegotiation.model.Agreement;
+import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
+
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +41,31 @@ public class AgreementUtil {
             return list.stream().map(Object::toString).collect(Collectors.joining(delimiter));
         }
         return null;
+    }
+
+    public static AgreementNegotiationState copyState(Agreement agreement) {
+        AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState();
+        agreementNegotiationState.setAgrementName(agreement.getAgrementName());
+        agreementNegotiationState.setBaseCurrency(agreement.getBaseCurrency());
+        agreementNegotiationState.setEligibleCurrency(agreement.getEligibleCurrency());
+        agreementNegotiationState.setDeliveryAmount(agreement.getDeliveryAmount());
+        agreementNegotiationState.setReturnAmount(agreement.getReturnAmount());
+        agreementNegotiationState.setCreditSupportAmount(agreement.getCreditSupportAmount());
+        agreementNegotiationState.setEligibleCollateral(agreement.getEligibleCollateral());
+        agreementNegotiationState.setValuationPercentage(agreement.getValuationPercentage());
+        agreementNegotiationState.setIndependentAmount(new BigDecimal(agreement.getIndependentAmount()));
+        agreementNegotiationState.setThresholdRating(agreement.getThresholdRating());
+        agreementNegotiationState.setThreshold(agreement.getThreshold());
+        agreementNegotiationState.setMinimumTransferAmount(new BigDecimal(agreement.getMinimumTransferAmount()));
+        agreementNegotiationState.setValuationAgent(agreement.getValuationAgent());
+        agreementNegotiationState.setValuationDate(agreement.getValuationDate());
+        agreementNegotiationState.setValuationTime(agreement.getValuationTime());
+        agreementNegotiationState.setNotificationTime(agreement.getNotificationTime());
+        agreementNegotiationState.setSpecifiedCondition(agreement.getSpecifiedCondition());
+        agreementNegotiationState.setSubstitutionDate(agreement.getSubstitutionDate());
+        agreementNegotiationState.setConsent(agreement.getConsent() == 1 ? true : false);
+        agreementNegotiationState.setValuationPercentage(agreement.getValuationPercentageCash());
+        return agreementNegotiationState;
     }
 
 }

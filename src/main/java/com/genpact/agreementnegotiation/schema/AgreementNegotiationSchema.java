@@ -9,6 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -18,6 +20,8 @@ import java.util.UUID;
 
 @CordaSerializable
 public class AgreementNegotiationSchema extends MappedSchema {
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
+
     public AgreementNegotiationSchema() {
         super(AgreementNegotiationSchema.class, 1, ImmutableList.of(PersistentIOU.class));
     }
@@ -120,21 +124,22 @@ public class AgreementNegotiationSchema extends MappedSchema {
           }
   */
         public PersistentIOU(UUID linearId, String agrementName,
-                             Date agrementInitiationDate, Date agrementAgreedDate, String lastUpdatedBy,
-                             Date agrementLastAmendDate, String negotiationState, String cptyInitiator,
+                             String agrementInitiationDate, String agrementAgreedDate, String lastUpdatedBy,
+                             String agrementLastAmendDate, String negotiationState, String cptyInitiator,
                              String cptyReciever, String baseCurrency, String eligibleCurrency,
                              String deliveryAmount, String returnAmount, String creditSupportAmount,
                              String eligibleCollateral, double valuationPercentage, BigDecimal independentAmount,
                              String thresholdRating, String threshold, BigDecimal minimumTransferAmount,
                              String valuationAgent, String valuationDate, Date valuationTime, Date notificationTime,
-                             String specifiedCondition, Date substitutionDate, Boolean consent) {
+                             String specifiedCondition, Date substitutionDate, Boolean consent) throws ParseException {
 
             this.linearId = linearId;
             this.agrementName = agrementName;
-            this.agrementInitiationDate = agrementInitiationDate;
-            this.agrementAgreedDate = agrementAgreedDate;
+            this.agrementInitiationDate = FORMAT.parse(agrementInitiationDate);
+            this.agrementAgreedDate = FORMAT.parse(agrementAgreedDate);
             this.lastUpdatedBy = lastUpdatedBy;
-            this.agrementLastAmendDate = agrementLastAmendDate;
+            this.agrementLastAmendDate = FORMAT.parse(agrementLastAmendDate);
+            ;
             this.negotiationState = negotiationState;
             this.cptyInitiator = cptyInitiator;
             this.cptyReciever = cptyReciever;
