@@ -9,8 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -20,8 +18,6 @@ import java.util.UUID;
 
 @CordaSerializable
 public class AgreementNegotiationSchema extends MappedSchema {
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
-
     public AgreementNegotiationSchema() {
         super(AgreementNegotiationSchema.class, 1, ImmutableList.of(PersistentIOU.class));
     }
@@ -36,16 +32,16 @@ public class AgreementNegotiationSchema extends MappedSchema {
         private String agrementName = null;
 
         @Column(name = "agrementInitiationDate")
-        private Date agrementInitiationDate = null;
+        private String agrementInitiationDate = null;
 
         @Column(name = "agrementAgreedDate")
-        private Date agrementAgreedDate = null;
+        private String agrementAgreedDate = null;
 
         @Column(name = "lastUpdatedBy")
         private String lastUpdatedBy = null;
 
         @Column(name = "agrementLastAmendDate")
-        private Date agrementLastAmendDate = null;
+        private String agrementLastAmendDate = null;
 
         @Column(name = "negotiationState")
         private String negotiationState;
@@ -63,13 +59,13 @@ public class AgreementNegotiationSchema extends MappedSchema {
         private String eligibleCurrency;
 
         @Column(name = "deliveryAmount")
-        private String deliveryAmount;
+        private int deliveryAmount;
 
         @Column(name = "returnAmount")
-        private String returnAmount;
+        private int returnAmount;
 
         @Column(name = "creditSupportAmount")
-        private String creditSupportAmount;
+        private int creditSupportAmount;
 
         @Column(name = "eligibleCollateral")
         private String eligibleCollateral;
@@ -81,10 +77,10 @@ public class AgreementNegotiationSchema extends MappedSchema {
         private BigDecimal independentAmount;
 
         @Column(name = "thresholdRating")
-        private String thresholdRating;
+        private int thresholdRating;
 
         @Column(name = "threshold")
-        private String threshold;
+        private int threshold;
 
         @Column(name = "minimumTransferAmount")
         private BigDecimal minimumTransferAmount;
@@ -96,7 +92,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
         private String valuationDate;
 
         @Column(name = "valuationTime")
-        private Date valuationTime;
+        private String valuationTime;
 
         @Column(name = "notificationTime")
         private Date notificationTime;
@@ -127,19 +123,18 @@ public class AgreementNegotiationSchema extends MappedSchema {
                              String agrementInitiationDate, String agrementAgreedDate, String lastUpdatedBy,
                              String agrementLastAmendDate, String negotiationState, String cptyInitiator,
                              String cptyReciever, String baseCurrency, String eligibleCurrency,
-                             String deliveryAmount, String returnAmount, String creditSupportAmount,
+                             int deliveryAmount, int returnAmount, int creditSupportAmount,
                              String eligibleCollateral, double valuationPercentage, BigDecimal independentAmount,
-                             String thresholdRating, String threshold, BigDecimal minimumTransferAmount,
-                             String valuationAgent, String valuationDate, Date valuationTime, Date notificationTime,
-                             String specifiedCondition, Date substitutionDate, Boolean consent) throws ParseException {
+                             int thresholdRating, int threshold, BigDecimal minimumTransferAmount,
+                             String valuationAgent, String valuationDate, String valuationTime, Date notificationTime,
+                             String specifiedCondition, Date substitutionDate, Boolean consent) {
 
             this.linearId = linearId;
             this.agrementName = agrementName;
-            this.agrementInitiationDate = FORMAT.parse(agrementInitiationDate);
-            this.agrementAgreedDate = FORMAT.parse(agrementAgreedDate);
+            this.agrementInitiationDate = agrementInitiationDate;
+            this.agrementAgreedDate = agrementAgreedDate;
             this.lastUpdatedBy = lastUpdatedBy;
-            this.agrementLastAmendDate = FORMAT.parse(agrementLastAmendDate);
-            ;
+            this.agrementLastAmendDate = agrementLastAmendDate;
             this.negotiationState = negotiationState;
             this.cptyInitiator = cptyInitiator;
             this.cptyReciever = cptyReciever;
@@ -179,19 +174,19 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.agrementName = agrementName;
         }
 
-        public Date getAgrementInitiationDate() {
+        public String getAgrementInitiationDate() {
             return agrementInitiationDate;
         }
 
-        public void setAgrementInitiationDate(Date agrementInitiationDate) {
+        public void setAgrementInitiationDate(String agrementInitiationDate) {
             this.agrementInitiationDate = agrementInitiationDate;
         }
 
-        public Date getAgrementAgreedDate() {
+        public String getAgrementAgreedDate() {
             return agrementAgreedDate;
         }
 
-        public void setAgrementAgreedDate(Date agrementAgreedDate) {
+        public void setAgrementAgreedDate(String agrementAgreedDate) {
             this.agrementAgreedDate = agrementAgreedDate;
         }
 
@@ -203,11 +198,11 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.lastUpdatedBy = lastUpdatedBy;
         }
 
-        public Date getAgrementLastAmendDate() {
+        public String getAgrementLastAmendDate() {
             return agrementLastAmendDate;
         }
 
-        public void setAgrementLastAmendDate(Date agrementLastAmendDate) {
+        public void setAgrementLastAmendDate(String agrementLastAmendDate) {
             this.agrementLastAmendDate = agrementLastAmendDate;
         }
 
@@ -251,27 +246,27 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.eligibleCurrency = eligibleCurrency;
         }
 
-        public String getDeliveryAmount() {
+        public int getDeliveryAmount() {
             return deliveryAmount;
         }
 
-        public void setDeliveryAmount(String deliveryAmount) {
+        public void setDeliveryAmount(int deliveryAmount) {
             this.deliveryAmount = deliveryAmount;
         }
 
-        public String getReturnAmount() {
+        public int getReturnAmount() {
             return returnAmount;
         }
 
-        public void setReturnAmount(String returnAmount) {
+        public void setReturnAmount(int returnAmount) {
             this.returnAmount = returnAmount;
         }
 
-        public String getCreditSupportAmount() {
+        public int getCreditSupportAmount() {
             return creditSupportAmount;
         }
 
-        public void setCreditSupportAmount(String creditSupportAmount) {
+        public void setCreditSupportAmount(int creditSupportAmount) {
             this.creditSupportAmount = creditSupportAmount;
         }
 
@@ -299,19 +294,19 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.independentAmount = independentAmount;
         }
 
-        public String getThresholdRating() {
+        public int getThresholdRating() {
             return thresholdRating;
         }
 
-        public void setThresholdRating(String thresholdRating) {
+        public void setThresholdRating(int thresholdRating) {
             this.thresholdRating = thresholdRating;
         }
 
-        public String getThreshold() {
+        public int getThreshold() {
             return threshold;
         }
 
-        public void setThreshold(String threshold) {
+        public void setThreshold(int threshold) {
             this.threshold = threshold;
         }
 
@@ -339,11 +334,11 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.valuationDate = valuationDate;
         }
 
-        public Date getValuationTime() {
+        public String getValuationTime() {
             return valuationTime;
         }
 
-        public void setValuationTime(Date valuationTime) {
+        public void setValuationTime(String valuationTime) {
             this.valuationTime = valuationTime;
         }
 

@@ -52,7 +52,7 @@ public class AgreementUtil {
         agreementNegotiationState.setReturnAmount(agreement.getReturnAmount());
         agreementNegotiationState.setCreditSupportAmount(agreement.getCreditSupportAmount());
         agreementNegotiationState.setEligibleCollateral(agreement.getEligibleCollateral());
-        agreementNegotiationState.setValuationPercentage(agreement.getValuationPercentage());
+        agreementNegotiationState.setValuationPercentage(agreement.getValuationPercentageCash());
         agreementNegotiationState.setIndependentAmount(new BigDecimal(agreement.getIndependentAmount()));
         agreementNegotiationState.setThresholdRating(agreement.getThresholdRating());
         agreementNegotiationState.setThreshold(agreement.getThreshold());
@@ -63,8 +63,7 @@ public class AgreementUtil {
         agreementNegotiationState.setNotificationTime(agreement.getNotificationTime());
         agreementNegotiationState.setSpecifiedCondition(agreement.getSpecifiedCondition());
         agreementNegotiationState.setSubstitutionDate(agreement.getSubstitutionDate());
-        agreementNegotiationState.setConsent(agreement.getConsent() == 1 ? true : false);
-        agreementNegotiationState.setValuationPercentage(agreement.getValuationPercentageCash());
+        agreementNegotiationState.setConsent(agreement.getConsent() == 1 ? true:false );
         return agreementNegotiationState;
     }
 

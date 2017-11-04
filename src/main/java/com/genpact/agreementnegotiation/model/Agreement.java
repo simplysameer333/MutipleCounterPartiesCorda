@@ -12,14 +12,14 @@ public class Agreement {
     private CordaX500Name counterparty = null;
     private String baseCurrency = null;
     private String eligibleCurrency = null;
-    private String deliveryAmount = null;
-    private String returnAmount = null;
-    private String creditSupportAmount = null;
+    private int deliveryAmount = 0;
+    private int returnAmount = 0;
+    private int creditSupportAmount = 0;
     private String eligibleCollateral = null;
-    private double valuationPercentage = -99;
+    private double valuationPercentageCash = -99;
     private int independentAmount = 0;
-    private String thresholdRating = null;
-    private String threshold = null;
+    private int thresholdRating = 0;
+    private int threshold = 0;
     private int minimumTransferAmount = 0;
     private String valuationAgent = null;
     private String valuationDate = null;
@@ -29,92 +29,72 @@ public class Agreement {
     private Date substitutionDate = null;
     private String specifiedCondition = null;
     private List<String> attachmentHash;
-    private int valuationPercentageCash = 0;
-
-
-    // Dummy constructor used by the create-iou API endpoint.
-    public Agreement() {
-    }
 
     public String getAgrementName() {
         return agrementName;
     }
-
     public String getBaseCurrency() {
         return baseCurrency;
     }
-
     public String getEligibleCurrency() {
         return eligibleCurrency;
     }
-
-    public String getDeliveryAmount() {
+    public int getDeliveryAmount() {
         return deliveryAmount;
     }
-
-    public String getReturnAmount() {
+    public int getReturnAmount() {
         return returnAmount;
     }
-
-    public String getCreditSupportAmount() {
+    public int getCreditSupportAmount() {
         return creditSupportAmount;
     }
-
     public String getEligibleCollateral() {
         return eligibleCollateral;
     }
-
-    public double getValuationPercentage() {
-        return valuationPercentage;
+    public double getValuationPercentageCash() {
+        return valuationPercentageCash;
     }
-
     public int getIndependentAmount() {
         return independentAmount;
     }
-
-    public String getThresholdRating() {
+    public int getThresholdRating() {
         return thresholdRating;
     }
-
-    public String getThreshold() {
+    public int getThreshold() {
         return threshold;
     }
-
     public int getMinimumTransferAmount() {
         return minimumTransferAmount;
     }
-
     public String getValuationAgent() {
         return valuationAgent;
     }
-
     public String getValuationDate() {
         return valuationDate;
     }
-
     public String getValuationTime() {
         return valuationTime;
     }
-
     public Date getNotificationTime() {
         return notificationTime;
     }
-
     public String getSpecifiedCondition() {
         return specifiedCondition;
     }
-
     public Date getSubstitutionDate() {
         return substitutionDate;
     }
-
     public int getConsent() {
         return consent;
     }
-
     public CordaX500Name getCounterparty() {
         return counterparty;
     }
+
+
+
+
+
 
     public List<String> getAttachmentHash() {
         return attachmentHash;
@@ -124,38 +104,14 @@ public class Agreement {
         this.attachmentHash = attachmentHash;
     }
 
-    public int getValuationPercentageCash() {
-        return valuationPercentageCash;
-    }
 
-    public void setValuationPercentageCash(int valuationPercentageCash) {
-        this.valuationPercentageCash = valuationPercentageCash;
+
+    // Dummy constructor used by the create-iou API endpoint.
+    public Agreement() {
     }
 
     @Override
     public String toString() {
-        return "Agreement{" +
-                "agrementName='" + agrementName + '\'' +
-                ", counterparty=" + counterparty +
-                ", baseCurrency='" + baseCurrency + '\'' +
-                ", eligibleCurrency='" + eligibleCurrency + '\'' +
-                ", deliveryAmount='" + deliveryAmount + '\'' +
-                ", returnAmount='" + returnAmount + '\'' +
-                ", creditSupportAmount='" + creditSupportAmount + '\'' +
-                ", eligibleCollateral='" + eligibleCollateral + '\'' +
-                ", valuationPercentage=" + valuationPercentage +
-                ", independentAmount=" + independentAmount +
-                ", thresholdRating='" + thresholdRating + '\'' +
-                ", threshold='" + threshold + '\'' +
-                ", minimumTransferAmount=" + minimumTransferAmount +
-                ", valuationAgent='" + valuationAgent + '\'' +
-                ", valuationDate='" + valuationDate + '\'' +
-                ", valuationTime='" + valuationTime + '\'' +
-                ", notificationTime=" + notificationTime +
-                ", consent=" + consent +
-                ", substitutionDate=" + substitutionDate +
-                ", specifiedCondition='" + specifiedCondition + '\'' +
-                ", attachmentHash=" + attachmentHash +
-                '}';
+        return String.format("Agreement(agrementName=%d, agreementValue=%s, collateral=%s)", agrementName);
     }
 }

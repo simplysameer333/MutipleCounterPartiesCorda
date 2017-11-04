@@ -29,7 +29,7 @@ app.controller('AgreementController', function($http, $location, $uibModal) {
 
         modalInstance.result.then(() => {}, () => {});
     };
-	
+
 	demoApp.viewAgreement = (agreement) => {
 		$http.get(apiBaseURL + "getAgreement/"+agreement.agrementName)
 		.then(function(response) {
@@ -45,10 +45,10 @@ app.controller('AgreementController', function($http, $location, $uibModal) {
 			});
 			modalInstance.result.then(() => {}, () => {});
 		});
-		
-		
+
+
     };
-	
+
 	demoApp.amendAgreement = (agreement) => {
         const modalInstance = $uibModal.open({
             templateUrl: 'amendAgreementModal.html',
@@ -62,8 +62,8 @@ app.controller('AgreementController', function($http, $location, $uibModal) {
 
         modalInstance.result.then(() => {}, () => {});
     };
-	
-	
+
+
 	demoApp.viewAudit = (agreement) => {
         $http.get(apiBaseURL + "audit?agreementName=" + agreement.agrementName)
         .then(function(response) {
@@ -90,7 +90,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $http, $location, $uibModa
 	modalInstance.collateral = [{id: 1,name:"US-TBILL"},{id: 2,name:"US-TNOTE"},{id: 3,name:"US_TBOND"},{id: 4,name:"CASH"}];
 	modalInstance.threshold = [{id: 1,name:"AAA"},{id: 2,name:"AA+ to AA-"},{id: 3,name:"A+ to A-"},{id: 4,name:"BBB+ or below"}];
 	modalInstance.yesNo = [{id: 1,name:"Yes"},{id: 0,name:"No"}];
-	
+
 
     // Validate and create IOU.
     modalInstance.create = () => {
@@ -101,7 +101,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $http, $location, $uibModa
             modalInstance.formError = false;
 
             $uibModalInstance.close();
-			
+
             const createIOUEndpoint = apiBaseURL + "initFlow/" +modalInstance.form.counterparty;
 
             // Create PO and handle success / fail responses.
@@ -135,7 +135,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $http, $location, $uibModa
 
 app.controller('AgreementCtrl', function ($scope, $http, $location, $uibModalInstance, $uibModal, apiBaseURL, agreement) {
     const modalInstance = this;
-	$scope.agreement = agreement;	
+	$scope.agreement = agreement;
     // Validate and create IOU.
     $scope.agree = (agreement) => {
 		console.log('Called Create '+agreement);

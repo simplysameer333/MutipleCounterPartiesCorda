@@ -10,9 +10,7 @@ import net.corda.core.schemas.QueryableState;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,21 +22,21 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
 
     private String baseCurrency;
-    private List<String> eligibleCurrency;
-    private String deliveryAmount;
-    private String returnAmount;
-    private String creditSupportAmount;
+    private String eligibleCurrency;
+    private int deliveryAmount;
+    private int returnAmount;
+    private int creditSupportAmount;
     private String eligibleCollateral;
     private double valuationPercentage = -99;
     private BigDecimal independentAmount = new BigDecimal(-99);
-    private String thresholdRating;
-    private String threshold;
+    private int thresholdRating;
+    private int threshold;
     private BigDecimal minimumTransferAmount;
     private String valuationAgent;
     private String valuationDate;
-    private Date valuationTime;
+    private String valuationTime;
     private Date notificationTime;
-    private List<String> specifiedCondition;
+    private String specifiedCondition;
     private Date substitutionDate;
     private Boolean consent;
 
@@ -46,12 +44,12 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         super();
     }
 
-    public AgreementNegotiationState(String baseCurrency, List<String> eligibleCurrency,
-                                     String deliveryAmount, String returnAmount, String creditSupportAmount,
+    public AgreementNegotiationState(String baseCurrency, String eligibleCurrency,
+                                     int deliveryAmount, int returnAmount, int creditSupportAmount,
                                      String eligibleCollateral, double valuationPercentage, BigDecimal independentAmount,
-                                     String thresholdRating, String threshold, BigDecimal minimumTransferAmount,
-                                     String valuationAgent, String valuationDate, Date valuationTime, Date notificationTime,
-                                     List<String> specifiedCondition, Date substitutionDate, Boolean consent,
+                                     int thresholdRating, int threshold, BigDecimal minimumTransferAmount,
+                                     String valuationAgent, String valuationDate, String valuationTime, Date notificationTime,
+                                     String specifiedCondition, Date substitutionDate, Boolean consent,
                                      String agrementName, Date agrementInitiationDate,
                                      Date agrementAgreedDate, Party cptyInitiator, Party cptyReciever, Party lastUpdatedBy,
                                      Date agrementLastAmendDate, AgreementEnumState status) {
@@ -87,41 +85,35 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.baseCurrency = baseCurrency;
     }
 
-    public List<String> getEligibleCurrency() {
+    public String getEligibleCurrency() {
         return eligibleCurrency;
     }
 
-    public void setEligibleCurrency(List<String> eligibleCurrency) {
+    public void setEligibleCurrency(String eligibleCurrency) {
         this.eligibleCurrency = eligibleCurrency;
     }
 
-    public void setEligibleCurrency(String eligibleCurrency) {
-        List<String> eligibleCurrencyList = new ArrayList<String>();
-        eligibleCurrencyList.add(eligibleCurrency);
-        this.eligibleCurrency = eligibleCurrencyList;
-    }
-
-    public String getDeliveryAmount() {
+    public int getDeliveryAmount() {
         return deliveryAmount;
     }
 
-    public void setDeliveryAmount(String deliveryAmount) {
+    public void setDeliveryAmount(int deliveryAmount) {
         this.deliveryAmount = deliveryAmount;
     }
 
-    public String getReturnAmount() {
+    public int getReturnAmount() {
         return returnAmount;
     }
 
-    public void setReturnAmount(String returnAmount) {
+    public void setReturnAmount(int returnAmount) {
         this.returnAmount = returnAmount;
     }
 
-    public String getCreditSupportAmount() {
+    public int getCreditSupportAmount() {
         return creditSupportAmount;
     }
 
-    public void setCreditSupportAmount(String creditSupportAmount) {
+    public void setCreditSupportAmount(int creditSupportAmount) {
         this.creditSupportAmount = creditSupportAmount;
     }
 
@@ -149,19 +141,19 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.independentAmount = independentAmount;
     }
 
-    public String getThresholdRating() {
+    public int getThresholdRating() {
         return thresholdRating;
     }
 
-    public void setThresholdRating(String thresholdRating) {
+    public void setThresholdRating(int thresholdRating) {
         this.thresholdRating = thresholdRating;
     }
 
-    public String getThreshold() {
+    public int getThreshold() {
         return threshold;
     }
 
-    public void setThreshold(String threshold) {
+    public void setThreshold(int threshold) {
         this.threshold = threshold;
     }
 
@@ -190,59 +182,31 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     }
 
     public String getValuationTime() {
-        if (valuationTime != null) {
-            String dateStr = FORMAT.format(valuationTime);
-            return dateStr;
-        }
-        return "";
-    }
-
-    public void setValuationTime(Date valuationTime) {
-        this.valuationTime = valuationTime;
+        return valuationTime;
     }
 
     public void setValuationTime(String valuationTime) {
-        try {
-            this.valuationTime = FORMAT.parse(valuationTime);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        this.valuationTime = valuationTime;
     }
 
-    public String getNotificationTime() {
-        if (notificationTime != null) {
-            String dateStr = FORMAT.format(notificationTime);
-            return dateStr;
-        }
-        return "";
+    public Date getNotificationTime() {
+        return notificationTime;
     }
 
     public void setNotificationTime(Date notificationTime) {
         this.notificationTime = notificationTime;
     }
 
-    public List<String> getSpecifiedCondition() {
+    public String getSpecifiedCondition() {
         return specifiedCondition;
     }
 
-    public void setSpecifiedCondition(List<String> specifiedCondition) {
+    public void setSpecifiedCondition(String specifiedCondition) {
         this.specifiedCondition = specifiedCondition;
     }
 
-    public void setSpecifiedCondition(String specifiedCondition) {
-        List<String> specifiedConditionList = new ArrayList<String>();
-        specifiedConditionList.add(specifiedCondition);
-        this.specifiedCondition = specifiedConditionList;
-    }
-
-
-    public String getSubstitutionDate() {
-        if (substitutionDate != null) {
-            String dateStr = FORMAT.format(substitutionDate);
-            return dateStr;
-        }
-        return "";
-
+    public Date getSubstitutionDate() {
+        return substitutionDate;
     }
 
     public void setSubstitutionDate(Date substitutionDate) {
@@ -267,42 +231,41 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     @Override
     public PersistentState generateMappedObject(MappedSchema schema) {
         if (schema instanceof AgreementNegotiationSchema) {
-            try {
-                return new AgreementNegotiationSchema.PersistentIOU(
-                        this.getLinearId().getId(),
-                        this.getAgrementName(),
-                        this.getAgrementInitiationDate(),
-                        this.getAgrementAgreedDate(),
-                        this.getLastUpdatedBy().getName().getCommonName(),
-                        this.getAgrementLastAmendDate(),
-                        this.getStatus().toString(),
-                        this.getCptyInitiator().getName().getCommonName(),
-                        this.getCptyReciever().getName().getCommonName(),
-                        this.baseCurrency,
-                        AgreementUtil.getDelimiterSepratedStringFromList(this.eligibleCurrency, ","),
-                        this.deliveryAmount,
-                        this.returnAmount,
-                        this.creditSupportAmount,
-                        this.eligibleCollateral,
-                        this.valuationPercentage,
-                        this.independentAmount,
-                        this.thresholdRating,
-                        this.threshold,
-                        this.minimumTransferAmount,
-                        this.valuationAgent,
-                        this.valuationDate,
-                        this.valuationTime,
-                        this.notificationTime,
-                        AgreementUtil.getDelimiterSepratedStringFromList(this.specifiedCondition, ","),
-                        this.substitutionDate,
-                        this.consent
-                );
-            } catch (ParseException e) {
-                e.printStackTrace();
-                throw new IllegalArgumentException("Unrecognised schema $schema");
-            }
+            return new AgreementNegotiationSchema.PersistentIOU(
+                    this.getLinearId().getId(),
+                    this.getAgrementName(),
+                    this.getAgrementInitiationDate(),
+                    this.getAgrementAgreedDate(),
+                    this.getLastUpdatedBy().getName().getCommonName(),
+                    this.getAgrementLastAmendDate(),
+                    this.getStatus().toString(),
+                    this.getCptyInitiator().getName().getCommonName(),
+                    this.getCptyReciever().getName().getCommonName(),
+                    this.baseCurrency,
+                    //AgreementUtil.getDelimiterSepratedStringFromList(this.eligibleCurrency, ","),
+                    this.eligibleCurrency,
+                    this.deliveryAmount,
+                    this.returnAmount,
+                    this.creditSupportAmount,
+                    this.eligibleCollateral,
+                    this.valuationPercentage,
+                    this.independentAmount,
+                    this.thresholdRating,
+                    this.threshold,
+                    this.minimumTransferAmount,
+                    this.valuationAgent,
+                    this.valuationDate,
+                    this.valuationTime,
+                    this.notificationTime,
+                    //AgreementUtil.getDelimiterSepratedStringFromList(this.specifiedCondition, ","),
+                    this.specifiedCondition,
+                    this.substitutionDate,
+                    this.consent
+            );
         } else {
             throw new IllegalArgumentException("Unrecognised schema $schema");
         }
     }
+
+
 }

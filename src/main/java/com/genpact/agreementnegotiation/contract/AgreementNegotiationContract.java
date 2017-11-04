@@ -209,14 +209,14 @@ public class AgreementNegotiationContract implements Contract {
     private void checkMandatoryFields(AgreementNegotiationState out) {
         requireThat(check -> {
 
-            check.using("Base Currency cannot be empty", out.getBaseCurrency() != null);
-            check.using("Delivery Amount cannot be empty", out.getDeliveryAmount() != null);
-            check.using("Return Amount cannot be empty", out.getReturnAmount() != null);
+       /*     check.using("Base Currency cannot be empty", out.getBaseCurrency() != null);
+            check.using("Delivery Amount cannot be empty", out.getDeliveryAmount() != 0);
+            check.using("Return Amount cannot be empty", out.getReturnAmount() != 0);
             check.using("Eligible Collateral cannot be empty", out.getEligibleCollateral() != null);
             check.using("Valuation Percentage cannot be less than 0", out.getValuationPercentage() != -99);
             check.using("Independent Amount Amount cannot be empty", out.getIndependentAmount().signum() != -99);
             check.using("Minimum Transfer Amount cannot be empty", out.getMinimumTransferAmount() != null);
-
+        */
             return null;
         });
     }

@@ -1,5 +1,6 @@
 package com.genpact.agreementnegotiation.api;
 
+import com.genpact.agreementnegotiation.dummydata.DummyData;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAcceptFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
@@ -69,17 +70,17 @@ public class AgreementNegotiationApi {
 
         try {
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
-            AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
-            agreementNegotiationState.setCptyReciever(rpcOps.wellKnownPartyFromX500Name(agreement.getCounterparty()));
-            agreementNegotiationState.setCptyInitiator(rpcOps.wellKnownPartyFromX500Name(myLegalName));
+            AgreementNegotiationState agreementDummy = AgreementUtil.copyState(agreement);
+            agreementDummy.setCptyInitiator(rpcOps.wellKnownPartyFromX500Name(myLegalName));
 
             if (agreement.getAttachmentHash() != null && !agreement.getAttachmentHash().isEmpty()) {
                 List<SecureHash> attachmentHashes = new ArrayList<SecureHash>();
                 for (String url : agreement.getAttachmentHash()) {
                     SecureHash ourAttachmentHash = null;
                     try {
-                        InputStream inputStream = new FileInputStream(new File(
-                                "C:\\Users\\hamesam\\Downloads\\tomcat.zip"));
+                        /*InputStream inputStream = new FileInputStream(new File(
+                                "C:\\Users\\hamesam\\Downloads\\tomcat.zip"));*/
+                        InputStream inputStream = new FileInputStream(new File(url));
                         ourAttachmentHash = rpcOps.uploadAttachment(inputStream);
                         attachmentHashes.add(ourAttachmentHash);
                     } catch (FileNotFoundException e) {
@@ -88,7 +89,7 @@ public class AgreementNegotiationApi {
                     }
                 }
                 if (!attachmentHashes.isEmpty()) {
-                    agreementNegotiationState.setAttachmentHash(attachmentHashes);
+                    agreementDummy.setAttachmentHash(attachmentHashes);
                 }
             }
 
@@ -96,7 +97,7 @@ public class AgreementNegotiationApi {
 
             //get the attachment path
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreementNegotiationState,
+                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreementDummy,
                             rpcOps.wellKnownPartyFromX500Name(agreement.getCounterparty()));
 
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));

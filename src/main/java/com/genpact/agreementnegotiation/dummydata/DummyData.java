@@ -9,8 +9,8 @@ public class DummyData {
         AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState();
         agreementNegotiationState.setAgrementName("Test");
         agreementNegotiationState.setBaseCurrency("GBP");
-        agreementNegotiationState.setDeliveryAmount("Party A");
-        agreementNegotiationState.setReturnAmount("Party A");
+        agreementNegotiationState.setDeliveryAmount(2);
+        agreementNegotiationState.setReturnAmount(1);
         agreementNegotiationState.setEligibleCollateral("Cash");
         agreementNegotiationState.setValuationPercentage(100);
         agreementNegotiationState.setIndependentAmount(new BigDecimal(10));
