@@ -5,11 +5,10 @@ import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.serialization.CordaSerializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -106,19 +105,13 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @Column(name = "consent")
         private Boolean consent;
 
-        /*  public PersistentIOU(UUID id, String agrementName,
-                               Date agrementInitiationDate, Date agrementAgreedDate,
-                               String commonName, Date agrementLastAmendDate, String s,
-                               String name, String commonName1, BigDecimal baseCurrency,
-                               BigDecimal eligibleCurrency, BigDecimal deliveryAmount, BigDecimal
-                                       returnAmount, BigDecimal creditSupportAmount, String eligibleCollateral,
-                               double valuationPercentage, BigDecimal independentAmount, String thresholdRating,
-                               BigDecimal threshold, BigDecimal minimumTransferAmount, String valuationAgent,
-                               Date valuationDate, Date valuationTime, Date notificationTime,
-                               String specifiedCondition, Date substitutionDate, Boolean consent) {
+        @Embedded
+        @ElementCollection
+        private List<String> testOneToMany;
 
-          }
-  */
+        public PersistentIOU() {
+        }
+
         public PersistentIOU(UUID linearId, String agrementName,
                              String agrementInitiationDate, String agrementAgreedDate, String lastUpdatedBy,
                              String agrementLastAmendDate, String negotiationState, String cptyInitiator,
@@ -127,7 +120,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
                              String eligibleCollateral, double valuationPercentage, BigDecimal independentAmount,
                              int thresholdRating, int threshold, BigDecimal minimumTransferAmount,
                              String valuationAgent, String valuationDate, String valuationTime, Date notificationTime,
-                             String specifiedCondition, Date substitutionDate, Boolean consent) {
+                             String specifiedCondition, Date substitutionDate, Boolean consent, List<String> testOneToMany) {
 
             this.linearId = linearId;
             this.agrementName = agrementName;
@@ -156,6 +149,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.specifiedCondition = specifiedCondition;
             this.substitutionDate = substitutionDate;
             this.consent = consent;
+            this.testOneToMany = testOneToMany;
         }
 
         public UUID getLinearId() {

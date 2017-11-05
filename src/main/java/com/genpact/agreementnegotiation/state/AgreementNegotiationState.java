@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,8 +19,6 @@ import java.util.List;
  * Define your state object here.
  */
 public class AgreementNegotiationState extends AgreementStateTemplate implements QueryableState {
-
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
 
     private String baseCurrency;
     private String eligibleCurrency;
@@ -40,8 +39,14 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     private Date substitutionDate;
     private Boolean consent;
 
+    private List<String> testOneToMany;
+
     public AgreementNegotiationState() {
         super();
+
+        testOneToMany = new ArrayList<>();
+        testOneToMany.add("add");
+        testOneToMany.add("add2");
     }
 
     public AgreementNegotiationState(String baseCurrency, String eligibleCurrency,
@@ -260,12 +265,36 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
                     //AgreementUtil.getDelimiterSepratedStringFromList(this.specifiedCondition, ","),
                     this.specifiedCondition,
                     this.substitutionDate,
-                    this.consent
+                    this.consent,
+                    this.testOneToMany
             );
         } else {
             throw new IllegalArgumentException("Unrecognised schema $schema");
         }
     }
 
-
+    @Override
+    public String toString() {
+        return "AgreementNegotiationState{" +
+                "baseCurrency='" + baseCurrency + '\'' +
+                ", eligibleCurrency='" + eligibleCurrency + '\'' +
+                ", deliveryAmount=" + deliveryAmount +
+                ", returnAmount=" + returnAmount +
+                ", creditSupportAmount=" + creditSupportAmount +
+                ", eligibleCollateral='" + eligibleCollateral + '\'' +
+                ", valuationPercentage=" + valuationPercentage +
+                ", independentAmount=" + independentAmount +
+                ", thresholdRating=" + thresholdRating +
+                ", threshold=" + threshold +
+                ", minimumTransferAmount=" + minimumTransferAmount +
+                ", valuationAgent='" + valuationAgent + '\'' +
+                ", valuationDate='" + valuationDate + '\'' +
+                ", valuationTime='" + valuationTime + '\'' +
+                ", notificationTime=" + notificationTime +
+                ", specifiedCondition='" + specifiedCondition + '\'' +
+                ", substitutionDate=" + substitutionDate +
+                ", consent=" + consent +
+                ", testOneToMany=" +AgreementUtil.getDelimiterSepratedStringFromList(this.testOneToMany, ",")  +
+                '}';
+    }
 }

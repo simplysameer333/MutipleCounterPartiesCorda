@@ -5,12 +5,15 @@ import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class AgreementUtil {
+    public static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
+
     public static <T> void copyAllFields(T to, T from) {
         Class<T> clazz = (Class<T>) from.getClass();
         List<Field> fields = getAllModelFields(clazz);

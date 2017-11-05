@@ -119,7 +119,7 @@ public class AgreementNegotiationAmendFlow {
                 }
                 StateAndRef<AgreementNegotiationState>  previousStatesAndRef= previousStates.get(0);
                 AgreementNegotiationState previousState= previousStatesAndRef.getState().getData();
-
+                System.out.println("================================> previousState "+ previousState.toString());
 
                 progressTracker.setCurrentStep(TX_BUILDING);
                 // We create a transaction builder.

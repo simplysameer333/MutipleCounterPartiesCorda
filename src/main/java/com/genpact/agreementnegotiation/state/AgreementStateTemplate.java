@@ -1,20 +1,26 @@
 package com.genpact.agreementnegotiation.state;
 
+import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.LinearState;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
+
+
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 public class AgreementStateTemplate implements LinearState {
 
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
 
     private UniqueIdentifier linearId;
 
@@ -59,7 +65,7 @@ public class AgreementStateTemplate implements LinearState {
 
     public String getAgrementInitiationDate() {
         if (agrementInitiationDate != null) {
-            String dateStr = FORMAT.format(agrementInitiationDate);
+            String dateStr = AgreementUtil.FORMAT.format(agrementInitiationDate);
             return dateStr;
         }
         return "";
@@ -71,7 +77,7 @@ public class AgreementStateTemplate implements LinearState {
 
     public String getAgrementAgreedDate() {
         if (agrementAgreedDate != null) {
-            String dateStr = FORMAT.format(agrementAgreedDate);
+            String dateStr = AgreementUtil.FORMAT.format(agrementAgreedDate);
             return dateStr;
         }
         return "";
@@ -107,7 +113,7 @@ public class AgreementStateTemplate implements LinearState {
 
     public String getAgrementLastAmendDate() {
         if (agrementLastAmendDate != null) {
-            String dateStr = FORMAT.format(agrementAgreedDate);
+            String dateStr = AgreementUtil.FORMAT.format(agrementLastAmendDate);
             return dateStr;
         }
         return "";
@@ -146,5 +152,12 @@ public class AgreementStateTemplate implements LinearState {
     public List<AbstractParty> getParticipants() {
         return ImmutableList.of(cptyInitiator, cptyReciever);
     }
+
+/*
+    public String printState() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException
+    {
+        return ToStringBuilder.reflectionToString(this);
+    }
+*/
 
 }

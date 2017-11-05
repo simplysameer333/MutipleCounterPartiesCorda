@@ -108,6 +108,13 @@ public class AgreementNegotiationApi {
             final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
             System.out.println("message " + msg);
 
+            System.out.println("befoore===================================> " + agreementDummy.toString());
+            AgreementNegotiationState a1 = new AgreementNegotiationState();
+            AgreementUtil.copyAllFields(a1, agreementDummy);
+            System.out.println("after ====================================> " + a1.toString());
+
+
+
             return Response.ok("startInitFlow GET endpoint.").build();
         } catch (Throwable ex) {
             System.out.println("Exception" + ex.toString());
@@ -197,12 +204,12 @@ public class AgreementNegotiationApi {
     @Path("getAgreement/{agreementName}")
     @Produces(MediaType.APPLICATION_JSON)
     public StateAndRef<AgreementNegotiationState> getAgreement(@PathParam("agreementName") String agreementName) {
-        List<StateAndRef<AgreementNegotiationState>> result = new ArrayList<StateAndRef<AgreementNegotiationState>>();
+        List<StateAndRef<AgreementNegotiationState>> result = null;
         try {
-            //QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
-            Field uniqueAttributeName = AgreementNegotiationSchema.PersistentIOU.class.getDeclaredField("agrementName");
 
+            Field uniqueAttributeName = AgreementNegotiationSchema.PersistentIOU.class.getDeclaredField("agrementName");
             CriteriaExpression uniqueAttributeEXpression = Builder.equal(uniqueAttributeName, agreementName);
+
             QueryCriteria customCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression);
             result = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class).getStates();
 
