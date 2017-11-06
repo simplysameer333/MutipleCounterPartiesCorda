@@ -10,10 +10,10 @@ import net.corda.core.schemas.QueryableState;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Define your state object here.
@@ -44,9 +44,12 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     public AgreementNegotiationState() {
         super();
 
+        //TODO this is just sample code to test saving of List
         testOneToMany = new ArrayList<>();
-        testOneToMany.add("add");
-        testOneToMany.add("add2");
+        Random num = new Random();
+
+        testOneToMany.add("add" + num.nextInt());
+        testOneToMany.add("add" + num.nextInt());
     }
 
     public AgreementNegotiationState(String baseCurrency, String eligibleCurrency,

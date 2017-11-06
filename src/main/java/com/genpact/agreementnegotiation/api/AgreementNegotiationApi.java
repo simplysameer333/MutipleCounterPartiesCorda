@@ -1,9 +1,9 @@
 package com.genpact.agreementnegotiation.api;
 
-import com.genpact.agreementnegotiation.dummydata.DummyData;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAcceptFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
+import com.genpact.agreementnegotiation.flow.AgreementNegotiationSearchFlow;
 import com.genpact.agreementnegotiation.model.Agreement;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
@@ -280,4 +280,42 @@ public class AgreementNegotiationApi {
 
     }
 
+
+    @GET
+    @Path("getList")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<StateAndRef<AgreementNegotiationState>> getStatesUsingLinerIds(@QueryParam("listSearch")
+                                                                                       String listSearch) {
+        try {
+            final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
+
+            FlowProgressHandle<List<String>> flowHandle = rpcOps
+                    .startTrackedFlowDynamic(AgreementNegotiationSearchFlow.Initiator.class, listSearch,
+                            otherParty);
+            final List<String> linerIds = flowHandle.getReturnValue().get();
+
+            if (linerIds != null && !linerIds.isEmpty()) {
+                Field uniqueAttributeName = AgreementNegotiationSchema.PersistentIOU.class
+                        .getDeclaredField("linearId");
+                CriteriaExpression uniqueAttributeEXpression = Builder.in(uniqueAttributeName, linerIds);
+
+                QueryCriteria customCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression,
+                        Vault.StateStatus.CONSUMED);
+
+                QueryCriteria vaultCriteria = new QueryCriteria.VaultCustomQueryCriteria(uniqueAttributeEXpression, Vault.StateStatus.UNCONSUMED);
+
+                Vault.Page<AgreementNegotiationState> results = rpcOps.vaultQueryByCriteria(vaultCriteria, AgreementNegotiationState.class);
+                Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class);
+
+                results1.getStates().addAll(results.getStates());
+                return results1.getStates();
+            }
+        } catch (Exception ex) {
+            System.out.println("Exception" + ex.toString());
+            ex.printStackTrace();
+        }
+
+        return null;
+
+    }
 }

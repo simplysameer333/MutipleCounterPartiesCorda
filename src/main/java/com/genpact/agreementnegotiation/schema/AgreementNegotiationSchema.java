@@ -25,7 +25,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
     @Table(name = "iou_states")
     public static class PersistentIOU extends PersistentState {
         @Column(name = "linearId")
-        private UUID linearId;
+        private String linearId;
 
         @Column(name = "agrementName")
         private String agrementName = null;
@@ -107,6 +107,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
 
         @Embedded
         @ElementCollection
+        @CollectionTable(name = "LIST_COLLECTION")
         private List<String> testOneToMany;
 
         public PersistentIOU() {
@@ -122,7 +123,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
                              String valuationAgent, String valuationDate, String valuationTime, Date notificationTime,
                              String specifiedCondition, Date substitutionDate, Boolean consent, List<String> testOneToMany) {
 
-            this.linearId = linearId;
+            this.linearId = linearId.toString();
             this.agrementName = agrementName;
             this.agrementInitiationDate = agrementInitiationDate;
             this.agrementAgreedDate = agrementAgreedDate;
@@ -152,11 +153,11 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.testOneToMany = testOneToMany;
         }
 
-        public UUID getLinearId() {
+        public String getLinearId() {
             return linearId;
         }
 
-        public void setLinearId(UUID linearId) {
+        public void setLinearId(String linearId) {
             this.linearId = linearId;
         }
 
