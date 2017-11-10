@@ -1,5 +1,6 @@
 package com.genpact.agreementnegotiation.schema;
 
+import com.genpact.agreementnegotiation.state.EligibleCollateral;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
@@ -110,6 +111,16 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @CollectionTable(name = "LIST_COLLECTION")
         private List<String> testOneToMany;
 
+        @Embedded
+        @ElementCollection
+        @CollectionTable(name = "INITIATOR_COLLATERAL")
+        List<EligibleCollateral> cptyInitiatorCollateral;
+
+        @Embedded
+        @ElementCollection
+        @CollectionTable(name = "RESPONDER_COLLATERAL")
+        List<EligibleCollateral> cptyResponderCollateral;
+
         public PersistentIOU() {
         }
 
@@ -121,7 +132,8 @@ public class AgreementNegotiationSchema extends MappedSchema {
                              String eligibleCollateral, double valuationPercentage, BigDecimal independentAmount,
                              int thresholdRating, int threshold, BigDecimal minimumTransferAmount,
                              String valuationAgent, String valuationDate, String valuationTime, Date notificationTime,
-                             String specifiedCondition, Date substitutionDate, Boolean consent, List<String> testOneToMany) {
+                             String specifiedCondition, Date substitutionDate, Boolean consent, List<String> testOneToMany,
+                             List<EligibleCollateral> cptyInitiatorCollateral, List<EligibleCollateral> cptyIResponderCollateral) {
 
             this.linearId = linearId.toString();
             this.agrementName = agrementName;
@@ -151,6 +163,8 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.substitutionDate = substitutionDate;
             this.consent = consent;
             this.testOneToMany = testOneToMany;
+            this.cptyResponderCollateral = cptyResponderCollateral;
+            this.cptyInitiatorCollateral = cptyInitiatorCollateral;
         }
 
         public String getLinearId() {

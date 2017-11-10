@@ -1,6 +1,7 @@
 package com.genpact.agreementnegotiation.dummydata;
 
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
+import com.genpact.agreementnegotiation.state.EligibleCollateral;
 
 import java.math.BigDecimal;
 
@@ -16,5 +17,16 @@ public class DummyData {
         agreementNegotiationState.setIndependentAmount(new BigDecimal(10));
         agreementNegotiationState.setMinimumTransferAmount(new BigDecimal(10));
         return agreementNegotiationState;
+    }
+
+    public static EligibleCollateral getDummyEligibleCollateral() {
+        EligibleCollateral e1 = new EligibleCollateral();
+        e1.setCollateralType("A");
+        e1.setCurrency("USD");
+        e1.setMoodysRating("A++");
+        e1.setSpRating("spRating");
+        e1.setPeriod("1 Year");
+
+        return e1;
     }
 }

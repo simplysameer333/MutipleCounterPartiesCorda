@@ -7,20 +7,12 @@ import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
-
-
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 public class AgreementStateTemplate implements LinearState {
-
 
     private UniqueIdentifier linearId;
 

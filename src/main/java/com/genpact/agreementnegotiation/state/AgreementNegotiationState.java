@@ -1,5 +1,6 @@
 package com.genpact.agreementnegotiation.state;
 
+import com.genpact.agreementnegotiation.dummydata.DummyData;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import com.google.common.collect.ImmutableList;
@@ -38,6 +39,9 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     private String specifiedCondition;
     private Date substitutionDate;
     private Boolean consent;
+    private List<EligibleCollateral> cptyInitiatorCollateral;
+    private List<EligibleCollateral> cptyResponderCollateral;
+
 
     private List<String> testOneToMany;
 
@@ -50,6 +54,23 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
         testOneToMany.add("add" + num.nextInt());
         testOneToMany.add("add" + num.nextInt());
+
+        //TODO remove this once frontId is passing these values
+        EligibleCollateral e1 = DummyData.getDummyEligibleCollateral();
+        e1.setCollateralType("FirstA");
+
+        EligibleCollateral e2 = DummyData.getDummyEligibleCollateral();
+        e2.setCollateralType("Second");
+
+        cptyInitiatorCollateral = new ArrayList<>();
+        cptyInitiatorCollateral.add(e1);
+        cptyInitiatorCollateral.add(e2);
+
+        EligibleCollateral e3 = DummyData.getDummyEligibleCollateral();
+        e3.setCollateralType("Second");
+
+        cptyResponderCollateral = new ArrayList<>();
+        cptyResponderCollateral.add(e3);
     }
 
     public AgreementNegotiationState(String baseCurrency, String eligibleCurrency,
@@ -269,7 +290,9 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
                     this.specifiedCondition,
                     this.substitutionDate,
                     this.consent,
-                    this.testOneToMany
+                    this.testOneToMany,
+                    cptyInitiatorCollateral,
+                    cptyResponderCollateral
             );
         } else {
             throw new IllegalArgumentException("Unrecognised schema $schema");
