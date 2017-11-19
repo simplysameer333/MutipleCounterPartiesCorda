@@ -145,11 +145,4 @@ public class AgreementStateTemplate implements LinearState {
         return ImmutableList.of(cptyInitiator, cptyReciever);
     }
 
-/*
-    public String printState() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException
-    {
-        return ToStringBuilder.reflectionToString(this);
-    }
-*/
-
 }

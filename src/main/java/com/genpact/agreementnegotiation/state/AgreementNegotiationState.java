@@ -1,6 +1,5 @@
 package com.genpact.agreementnegotiation.state;
 
-import com.genpact.agreementnegotiation.dummydata.DummyData;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import com.google.common.collect.ImmutableList;
@@ -10,11 +9,8 @@ import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Define your state object here.
@@ -26,62 +22,34 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     private int deliveryAmount;
     private int returnAmount;
     private int creditSupportAmount;
-    private String eligibleCollateral;
-    private double valuationPercentage = -99;
-    private BigDecimal independentAmount = new BigDecimal(-99);
-    private int thresholdRating;
-    private int threshold;
-    private BigDecimal minimumTransferAmount;
+    private int eligibleCollateralType = 0;
+    private Boolean initialMargin;
     private String valuationAgent;
     private String valuationDate;
     private String valuationTime;
     private Date notificationTime;
-    private String specifiedCondition;
-    private Date substitutionDate;
+    private List<String> specifiedCondition;
+    private Date substitutionDateFrom = null;
+    private Date substitutionDateTo = null;
     private Boolean consent;
-    private List<EligibleCollateral> cptyInitiatorCollateral;
-    private List<EligibleCollateral> cptyResponderCollateral;
-
-
-    private List<String> testOneToMany;
+    private List<EligibleCollateralState> eligibleCollateralStates;
+    private List<EligibleCollateralState> thresholds;
+    private List<String> attachmentHash;
 
     public AgreementNegotiationState() {
         super();
-
-        //TODO this is just sample code to test saving of List
-        testOneToMany = new ArrayList<>();
-        Random num = new Random();
-
-        testOneToMany.add("add" + num.nextInt());
-        testOneToMany.add("add" + num.nextInt());
-
-        //TODO remove this once frontId is passing these values
-        EligibleCollateral e1 = DummyData.getDummyEligibleCollateral();
-        e1.setCollateralType("FirstA");
-
-        EligibleCollateral e2 = DummyData.getDummyEligibleCollateral();
-        e2.setCollateralType("Second");
-
-        cptyInitiatorCollateral = new ArrayList<>();
-        cptyInitiatorCollateral.add(e1);
-        cptyInitiatorCollateral.add(e2);
-
-        EligibleCollateral e3 = DummyData.getDummyEligibleCollateral();
-        e3.setCollateralType("Second");
-
-        cptyResponderCollateral = new ArrayList<>();
-        cptyResponderCollateral.add(e3);
     }
 
     public AgreementNegotiationState(String baseCurrency, String eligibleCurrency,
                                      int deliveryAmount, int returnAmount, int creditSupportAmount,
-                                     String eligibleCollateral, double valuationPercentage, BigDecimal independentAmount,
-                                     int thresholdRating, int threshold, BigDecimal minimumTransferAmount,
-                                     String valuationAgent, String valuationDate, String valuationTime, Date notificationTime,
-                                     String specifiedCondition, Date substitutionDate, Boolean consent,
-                                     String agrementName, Date agrementInitiationDate,
+                                     int eligibleCollateralType, String valuationAgent, String valuationDate,
+                                     String valuationTime, Date notificationTime,
+                                     Date substitutionDateTo, Boolean consent, List<String> specifiedCondition,
+                                     String agrementName, Date agrementInitiationDate, Date substitutionDateFrom,
                                      Date agrementAgreedDate, Party cptyInitiator, Party cptyReciever, Party lastUpdatedBy,
-                                     Date agrementLastAmendDate, AgreementEnumState status) {
+                                     Date agrementLastAmendDate, AgreementEnumState status, List<String> attachmentHash,
+                                     List<EligibleCollateralState> eligibleCollateralStates,
+                                     List<EligibleCollateralState> thresholds) {
 
         super(agrementName, agrementInitiationDate, agrementAgreedDate, cptyInitiator, cptyReciever, lastUpdatedBy,
                 agrementLastAmendDate, status);
@@ -91,19 +59,19 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.deliveryAmount = deliveryAmount;
         this.returnAmount = returnAmount;
         this.creditSupportAmount = creditSupportAmount;
-        this.eligibleCollateral = eligibleCollateral;
-        this.valuationPercentage = valuationPercentage;
-        this.independentAmount = independentAmount;
-        this.thresholdRating = thresholdRating;
-        this.threshold = threshold;
-        this.minimumTransferAmount = minimumTransferAmount;
+        this.eligibleCollateralType = eligibleCollateralType;
+        this.initialMargin = initialMargin;
         this.valuationAgent = valuationAgent;
         this.valuationDate = valuationDate;
         this.valuationTime = valuationTime;
         this.notificationTime = notificationTime;
+        this.substitutionDateTo = substitutionDateTo;
+        this.substitutionDateFrom = substitutionDateFrom;
         this.specifiedCondition = specifiedCondition;
-        this.substitutionDate = substitutionDate;
         this.consent = consent;
+        this.eligibleCollateralStates = this.eligibleCollateralStates;
+        this.thresholds = this.thresholds;
+        this.attachmentHash = attachmentHash;
     }
 
     public String getBaseCurrency() {
@@ -146,52 +114,20 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.creditSupportAmount = creditSupportAmount;
     }
 
-    public String getEligibleCollateral() {
-        return eligibleCollateral;
+    public int getEligibleCollateralType() {
+        return eligibleCollateralType;
     }
 
-    public void setEligibleCollateral(String eligibleCollateral) {
-        this.eligibleCollateral = eligibleCollateral;
+    public void setEligibleCollateralType(int eligibleCollateralType) {
+        this.eligibleCollateralType = eligibleCollateralType;
     }
 
-    public double getValuationPercentage() {
-        return valuationPercentage;
+    public Boolean getInitialMargin() {
+        return initialMargin;
     }
 
-    public void setValuationPercentage(double valuationPercentage) {
-        this.valuationPercentage = valuationPercentage;
-    }
-
-    public BigDecimal getIndependentAmount() {
-        return independentAmount;
-    }
-
-    public void setIndependentAmount(BigDecimal independentAmount) {
-        this.independentAmount = independentAmount;
-    }
-
-    public int getThresholdRating() {
-        return thresholdRating;
-    }
-
-    public void setThresholdRating(int thresholdRating) {
-        this.thresholdRating = thresholdRating;
-    }
-
-    public int getThreshold() {
-        return threshold;
-    }
-
-    public void setThreshold(int threshold) {
-        this.threshold = threshold;
-    }
-
-    public BigDecimal getMinimumTransferAmount() {
-        return minimumTransferAmount;
-    }
-
-    public void setMinimumTransferAmount(BigDecimal minimumTransferAmount) {
-        this.minimumTransferAmount = minimumTransferAmount;
+    public void setInitialMargin(Boolean initialMargin) {
+        this.initialMargin = initialMargin;
     }
 
     public String getValuationAgent() {
@@ -218,28 +154,61 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.valuationTime = valuationTime;
     }
 
-    public Date getNotificationTime() {
+    public String getNotificationTime() {
+        if (notificationTime != null) {
+            String dateStr = AgreementUtil.FORMAT.format(notificationTime);
+            return dateStr;
+        }
+        return "";
+    }
+
+    public Date getNotificationTimeAsDate() {
         return notificationTime;
     }
+
 
     public void setNotificationTime(Date notificationTime) {
         this.notificationTime = notificationTime;
     }
 
-    public String getSpecifiedCondition() {
+    public List<String> getSpecifiedCondition() {
         return specifiedCondition;
     }
 
-    public void setSpecifiedCondition(String specifiedCondition) {
+    public void setSpecifiedCondition(List<String> specifiedCondition) {
         this.specifiedCondition = specifiedCondition;
     }
 
-    public Date getSubstitutionDate() {
-        return substitutionDate;
+    public Date getSubstitutionDateFromAsDate() {
+        return substitutionDateFrom;
     }
 
-    public void setSubstitutionDate(Date substitutionDate) {
-        this.substitutionDate = substitutionDate;
+    public String getSubstitutionDateFrom() {
+        if (substitutionDateFrom != null) {
+            String dateStr = AgreementUtil.FORMAT.format(substitutionDateFrom);
+            return dateStr;
+        }
+        return "";
+    }
+
+    public void setSubstitutionDateFrom(Date substitutionDateFrom) {
+        this.substitutionDateFrom = substitutionDateFrom;
+    }
+
+    public Date getSubstitutionDateToAsDate() {
+        return substitutionDateTo;
+    }
+
+    public String getSubstitutionDateTo() {
+        if (substitutionDateTo != null) {
+            String dateStr = AgreementUtil.FORMAT.format(substitutionDateTo);
+            return dateStr;
+        }
+        return "";
+    }
+
+    public void setSubstitutionDateTo(Date substitutionDateTo) {
+        this.substitutionDateTo = substitutionDateTo;
     }
 
     public Boolean getConsent() {
@@ -248,6 +217,22 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
     public void setConsent(Boolean consent) {
         this.consent = consent;
+    }
+
+    public List<EligibleCollateralState> getEligibleCollateralStates() {
+        return eligibleCollateralStates;
+    }
+
+    public void setEligibleCollateralStates(List<EligibleCollateralState> eligibleCollateralStates) {
+        this.eligibleCollateralStates = eligibleCollateralStates;
+    }
+
+    public List<EligibleCollateralState> getThresholds() {
+        return thresholds;
+    }
+
+    public void setThresholds(List<EligibleCollateralState> thresholds) {
+        this.thresholds = thresholds;
     }
 
     @NotNull
@@ -271,28 +256,21 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
                     this.getCptyInitiator().getName().getCommonName(),
                     this.getCptyReciever().getName().getCommonName(),
                     this.baseCurrency,
-                    //AgreementUtil.getDelimiterSepratedStringFromList(this.eligibleCurrency, ","),
                     this.eligibleCurrency,
                     this.deliveryAmount,
                     this.returnAmount,
                     this.creditSupportAmount,
-                    this.eligibleCollateral,
-                    this.valuationPercentage,
-                    this.independentAmount,
-                    this.thresholdRating,
-                    this.threshold,
-                    this.minimumTransferAmount,
+                    this.eligibleCollateralType,
                     this.valuationAgent,
                     this.valuationDate,
                     this.valuationTime,
                     this.notificationTime,
-                    //AgreementUtil.getDelimiterSepratedStringFromList(this.specifiedCondition, ","),
                     this.specifiedCondition,
-                    this.substitutionDate,
+                    this.substitutionDateTo,
+                    this.substitutionDateFrom,
                     this.consent,
-                    this.testOneToMany,
-                    cptyInitiatorCollateral,
-                    cptyResponderCollateral
+                    eligibleCollateralStates,
+                    thresholds
             );
         } else {
             throw new IllegalArgumentException("Unrecognised schema $schema");
@@ -307,20 +285,19 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
                 ", deliveryAmount=" + deliveryAmount +
                 ", returnAmount=" + returnAmount +
                 ", creditSupportAmount=" + creditSupportAmount +
-                ", eligibleCollateral='" + eligibleCollateral + '\'' +
-                ", valuationPercentage=" + valuationPercentage +
-                ", independentAmount=" + independentAmount +
-                ", thresholdRating=" + thresholdRating +
-                ", threshold=" + threshold +
-                ", minimumTransferAmount=" + minimumTransferAmount +
+                ", eligibleCollateralType=" + eligibleCollateralType +
+                ", initialMargin=" + initialMargin +
                 ", valuationAgent='" + valuationAgent + '\'' +
                 ", valuationDate='" + valuationDate + '\'' +
                 ", valuationTime='" + valuationTime + '\'' +
                 ", notificationTime=" + notificationTime +
-                ", specifiedCondition='" + specifiedCondition + '\'' +
-                ", substitutionDate=" + substitutionDate +
+                ", specifiedCondition=" + specifiedCondition +
+                ", substitutionDateFrom=" + substitutionDateFrom +
+                ", substitutionDateTo=" + substitutionDateTo +
                 ", consent=" + consent +
-                ", testOneToMany=" +AgreementUtil.getDelimiterSepratedStringFromList(this.testOneToMany, ",")  +
+                ", eligibleCollateralStates=" + eligibleCollateralStates +
+                ", thresholds=" + thresholds +
+                ", attachmentHash=" + attachmentHash +
                 '}';
     }
 }

@@ -1,5 +1,6 @@
 package com.genpact.agreementnegotiation.whitelist;
 
+import com.genpact.agreementnegotiation.state.EligibleCollateralState;
 import net.corda.core.serialization.SerializationWhitelist;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +15,7 @@ public class AgreementNegotiationSerializationWhitelist implements Serialization
         List<Class<?>> whiteList = new ArrayList<Class<?>> ();
         whiteList.add(java.util.Date.class);
         whiteList.add(com.genpact.agreementnegotiation.state.AgreementNegotiationState.class);
-        whiteList.add(com.genpact.agreementnegotiation.state.EligibleCollateral.class);
+        whiteList.add(EligibleCollateralState.class);
         whiteList.add(com.genpact.agreementnegotiation.state.AgreementEnumState.class);
         whiteList.add(net.corda.core.identity.Party.class);
         whiteList.add(java.util.HashSet.class);

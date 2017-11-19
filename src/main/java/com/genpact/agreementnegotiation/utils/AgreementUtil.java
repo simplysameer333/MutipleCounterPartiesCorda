@@ -1,10 +1,11 @@
 package com.genpact.agreementnegotiation.utils;
 
 import com.genpact.agreementnegotiation.model.Agreement;
+import com.genpact.agreementnegotiation.model.EligibleCollateral;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
+import com.genpact.agreementnegotiation.state.EligibleCollateralState;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,20 +55,45 @@ public class AgreementUtil {
         agreementNegotiationState.setDeliveryAmount(agreement.getDeliveryAmount());
         agreementNegotiationState.setReturnAmount(agreement.getReturnAmount());
         agreementNegotiationState.setCreditSupportAmount(agreement.getCreditSupportAmount());
-        agreementNegotiationState.setEligibleCollateral(agreement.getEligibleCollateral());
-        agreementNegotiationState.setValuationPercentage(agreement.getValuationPercentageCash());
-        agreementNegotiationState.setIndependentAmount(new BigDecimal(agreement.getIndependentAmount()));
-        agreementNegotiationState.setThresholdRating(agreement.getThresholdRating());
-        agreementNegotiationState.setThreshold(agreement.getThreshold());
-        agreementNegotiationState.setMinimumTransferAmount(new BigDecimal(agreement.getMinimumTransferAmount()));
+        agreementNegotiationState.setEligibleCollateralType(agreement.getEligibleCollateralType());
+        agreementNegotiationState.setInitialMargin(agreement.getInitialMargin() == 1 ? true : false);
         agreementNegotiationState.setValuationAgent(agreement.getValuationAgent());
         agreementNegotiationState.setValuationDate(agreement.getValuationDate());
         agreementNegotiationState.setValuationTime(agreement.getValuationTime());
         agreementNegotiationState.setNotificationTime(agreement.getNotificationTime());
-        agreementNegotiationState.setSpecifiedCondition(agreement.getSpecifiedCondition());
-        agreementNegotiationState.setSubstitutionDate(agreement.getSubstitutionDate());
+        agreementNegotiationState.setSubstitutionDateFrom(agreement.getSubstitutionDateFrom());
+        agreementNegotiationState.setSubstitutionDateTo(agreement.getSubstitutionDateTo());
+        agreementNegotiationState.setSpecifiedCondition(agreement.getSpecifiedConditions());
         agreementNegotiationState.setConsent(agreement.getConsent() == 1 ? true:false );
+
+        List<EligibleCollateralState> eligibleCollateralStates = new ArrayList<>();
+        for (EligibleCollateral value : agreement.getEligibleCollaterals()) {
+            eligibleCollateralStates.add(copyEligibleCollateralState(value));
+        }
+        agreementNegotiationState.setEligibleCollateralStates(eligibleCollateralStates);
+
+        List<EligibleCollateralState> thresholds = new ArrayList<>();
+        for (EligibleCollateral value : agreement.getThresholds()) {
+            thresholds.add(copyEligibleCollateralState(value));
+        }
+        agreementNegotiationState.setThresholds(thresholds);
+
         return agreementNegotiationState;
     }
 
+    public static EligibleCollateralState copyEligibleCollateralState(EligibleCollateral value) {
+        EligibleCollateralState eligibleCollateralStateValue = new EligibleCollateralState();
+        eligibleCollateralStateValue.setCurrency(value.getCurrency());
+        eligibleCollateralStateValue.setRatingType(value.getRatingType());
+        eligibleCollateralStateValue.setRating(value.getRating());
+        eligibleCollateralStateValue.setRatingRangeFrom(value.getRatingRangeFrom());
+        eligibleCollateralStateValue.setRatingRangeTo(value.getRatingRangeTo());
+        eligibleCollateralStateValue.setAmount(value.getAmount());
+        eligibleCollateralStateValue.setRemainingMaturity(value.getRemainingMaturity() == 1 ? true : false);
+        eligibleCollateralStateValue.setRemMaturityTo(value.getRemMaturityTo());
+        eligibleCollateralStateValue.setInitiatorAccepted(value.getPartyA() == 1 ? true : false);
+        eligibleCollateralStateValue.setResponderAccecpted(value.getPartyB() == 1 ? true : false);
+
+        return eligibleCollateralStateValue;
+    }
 }

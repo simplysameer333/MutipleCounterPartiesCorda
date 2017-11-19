@@ -1,6 +1,6 @@
 package com.genpact.agreementnegotiation.schema;
 
-import com.genpact.agreementnegotiation.state.EligibleCollateral;
+import com.genpact.agreementnegotiation.state.EligibleCollateralState;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
@@ -68,13 +68,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
         private int creditSupportAmount;
 
         @Column(name = "eligibleCollateral")
-        private String eligibleCollateral;
-
-        @Column(name = "valuationPercentage")
-        private double valuationPercentage;
-
-        @Column(name = "independentAmount")
-        private BigDecimal independentAmount;
+        private int eligibleCollateralType;
 
         @Column(name = "thresholdRating")
         private int thresholdRating;
@@ -97,29 +91,29 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @Column(name = "notificationTime")
         private Date notificationTime;
 
-        @Column(name = "specifiedCondition")
-        private String specifiedCondition;
+        @Column(name = "substitutionDateFrom")
+        private Date substitutionDateFrom;
 
-        @Column(name = "substitutionDate")
-        private Date substitutionDate;
+        @Column(name = "substitutionDateTo")
+        private Date substitutionDateTo;
 
         @Column(name = "consent")
         private Boolean consent;
 
         @Embedded
         @ElementCollection
-        @CollectionTable(name = "LIST_COLLECTION")
-        private List<String> testOneToMany;
+        @CollectionTable(name = "LIST_SPECIFIC_CONDITIONS")
+        private List<String> specifiedCondition;
 
         @Embedded
         @ElementCollection
-        @CollectionTable(name = "INITIATOR_COLLATERAL")
-        List<EligibleCollateral> cptyInitiatorCollateral;
+        @CollectionTable(name = "Agreement_EligibleCollateralStates")
+        List<EligibleCollateralState> eligibleCollateralStates;
 
         @Embedded
         @ElementCollection
-        @CollectionTable(name = "RESPONDER_COLLATERAL")
-        List<EligibleCollateral> cptyResponderCollateral;
+        @CollectionTable(name = "Agreement_Thresholds")
+        List<EligibleCollateralState> threshods;
 
         public PersistentIOU() {
         }
@@ -129,11 +123,10 @@ public class AgreementNegotiationSchema extends MappedSchema {
                              String agrementLastAmendDate, String negotiationState, String cptyInitiator,
                              String cptyReciever, String baseCurrency, String eligibleCurrency,
                              int deliveryAmount, int returnAmount, int creditSupportAmount,
-                             String eligibleCollateral, double valuationPercentage, BigDecimal independentAmount,
-                             int thresholdRating, int threshold, BigDecimal minimumTransferAmount,
-                             String valuationAgent, String valuationDate, String valuationTime, Date notificationTime,
-                             String specifiedCondition, Date substitutionDate, Boolean consent, List<String> testOneToMany,
-                             List<EligibleCollateral> cptyInitiatorCollateral, List<EligibleCollateral> cptyIResponderCollateral) {
+                             int eligibleCollateralType, String valuationAgent, String valuationDate, String valuationTime,
+                             Date notificationTime, List<String> specifiedCondition, Date substitutionDateTo,
+                             Date substitutionDateFrom, Boolean consent, List<EligibleCollateralState> eligibleCollateralStates,
+                             List<EligibleCollateralState> threshods) {
 
             this.linearId = linearId.toString();
             this.agrementName = agrementName;
@@ -149,22 +142,17 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.deliveryAmount = deliveryAmount;
             this.returnAmount = returnAmount;
             this.creditSupportAmount = creditSupportAmount;
-            this.eligibleCollateral = eligibleCollateral;
-            this.valuationPercentage = valuationPercentage;
-            this.independentAmount = independentAmount;
-            this.thresholdRating = thresholdRating;
-            this.threshold = threshold;
-            this.minimumTransferAmount = minimumTransferAmount;
+            this.eligibleCollateralType = eligibleCollateralType;
             this.valuationAgent = valuationAgent;
             this.valuationDate = valuationDate;
             this.valuationTime = valuationTime;
             this.notificationTime = notificationTime;
             this.specifiedCondition = specifiedCondition;
-            this.substitutionDate = substitutionDate;
+            this.substitutionDateTo = substitutionDateTo;
+            this.substitutionDateFrom = substitutionDateFrom;
             this.consent = consent;
-            this.testOneToMany = testOneToMany;
-            this.cptyResponderCollateral = cptyResponderCollateral;
-            this.cptyInitiatorCollateral = cptyInitiatorCollateral;
+            this.eligibleCollateralStates = eligibleCollateralStates;
+            this.threshods = threshods;
         }
 
         public String getLinearId() {
@@ -279,28 +267,44 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.creditSupportAmount = creditSupportAmount;
         }
 
-        public String getEligibleCollateral() {
-            return eligibleCollateral;
+        public int getEligibleCollateralType() {
+            return eligibleCollateralType;
         }
 
-        public void setEligibleCollateral(String eligibleCollateral) {
-            this.eligibleCollateral = eligibleCollateral;
+        public void setEligibleCollateralType(int eligibleCollateralType) {
+            this.eligibleCollateralType = eligibleCollateralType;
         }
 
-        public double getValuationPercentage() {
-            return valuationPercentage;
+        public Date getSubstitutionDateFrom() {
+            return substitutionDateFrom;
         }
 
-        public void setValuationPercentage(double valuationPercentage) {
-            this.valuationPercentage = valuationPercentage;
+        public void setSubstitutionDateFrom(Date substitutionDateFrom) {
+            this.substitutionDateFrom = substitutionDateFrom;
         }
 
-        public BigDecimal getIndependentAmount() {
-            return independentAmount;
+        public Date getSubstitutionDateTo() {
+            return substitutionDateTo;
         }
 
-        public void setIndependentAmount(BigDecimal independentAmount) {
-            this.independentAmount = independentAmount;
+        public void setSubstitutionDateTo(Date substitutionDateTo) {
+            this.substitutionDateTo = substitutionDateTo;
+        }
+
+        public List<EligibleCollateralState> getEligibleCollateralStates() {
+            return eligibleCollateralStates;
+        }
+
+        public void setEligibleCollateralStates(List<EligibleCollateralState> eligibleCollateralStates) {
+            this.eligibleCollateralStates = eligibleCollateralStates;
+        }
+
+        public List<EligibleCollateralState> getThreshods() {
+            return threshods;
+        }
+
+        public void setThreshods(List<EligibleCollateralState> threshods) {
+            this.threshods = threshods;
         }
 
         public int getThresholdRating() {
@@ -359,20 +363,12 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.notificationTime = notificationTime;
         }
 
-        public String getSpecifiedCondition() {
+        public List<String> getSpecifiedCondition() {
             return specifiedCondition;
         }
 
-        public void setSpecifiedCondition(String specifiedCondition) {
+        public void setSpecifiedCondition(List<String> specifiedCondition) {
             this.specifiedCondition = specifiedCondition;
-        }
-
-        public Date getSubstitutionDate() {
-            return substitutionDate;
-        }
-
-        public void setSubstitutionDate(Date substitutionDate) {
-            this.substitutionDate = substitutionDate;
         }
 
         public Boolean getConsent() {
