@@ -96,4 +96,64 @@ public class AgreementUtil {
 
         return eligibleCollateralStateValue;
     }
+
+    public static Agreement copyStateToVO(AgreementNegotiationState agreementNegotiationState) {
+        Agreement agreement = new Agreement();
+        agreement.setAgrementName(agreementNegotiationState.getAgrementName());
+        agreement.setBaseCurrency(agreementNegotiationState.getBaseCurrency());
+        agreement.setEligibleCurrency(agreementNegotiationState.getEligibleCurrency());
+        agreement.setDeliveryAmount(agreementNegotiationState.getDeliveryAmount());
+        agreement.setReturnAmount(agreementNegotiationState.getReturnAmount());
+        agreement.setCreditSupportAmount(agreementNegotiationState.getCreditSupportAmount());
+        agreement.setEligibleCollateralType(agreementNegotiationState.getEligibleCollateralType());
+        agreement.setInitialMargin(agreementNegotiationState.getInitialMargin() ? 1 : 0);
+        agreement.setValuationAgent(agreementNegotiationState.getValuationAgent());
+        agreement.setValuationDate(agreementNegotiationState.getValuationDate());
+        agreement.setValuationTime(agreementNegotiationState.getValuationTime());
+        agreement.setNotificationTime(agreementNegotiationState.getNotificationTimeAsDate());
+        agreement.setSubstitutionDateFrom(agreementNegotiationState.getSubstitutionDateFromAsDate());
+        agreement.setSubstitutionDateTo(agreementNegotiationState.getSubstitutionDateToAsDate());
+        agreement.setSpecifiedConditions(agreementNegotiationState.getSpecifiedCondition());
+        agreement.setConsent(agreementNegotiationState.getConsent() ? 1 : 0);
+
+        //Additional
+        agreement.setAgrementInitiationDate(agreementNegotiationState.getAgrementInitiationDateAsDate());
+        agreement.setAgrementAgreedDate(agreementNegotiationState.getAgrementAgreedDateAsDate());
+        agreement.setAgrementLastAmendDate(agreementNegotiationState.getAgrementLastAmendDateAsDate());
+        agreement.setCptyInitiator(agreementNegotiationState.getCptyInitiator().getName());
+        agreement.setCounterparty(agreementNegotiationState.getCptyReciever().getName());
+        agreement.setLastUpdatedBy(agreementNegotiationState.getLastUpdatedBy().getName());
+        agreement.setId(agreementNegotiationState.getLinearId().getId().toString());
+        agreement.setStatus(agreementNegotiationState.getStatus().toString());
+
+        List<EligibleCollateral> eligibleCollateralStates = new ArrayList<>();
+        for (EligibleCollateralState value : agreementNegotiationState.getEligibleCollateralStates()) {
+            eligibleCollateralStates.add(copyEligibleCollateralStatetoVO(value));
+        }
+        agreement.setEligibleCollaterals(eligibleCollateralStates);
+
+        List<EligibleCollateral> thresholds = new ArrayList<>();
+        for (EligibleCollateralState value : agreementNegotiationState.getThresholds()) {
+            thresholds.add(copyEligibleCollateralStatetoVO(value));
+        }
+        agreement.setThresholds(thresholds);
+
+        return agreement;
+    }
+
+    public static EligibleCollateral copyEligibleCollateralStatetoVO(EligibleCollateralState value) {
+        EligibleCollateral eligibleCollateral = new EligibleCollateral();
+        eligibleCollateral.setCurrency(value.getCurrency());
+        eligibleCollateral.setRatingType(value.getRatingType());
+        eligibleCollateral.setRating(value.getRating());
+        eligibleCollateral.setRatingRangeFrom(value.getRatingRangeFrom());
+        eligibleCollateral.setRatingRangeTo(value.getRatingRangeTo());
+        eligibleCollateral.setAmount(value.getAmount());
+        eligibleCollateral.setRemainingMaturity(value.getRemainingMaturity() ? 1 : 0);
+        eligibleCollateral.setRemMaturityTo(value.getRemMaturityTo());
+        eligibleCollateral.setPartyA(value.getInitiatorAccepted() ? 1 : 0);
+        eligibleCollateral.setPartyB(value.getResponderAccecpted() ? 1 : 0);
+
+        return eligibleCollateral;
+    }
 }

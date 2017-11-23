@@ -7,6 +7,7 @@ import net.corda.core.identity.Party;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
@@ -279,7 +280,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
     @Override
     public String toString() {
-        return "AgreementNegotiationState{" +
+      /*  return "AgreementNegotiationState{" +
                 "baseCurrency='" + baseCurrency + '\'' +
                 ", eligibleCurrency='" + eligibleCurrency + '\'' +
                 ", deliveryAmount=" + deliveryAmount +
@@ -299,5 +300,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
                 ", thresholds=" + thresholds +
                 ", attachmentHash=" + attachmentHash +
                 '}';
+                */
+        return ToStringBuilder.reflectionToString(this);
     }
 }

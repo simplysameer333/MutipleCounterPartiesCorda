@@ -126,7 +126,10 @@ public class AgreementNegotiationContract implements Contract {
                     if (out.getStatus() == AgreementEnumState.FULLY_ACCEPTED) {
                         check.using("For FULLY_ACCEPTED, INPUT state must be PARTIAL_ACCEPTED",
                                 in.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED);
-
+                        System.out.println("in.getLastUpdatedBy().getName() ========================= > " +
+                                in.getLastUpdatedBy().getName());
+                        System.out.println("out.getLastUpdatedBy().getName() ========================= > " +
+                                out.getLastUpdatedBy().getName());
                         check.using("Cannot be accepted by same person", !in.getLastUpdatedBy().getName()
                                 .equals(out.getLastUpdatedBy().getName()));
                     } else if (out.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED) {

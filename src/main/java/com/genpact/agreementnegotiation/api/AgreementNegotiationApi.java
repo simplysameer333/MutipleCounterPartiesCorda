@@ -70,6 +70,7 @@ public class AgreementNegotiationApi {
 
         try {
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
+            System.out.println("initFlow ==============================>" + agreement.toString());
             AgreementNegotiationState agreementDummy = AgreementUtil.copyState(agreement);
             agreementDummy.setCptyInitiator(rpcOps.wellKnownPartyFromX500Name(myLegalName));
 
@@ -128,7 +129,7 @@ public class AgreementNegotiationApi {
     @PUT
     @Path("amendFlow/{partyName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startAmendFlow(AgreementNegotiationState agreement, @PathParam("partyName") String partyName) {
+    public Response startAmendFlow(Agreement agreement, @PathParam("partyName") String partyName) {
         try {
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
 
@@ -137,8 +138,10 @@ public class AgreementNegotiationApi {
                     (double) agreement.getAgreementValue(), agreement.getCollateral(),
                     rpcOps.nodeInfo().getLegalIdentities().get(0), otherParty);
             */
+            AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
+
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, agreement,
+                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, agreementNegotiationState,
                             rpcOps.nodeInfo().getLegalIdentities().get(0));
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
@@ -162,7 +165,7 @@ public class AgreementNegotiationApi {
     @PUT
     @Path("acceptFlow")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response accept(AgreementNegotiationState agreement) {
+    public Response accept(Agreement agreement) {
         try {
 
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
@@ -171,8 +174,9 @@ public class AgreementNegotiationApi {
           /*  AgreementNegotiationState iouValue = new AgreementNegotiationState();
             iouValue.setAgrementName(agreement.getAgrementName());
 */
+            AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationAcceptFlow.Initiator.class, agreement,
+                    .startTrackedFlowDynamic(AgreementNegotiationAcceptFlow.Initiator.class, agreementNegotiationState,
                             otherParty);
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
@@ -194,16 +198,23 @@ public class AgreementNegotiationApi {
     @GET
     @Path("getAgreements")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StateAndRef<AgreementNegotiationState>> getAgreements() {
+    public List<Agreement> getAgreements() {
         QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
-        return rpcOps.vaultQueryByCriteria(criteria, AgreementNegotiationState.class).getStates();
+        List<StateAndRef<AgreementNegotiationState>> agreementNegotiationStates =
+                rpcOps.vaultQueryByCriteria(criteria, AgreementNegotiationState.class).getStates();
 
+        List<Agreement> agreementsList = new ArrayList<>();
+        for (StateAndRef<AgreementNegotiationState> value : agreementNegotiationStates) {
+            Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
+            agreementsList.add(agreement);
+        }
+        return agreementsList;
     }
 
     @GET
     @Path("getAgreement/{agreementName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public StateAndRef<AgreementNegotiationState> getAgreement(@PathParam("agreementName") String agreementName) {
+    public Agreement getAgreement(@PathParam("agreementName") String agreementName) {
         List<StateAndRef<AgreementNegotiationState>> result = null;
         try {
 
@@ -214,7 +225,7 @@ public class AgreementNegotiationApi {
             result = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class).getStates();
 
             if (result.size() > 0) {
-                return result.get(0);
+                return AgreementUtil.copyStateToVO(result.get(0).getState().getData());
             }
 
         } catch (Exception ex) {
@@ -255,7 +266,7 @@ public class AgreementNegotiationApi {
     @GET
     @Path("audit")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StateAndRef<AgreementNegotiationState>> getAudit(@QueryParam("agreementName") String agreementName) {
+    public List<Agreement> getAudit(@QueryParam("agreementName") String agreementName) {
 
         try {
             Field uniqueAttributeName = AgreementNegotiationSchema.PersistentIOU.class.getDeclaredField("agrementName");
@@ -269,7 +280,13 @@ public class AgreementNegotiationApi {
             Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class);
 
             results1.getStates().addAll(results.getStates());
-            return results1.getStates();
+
+            List<Agreement> agreementsList = new ArrayList<>();
+            for (StateAndRef<AgreementNegotiationState> value : results1.getStates()) {
+                Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
+                agreementsList.add(agreement);
+            }
+            return agreementsList;
         }
         catch (Exception ex) {
             System.out.println("Exception" + ex.toString());
@@ -284,8 +301,8 @@ public class AgreementNegotiationApi {
     @GET
     @Path("getList")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StateAndRef<AgreementNegotiationState>> getStatesUsingLinerIds(@QueryParam("listSearch")
-                                                                                       String listSearch) {
+    public List<Agreement> getStatesUsingLinerIds(@QueryParam("listSearch")
+                                                          String listSearch) {
         try {
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
 
@@ -308,7 +325,12 @@ public class AgreementNegotiationApi {
                 Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class);
 
                 results1.getStates().addAll(results.getStates());
-                return results1.getStates();
+                List<Agreement> agreementsList = new ArrayList<>();
+                for (StateAndRef<AgreementNegotiationState> value : results1.getStates()) {
+                    Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
+                    agreementsList.add(agreement);
+                }
+                return agreementsList;
             }
         } catch (Exception ex) {
             System.out.println("Exception" + ex.toString());

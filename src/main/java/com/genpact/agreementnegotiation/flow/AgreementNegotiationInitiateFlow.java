@@ -104,6 +104,7 @@ public class AgreementNegotiationInitiateFlow {
             // We create the transaction components.
             agreementNegotiationState.setLinearId(new UniqueIdentifier());
             agreementNegotiationState.setAgrementLastAmendDate(new Date());
+            agreementNegotiationState.setAgrementInitiationDate(new Date());
             agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
             agreementNegotiationState.setStatus(AgreementEnumState.INITIAL);
             agreementNegotiationState.setCptyReciever(otherParty);

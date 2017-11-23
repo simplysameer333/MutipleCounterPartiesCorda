@@ -1,13 +1,16 @@
 package com.genpact.agreementnegotiation.model;
 
 import net.corda.core.serialization.CordaSerializable;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @CordaSerializable
 public class EligibleCollateral {
 
-    public int currency;
+    public int collateralType;
+    public String currency;
     public int ratingType;
     public int rating;
+    public String ratingText;
     public int ratingRangeFrom;
     public int ratingRangeTo;
     public int amount;
@@ -20,12 +23,14 @@ public class EligibleCollateral {
     public EligibleCollateral() {
     }
 
-    public EligibleCollateral(int currency, int ratingType, int rating, int ratingRangeFrom, int ratingRangeTo,
+    public EligibleCollateral(int collateralType, String currency, int ratingType, int rating, String ratingText, int ratingRangeFrom, int ratingRangeTo,
                               int amount, int remainingMaturity, int remMaturityFrom, int remMaturityTo,
                               int partyA, int partyB) {
+        this.collateralType = collateralType;
         this.currency = currency;
         this.ratingType = ratingType;
         this.rating = rating;
+        this.ratingText = ratingText;
         this.ratingRangeFrom = ratingRangeFrom;
         this.ratingRangeTo = ratingRangeTo;
         this.amount = amount;
@@ -36,11 +41,20 @@ public class EligibleCollateral {
         this.partyB = partyB;
     }
 
-    public int getCurrency() {
+    public int getCollateralType() {
+        return collateralType;
+    }
+
+    public void setCollateralType(int collateralType) {
+        this.collateralType = collateralType;
+    }
+
+
+    public String getCurrency() {
         return currency;
     }
 
-    public void setCurrency(int currency) {
+    public void setCurrency(String currency) {
         this.currency = currency;
     }
 
@@ -58,6 +72,14 @@ public class EligibleCollateral {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    public String getRatingText() {
+        return ratingText;
+    }
+
+    public void setRatingText(String ratingText) {
+        this.ratingText = ratingText;
     }
 
     public int getRatingRangeFrom() {
@@ -126,7 +148,8 @@ public class EligibleCollateral {
 
     @Override
     public String toString() {
-        return "EligibleCollateralState{" +
+       /* return "EligibleCollateralState{" +
+                "collateralType=" + collateralType +
                 "currency=" + currency +
                 ", ratingType=" + ratingType +
                 ", rating=" + rating +
@@ -139,5 +162,7 @@ public class EligibleCollateral {
                 ", partyA=" + partyA +
                 ", partyB=" + partyB +
                 '}';
+                */
+        return ToStringBuilder.reflectionToString(this);
     }
 }

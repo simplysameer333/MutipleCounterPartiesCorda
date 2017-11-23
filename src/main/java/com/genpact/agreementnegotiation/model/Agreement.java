@@ -2,6 +2,7 @@ package com.genpact.agreementnegotiation.model;
 
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.serialization.CordaSerializable;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,12 +26,20 @@ public class Agreement {
     private String valuationTime = null;
     private Date notificationTime = null;
     private List<String> specifiedConditions = new ArrayList<String>();
-    ;
+
     private Date substitutionDateFrom = null;
     private Date substitutionDateTo = null;
     private int consent = 0;//boolean 0 or 1
     private List<String> attachmentHash;
 
+    //Additional Added fields
+    private Date agrementInitiationDate = null;
+    private Date agrementAgreedDate = null;
+    private CordaX500Name cptyInitiator = null;
+    private CordaX500Name lastUpdatedBy = null;
+    private Date agrementLastAmendDate = null;
+    private String id = null;
+    private String status = null;
 
     public Agreement() {
     }
@@ -217,9 +226,65 @@ public class Agreement {
         this.attachmentHash = attachmentHash;
     }
 
+    public Date getAgrementInitiationDate() {
+        return agrementInitiationDate;
+    }
+
+    public void setAgrementInitiationDate(Date agrementInitiationDate) {
+        this.agrementInitiationDate = agrementInitiationDate;
+    }
+
+    public Date getAgrementAgreedDate() {
+        return agrementAgreedDate;
+    }
+
+    public void setAgrementAgreedDate(Date agrementAgreedDate) {
+        this.agrementAgreedDate = agrementAgreedDate;
+    }
+
+    public CordaX500Name getCptyInitiator() {
+        return cptyInitiator;
+    }
+
+    public void setCptyInitiator(CordaX500Name cptyInitiator) {
+        this.cptyInitiator = cptyInitiator;
+    }
+
+    public CordaX500Name getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(CordaX500Name lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public Date getAgrementLastAmendDate() {
+        return agrementLastAmendDate;
+    }
+
+    public void setAgrementLastAmendDate(Date agrementLastAmendDate) {
+        this.agrementLastAmendDate = agrementLastAmendDate;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
-        return "Agreement{" +
+        /*return "Agreement{" +
                 "agrementName='" + agrementName + '\'' +
                 ", counterparty=" + counterparty +
                 ", baseCurrency='" + baseCurrency + '\'' +
@@ -240,8 +305,14 @@ public class Agreement {
                 ", substitutionDateTo=" + substitutionDateTo +
                 ", consent=" + consent +
                 ", attachmentHash=" + attachmentHash +
+                ", agrementInitiationDate=" + agrementInitiationDate +
+                ", agrementAgreedDate=" + agrementAgreedDate +
+                ", cptyInitiator=" + cptyInitiator +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", agrementLastAmendDate=" + agrementLastAmendDate +
+                ", id='" + id + '\'' +
                 '}';
+                */
+        return ToStringBuilder.reflectionToString(this);
     }
-
-
 }

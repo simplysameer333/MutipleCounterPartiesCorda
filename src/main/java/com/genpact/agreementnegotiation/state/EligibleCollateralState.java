@@ -1,7 +1,9 @@
 package com.genpact.agreementnegotiation.state;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class EligibleCollateralState {
-    public int currency;
+    public String currency;
     public int ratingType;
     public int rating;
     public int ratingRangeFrom;
@@ -16,7 +18,7 @@ public class EligibleCollateralState {
     public EligibleCollateralState() {
     }
 
-    public EligibleCollateralState(int currency, int ratingType, int rating, int ratingRangeFrom, int ratingRangeTo,
+    public EligibleCollateralState(String currency, int ratingType, int rating, int ratingRangeFrom, int ratingRangeTo,
                                    int amount, Boolean remainingMaturity, int remMaturityFrom,
                                    int remMaturityTo, Boolean partyA, Boolean partyB) {
         this.currency = currency;
@@ -32,11 +34,11 @@ public class EligibleCollateralState {
         this.isResponderAccecpted = partyB;
     }
 
-    public int getCurrency() {
+    public String getCurrency() {
         return currency;
     }
 
-    public void setCurrency(int currency) {
+    public void setCurrency(String currency) {
         this.currency = currency;
     }
 
@@ -122,7 +124,7 @@ public class EligibleCollateralState {
 
     @Override
     public String toString() {
-        return "EligibleCollateralState{" +
+       /* return "EligibleCollateralState{" +
                 "currency=" + currency +
                 ", ratingType=" + ratingType +
                 ", rating=" + rating +
@@ -135,5 +137,7 @@ public class EligibleCollateralState {
                 ", partyA=" + isInitiatorAccepted +
                 ", partyB=" + isResponderAccecpted +
                 '}';
+                */
+        return ToStringBuilder.reflectionToString(this);
     }
 }

@@ -2,10 +2,10 @@
 
 
 .btn-primary.active.focus,
-.btn-primary.active:focus, 
-.btn-primary.active:hover, 
-.btn-primary:active.focus, 
-.btn-primary:active:focus, 
+.btn-primary.active:focus,
+.btn-primary.active:hover,
+.btn-primary:active.focus,
+.btn-primary:active:focus,
 .btn-primary:active:hover,
 .open>.dropdown-toggle.btn-primary.focus,
 .open>.dropdown-toggle.btn-primary:focus,
@@ -14,7 +14,7 @@
     background-color : #01A2C1 !important;
     background-image: linear-gradient(to bottom,#01A2C1 0,#01A2C1 100%);
     border-color: #18798A !important;
-}   
+}
 
 .btn-primary
 {
@@ -23,7 +23,7 @@
     border-color: #18798A;
 }
 
-.btn-primary:focus, 
+.btn-primary:focus,
 .btn-primary:hover
 {
     background-color : #01A2C1 !important;
@@ -40,7 +40,7 @@
 
 .modal-dialog
 {
-	width: 95%;	
+	width: 95%;
 }
 
 .gp-table
@@ -54,17 +54,17 @@
     width: 80%;
     margin-right: 10px;
  }
- 
+
  .gp-inner-title
  {
 	 margin-left:10px;
  }
- 
+
  .gp-button-group .btn
  {
 	margin-right:5px;
  }
- 
+
  .btn-group>.btn
  {
 	border-top-right-radius: 4px !important;

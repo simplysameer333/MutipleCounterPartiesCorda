@@ -7,6 +7,7 @@ import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
@@ -63,8 +64,16 @@ public class AgreementStateTemplate implements LinearState {
         return "";
     }
 
+    public Date getAgrementInitiationDateAsDate() {
+        return agrementInitiationDate;
+    }
+
     public void setAgrementInitiationDate(Date agrementInitiationDate) {
         this.agrementInitiationDate = agrementInitiationDate;
+    }
+
+    public Date getAgrementAgreedDateAsDate() {
+        return agrementAgreedDate;
     }
 
     public String getAgrementAgreedDate() {
@@ -101,6 +110,10 @@ public class AgreementStateTemplate implements LinearState {
 
     public void setLastUpdatedBy(Party lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public Date getAgrementLastAmendDateAsDate() {
+        return agrementLastAmendDate;
     }
 
     public String getAgrementLastAmendDate() {
@@ -145,4 +158,8 @@ public class AgreementStateTemplate implements LinearState {
         return ImmutableList.of(cptyInitiator, cptyReciever);
     }
 
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 }

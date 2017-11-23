@@ -144,14 +144,22 @@ public class AgreementNegotiationAcceptFlow {
                 AgreementUtil.copyAllFields(agreementNegotiationState, previousState);
 
                 //Update transaction data
+                FlowSession otherPartySession = null;
                 agreementNegotiationState.setAgrementLastAmendDate(new Date());
                 agreementNegotiationState.setLastUpdatedBy(otherParty);
                 agreementNegotiationState.setStatus(AgreementEnumState.PARTIAL_ACCEPTED);
                 if (previousState.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED) {
                     agreementNegotiationState.setStatus(AgreementEnumState.FULLY_ACCEPTED);
+                    otherPartySession = initiateFlow(previousState.getCptyInitiator());
+                    System.out.println("previousState.getCptyReciever()) ========================= > " +
+                            previousState.getCptyInitiator().getName());
+                } else {
+                    otherPartySession = initiateFlow(previousState.getCptyInitiator());
+                    System.out.println("otherParty .getCptyReciever()) ========================= > " +
+                            previousState.getCptyInitiator().getName());
                 }
 
-                List<PublicKey> requiredSigners = ImmutableList.of(otherParty.getOwningKey(), previousState.getCptyInitiator().getOwningKey());
+                List<PublicKey> requiredSigners = ImmutableList.of(previousState.getCptyInitiator().getOwningKey(), previousState.getCptyInitiator().getOwningKey());
 
                 Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Accept(), requiredSigners);
 
@@ -166,7 +174,7 @@ public class AgreementNegotiationAcceptFlow {
                 SignedTransaction twiceSignedTx = getServiceHub().addSignature(signedTx);
 
                 /// Creating a session with the other party.
-                FlowSession otherPartySession = initiateFlow(previousState.getCptyReciever());
+                //  FlowSession otherPartySession = initiateFlow(otherParty);
 
                 progressTracker.setCurrentStep(SIGS_GATHERING);
                 // Obtaining the counterparty's signature.
