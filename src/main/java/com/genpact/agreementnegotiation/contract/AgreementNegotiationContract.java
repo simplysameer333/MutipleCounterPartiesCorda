@@ -121,7 +121,6 @@ public class AgreementNegotiationContract implements Contract {
                             out.getParticipants().stream().filter(party -> ((Party) party).getName().equals(lastUpdatedBy.getName()))
                                     .findFirst().isPresent());
 
-
                     //Accept will always output state, so need to test nul check
                     if (out.getStatus() == AgreementEnumState.FULLY_ACCEPTED) {
                         check.using("For FULLY_ACCEPTED, INPUT state must be PARTIAL_ACCEPTED",

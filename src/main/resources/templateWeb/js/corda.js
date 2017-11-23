@@ -78,6 +78,8 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
 			demoApp.agreements = response.data;
 		});
 	//demoApp.agreements = [{id:1}]; //SanjayTest
+
+
     demoApp.getAgreements();
 	$scope.getDateValue = (dt) => {
 		var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -92,6 +94,20 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
 			return formattedDate;
 		} else {
 			return 'NA';
+		}
+    };
+	$rootScope.convertToDt = (str) => {
+		if(str instanceof Date)
+		{
+
+		}
+		else {
+			if (str != null && str != undefined && str != '') {
+				var createdDate = new Date(str);
+				return createdDate;
+			} else {
+				return new Date();
+			}
 		}
     };
 });
@@ -288,9 +304,12 @@ app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $locat
 	$scope.threshold= threshold;
 	$scope.peers= peers;
 	$scope.yesNo= yesNo;
-	$scope.agreement = agreement;
+
 	//$scope.agreement = $rootScope.dummy; //SanjayTest
-    // Validate and create IOU.
+    $scope.agreement = agreement;
+	$scope.agreement.substitutionDateFrom = $rootScope.convertToDt($scope.agreement.substitutionDateFrom);
+	$scope.agreement.substitutionDateTo = $rootScope.convertToDt($scope.agreement.substitutionDateTo);
+	// Validate and create IOU.
     $scope.amendAgreement = (agreement) => {
 		console.log('Called Create ',agreement);
 		const updatedAgreement = {
@@ -392,20 +411,7 @@ app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $locat
         // No behaviour on close / dismiss.
         modalInstanceTwo.result.then(() => {}, () => {});
     };
-	$scope.convertToDt = (str) => {
-		if(str instanceof Date)
-		{
 
-		}
-		else {
-			if (str != null && str != undefined && str != '') {
-				var createdDate = new Date(str);
-				return createdDate;
-			} else {
-				return new Date();
-			}
-		}
-    };
 
     // Close create IOU modal dialogue.
     $scope.cancel = () => $uibModalInstance.dismiss();

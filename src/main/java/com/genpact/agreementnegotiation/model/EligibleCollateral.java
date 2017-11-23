@@ -6,40 +6,19 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @CordaSerializable
 public class EligibleCollateral {
 
-    public int collateralType;
-    public String currency;
-    public int ratingType;
-    public int rating;
-    public String ratingText;
-    public int ratingRangeFrom;
-    public int ratingRangeTo;
-    public int amount;
-    public int remainingMaturity; //boolean 0 or 1
-    public int remMaturityFrom;
-    public int remMaturityTo;
-    public int partyA; //boolean 0 or 1
-    public int partyB; //boolean 0 or 1
-
-    public EligibleCollateral() {
-    }
-
-    public EligibleCollateral(int collateralType, String currency, int ratingType, int rating, String ratingText, int ratingRangeFrom, int ratingRangeTo,
-                              int amount, int remainingMaturity, int remMaturityFrom, int remMaturityTo,
-                              int partyA, int partyB) {
-        this.collateralType = collateralType;
-        this.currency = currency;
-        this.ratingType = ratingType;
-        this.rating = rating;
-        this.ratingText = ratingText;
-        this.ratingRangeFrom = ratingRangeFrom;
-        this.ratingRangeTo = ratingRangeTo;
-        this.amount = amount;
-        this.remainingMaturity = remainingMaturity;
-        this.remMaturityFrom = remMaturityFrom;
-        this.remMaturityTo = remMaturityTo;
-        this.partyA = partyA;
-        this.partyB = partyB;
-    }
+    private int collateralType;
+    private String currency;
+    private int ratingType;
+    private int rating;
+    private String ratingText;
+    private int ratingRangeFrom;
+    private int ratingRangeTo;
+    private int amount;
+    private int remainingMaturity; //boolean 0 or 1
+    private int remMaturityFrom;
+    private int remMaturityTo;
+    private int partyA; //boolean 0 or 1
+    private int partyB; //boolean 0 or 1
 
     public int getCollateralType() {
         return collateralType;
@@ -48,7 +27,6 @@ public class EligibleCollateral {
     public void setCollateralType(int collateralType) {
         this.collateralType = collateralType;
     }
-
 
     public String getCurrency() {
         return currency;
@@ -148,21 +126,6 @@ public class EligibleCollateral {
 
     @Override
     public String toString() {
-       /* return "EligibleCollateralState{" +
-                "collateralType=" + collateralType +
-                "currency=" + currency +
-                ", ratingType=" + ratingType +
-                ", rating=" + rating +
-                ", ratingRangeFrom=" + ratingRangeFrom +
-                ", ratingRangeTo=" + ratingRangeTo +
-                ", amount=" + amount +
-                ", remainingMaturity=" + remainingMaturity +
-                ", remMaturityFrom=" + remMaturityFrom +
-                ", remMaturityTo=" + remMaturityTo +
-                ", partyA=" + partyA +
-                ", partyB=" + partyB +
-                '}';
-                */
         return ToStringBuilder.reflectionToString(this);
     }
 }

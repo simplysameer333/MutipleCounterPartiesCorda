@@ -20,7 +20,7 @@
 
 <nav class="navbar navbar-default">
     <div class="container-fluid">
-		<div class="gp-genpact-logo">
+        <div class="gp-genpact-logo">
             <svg xmlns="http://www.w3.org/2000/svg" width="172" height="63" viewBox="0 0 172 63"><title>
                 GP_HTL_RGB</title>
                 <g fill="none" fill-rule="evenodd">
@@ -38,12 +38,14 @@
         <div class="navbar-header">
             <a class="navbar-brand" href="#">{{demoApp.thisNode}}</a>
         </div>
-		<div class="btngroup">
-			<button ng-click="demoApp.openModal()" type="button" class="btn btn-primary navbar-btn">Initiate Agreement</button>
-			<button ng-click="demoApp.getAgreements()" title="See all Agreements" type="button" class="btn btn-default navbar-btn">
+        <div class="btngroup">
+            <button ng-click="demoApp.openModal()" type="button" class="btn btn-primary navbar-btn">Initiate Agreement
+            </button>
+            <button ng-click="demoApp.getAgreements()" title="See all Agreements" type="button"
+                    class="btn btn-default navbar-btn">
                 See all Agreements
             </button>
-		</div>
+        </div>
     </div>
 </nav>
 <div class="row">
@@ -125,51 +127,53 @@
     <div class="modal-header">
         <h4 class="modal-title">New Agreement</h4>
     </div>
-	<form class="gp-firm-side-ui">
+    <form class="gp-firm-side-ui">
         <div class="modal-body">
-			<div class="row">
-				<div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-12">
                     <div class="col-lg-6">
 
                         <h4 class="modal-title gp-inner-title">Agreement</h4>
 
-						<div class="form-group">
-							<label for="value" class="control-label lbl-p">Counterparty:</label>
-							<select ng-model="agreement.counterparty" class="form-control" id="counterparty" ng-options="peer as peer for peer in modalInstance.peers">
-							</select>
-							<label for="value" class="control-label lbl-p">Agreement Name:</label>
-							<input type="text" ng-model="agreement.agrementName" class="form-control" id="address">
-							<label for="value" class="control-label lbl-p">Base Currency:</label>
-							<input type="text" disabled ng-model="agreement.baseCurrency" class="form-control" id="address">
-							<label for="value" class="control-label lbl-p">Eligible Currency:</label>
-							<select ng-model="agreement.eligibleCurrency" class="form-control" >
-								<option>USD</option>
-								<option>GBP</option>
-								<option>INR</option>
-								<option>NOK</option>
-								<option>AUD</option>
-								<option>EUR</option>
-							</select>
-							<label for="value" class="control-label lbl-p">Delivery Amount:</label>
+                        <div class="form-group">
+                            <label for="value" class="control-label lbl-p">Counterparty:</label>
+                            <select ng-model="agreement.counterparty" class="form-control" id="counterparty"
+                                    ng-options="peer as peer for peer in modalInstance.peers">
+                            </select>
+                            <label for="value" class="control-label lbl-p">Agreement Name:</label>
+                            <input type="text" ng-model="agreement.agrementName" class="form-control" id="address">
+                            <label for="value" class="control-label lbl-p">Base Currency:</label>
+                            <input type="text" disabled ng-model="agreement.baseCurrency" class="form-control"
+                                   id="address">
+                            <label for="value" class="control-label lbl-p">Eligible Currency:</label>
+                            <select ng-model="agreement.eligibleCurrency" class="form-control">
+                                <option>USD</option>
+                                <option>GBP</option>
+                                <option>INR</option>
+                                <option>NOK</option>
+                                <option>AUD</option>
+                                <option>EUR</option>
+                            </select>
+                            <label for="value" class="control-label lbl-p">Delivery Amount:</label>
                             <select ng-model="agreement.deliveryAmount" class="form-control"
                                     ng-options="item.id as item.name for item in modalInstance.deliveryAmount track by item.id">
-							</select>
+                            </select>
 
-							<label for="value" class="control-label lbl-p">Return Amount:</label>
+                            <label for="value" class="control-label lbl-p">Return Amount:</label>
                             <select ng-model="agreement.returnAmount" class="form-control"
                                     ng-options="item.id as item.name for item in modalInstance.deliveryAmount track by item.id">
-							</select>
+                            </select>
 
-							<label for="value" class="control-label lbl-p">Credit Support Amount:</label>
+                            <label for="value" class="control-label lbl-p">Credit Support Amount:</label>
                             <select ng-model="agreement.creditSupportAmount" class="form-control"
                                     ng-options="item.id as item.name for item in modalInstance.deliveryAmount track by item.id">
-							</select>
+                            </select>
 
                             <label for="value" class="control-label lbl-p">Eligible Collateral Criteria:</label>
                             <select ng-change="changedValue()" class="form-control"
                                     ng-options="item as item.name for item in modalInstance.collateral track by item.id"
                                     ng-model="agreement.eligibleCollateral">
-							</select>
+                            </select>
                             <div class="col-lg-12" ng-show="agreement.eligibleCollaterals.length > 0">
                                 <div class="gp-table-div">
                                     <table class="table table-bordered table-striped gp-table">
@@ -212,8 +216,10 @@
 
 
                             <div class="control-label thr">
-								<button ng-click="addThresholds()" type="button" class="btn btn-primary">Add Thresholds</button>
-							</div>
+                                <button ng-click="addThresholds()" type="button" class="btn btn-primary">Add
+                                    Thresholds
+                                </button>
+                            </div>
                             <div class="col-lg-12" ng-show="agreement.thresholds.length > 0">
                                 <div class="gp-table-div">
                                     <table class="table table-bordered table-striped gp-table">
@@ -248,58 +254,59 @@
                             <label for="value" class="control-label lbl-p">Initial Margin:</label>
                             <select ng-model="agreement.initialMargin" class="form-control"
                                     ng-options="item.id as item.name for item in modalInstance.yesNo track by item.id">
-							</select>
+                            </select>
 
-							<label for="value" class="control-label lbl-p">Valuation Agent:</label>
-							<select ng-model="agreement.valuationAgent" class="form-control" id="counterparty" ng-options="peer as peer for peer in modalInstance.peers">
-							</select>
+                            <label for="value" class="control-label lbl-p">Valuation Agent:</label>
+                            <select ng-model="agreement.valuationAgent" class="form-control" id="counterparty"
+                                    ng-options="peer as peer for peer in modalInstance.peers">
+                            </select>
 
-							<label for="value" class="control-label lbl-p">Valuation Date:</label>
-							<select ng-model="agreement.valuationDate" class="form-control">
-								<option>LON - Business Hours</option>
-								<option>NYC - Business Hours</option>
-							</select>
+                            <label for="value" class="control-label lbl-p">Valuation Date:</label>
+                            <select ng-model="agreement.valuationDate" class="form-control">
+                                <option>LON - Business Hours</option>
+                                <option>NYC - Business Hours</option>
+                            </select>
 
-							<label for="value" class="control-label lbl-p">Valuation Time:</label>
-							<select ng-model="agreement.valuationTime" class="form-control">
-								<option>Close of Business</option>
-							</select>
+                            <label for="value" class="control-label lbl-p">Valuation Time:</label>
+                            <select ng-model="agreement.valuationTime" class="form-control">
+                                <option>Close of Business</option>
+                            </select>
 
-							<label for="value" class="control-label lbl-p">Notification Time:</label>
-							<input type="time" ng-model="agreement.notificationTime" class="form-control" id="address">
+                            <label for="value" class="control-label lbl-p">Notification Time:</label>
+                            <input type="time" ng-model="agreement.notificationTime" class="form-control" id="address">
 
-							<label for="value" class="control-label lbl-p">Specified Condition:</label>
-							<div class="checkbox">
-								<label>
+                            <label for="value" class="control-label lbl-p">Specified Condition:</label>
+                            <div class="checkbox">
+                                <label>
                                     <input ng-click="addConditions(1)" type="checkbox"> Illegality
-								</label>
-							</div>
-							<div class="checkbox">
-								<label>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
                                     <input ng-click="addConditions(2)" type="checkbox"> Credit Event Upon Merger
-								</label>
-							</div>
-							<div class="checkbox">
-								<label>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
                                     <input ng-click="addConditions(3)" type="checkbox"> Additional Termination Events
-								</label>
-							</div>
+                                </label>
+                            </div>
 
 
                             <div class="range">
-								<label for="value">Substitution Date:</label>
+                                <label for="value">Substitution Date:</label>
                                 <input type="date" placeholder="From" ng-model="agreement.substitutionDateFrom"
                                        id="address">
                                 <input type="date" placeholder="To" ng-model="agreement.substitutionDateTo"
                                        id="address">
-							</div>
+                            </div>
 
 
                             <label for="value" class="control-label lbl-p">Consent:</label>
                             <select ng-model="agreement.consent" class="form-control"
                                     ng-options="item.id as item.name for item in modalInstance.yesNo track by item.id">
-							</select>
-						</div>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -313,7 +320,7 @@
         </div>
         <div class="modal-footer">
             <button ng-click="modalInstance.create()" type="button" class="btn btn-primary">Submit</button>
-			<button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
+            <button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
         </div>
     </form>
 </script>
@@ -559,9 +566,9 @@
     </div>
     <form class="gp-firm-side-ui">
         <div class="modal-body">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="form-group">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form-group">
                         <label for="value" class="control-label lbl-p">Counterparty:</label>
                         <select disabled ng-model="agreement.counterparty" class="form-control" id="counterparty"
                                 ng-options="peer as peer for peer in peers">
@@ -745,16 +752,16 @@
                         <select ng-model="agreement.consent" class="form-control"
                                 ng-options="item.id as item.name for item in yesNo">
                         </select>
-					</div>
+                    </div>
 
                 </div>
             </div>
         </div>
         <div class="modal-footer">
-			<div class="btn-group gp-button-group">
-				<button type="button" ng-click="amendAgreement(agreement)" class="btn btn-primary">Amend</button>
-				<button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
-			</div>
+            <div class="btn-group gp-button-group">
+                <button type="button" ng-click="amendAgreement(agreement)" class="btn btn-primary">Amend</button>
+                <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
+            </div>
         </div>
     </form>
     </div>
@@ -765,7 +772,7 @@
     <div class="modal-header">
         <h4 class="modal-title">Eligible Collateral</h4>
     </div>
-	<div>
+    <div>
         <form class="gp-firm-side-ui">
             <div class="modal-body">
                 <div class="row">
@@ -773,47 +780,47 @@
                         <div class="form-group">
 
                             <label for="value" class="control-label lbl-p">Currency:</label>
-							<select ng-model="el.currency" class="form-control" >
-								<option>USD</option>
-								<option>GBP</option>
-								<option>INR</option>
-								<option>NOK</option>
-								<option>AUD</option>
-								<option>EUR</option>
-							</select>
-							<label for="value" class="control-label lbl-p">Valuation %:</label>
-							<input type="number" ng-model="el.valuation" class="form-control" id="address">
-							<div class="checkbox">
-								<label>
+                            <select ng-model="el.currency" class="form-control">
+                                <option>USD</option>
+                                <option>GBP</option>
+                                <option>INR</option>
+                                <option>NOK</option>
+                                <option>AUD</option>
+                                <option>EUR</option>
+                            </select>
+                            <label for="value" class="control-label lbl-p">Valuation %:</label>
+                            <input type="number" ng-model="el.valuation" class="form-control" id="address">
+                            <div class="checkbox">
+                                <label>
                                     <input ng-checked="el.partyA === 1" ng-model="el.partyA" type="checkbox"> Party A
-								</label>
-							</div>
-							<div class="checkbox">
-								<label>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
                                     <input ng-checked="el.partyB === 1" ng-model="el.partyB" type="checkbox"> Party B
-								</label>
-							</div>
+                                </label>
+                            </div>
 
-							<div ng-if="cash.length > 0">
-								<table class="table table-bordered table-striped">
-									<thead>
+                            <div ng-if="cash.length > 0">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
                                     <tr>
                                         <td>Currency</td>
                                         <td>Valuation %</td>
                                         <td>Party A</td>
                                         <td>Party B</td>
                                     </tr>
-									</thead>
-									<tbody>
+                                    </thead>
+                                    <tbody>
                                     <tr ng-repeat="x in cash">
                                         <td>{{x.currency}}</td>
                                         <td>{{x.valuation}}</td>
                                         <td>{{x.partyA ? "Yes":"No"}}</td>
                                         <td>{{x.partyB ? "Yes":"No"}}</td>
                                     </tr>
-									</tbody>
-								</table>
-							</div>
+                                    </tbody>
+                                </table>
+                            </div>
 
                         </div>
 
@@ -904,7 +911,7 @@
     <div class="modal-header">
         <h4 class="modal-title">Eligible Collateral</h4>
     </div>
-	<div>
+    <div>
         <form class="gp-firm-side-ui">
             <div class="modal-body">
                 <div class="row">
@@ -915,46 +922,46 @@
                             <select ng-model="el.moody" class="form-control"
                                     ng-options="item as item.name for item in moodys"
                                     ng-disabled="el.sp.id != null || el.fitch.id != null">
-							</select>
-							<label for="value" class="control-label lbl-p">S&P Rating:</label>
+                            </select>
+                            <label for="value" class="control-label lbl-p">S&P Rating:</label>
                             <select ng-model="el.sp" class="form-control" ng-options="item as item.name for item in sps"
                                     ng-disabled="el.moody.id != null || el.fitch.id != null">
-							</select>
-							<label for="value" class="control-label lbl-p">Fitch Rating:</label>
+                            </select>
+                            <label for="value" class="control-label lbl-p">Fitch Rating:</label>
                             <select ng-model="el.fitch" class="form-control"
                                     ng-options="item as item.name for item in fitchs"
                                     ng-disabled="el.sp.id != null || el.moody.id != null">
-							</select>
-							<div class="range">
-								<label for="value">Range:</label>
-								<input type="number" placeholder="From" ng-model="el.rfrom" id="address">
-								<input type="number" placeholder="To" ng-model="el.rto" id="address">
-							</div>
-							<label for="value" class="control-label lbl-p">Valuation %:</label>
-							<input type="number" ng-model="el.valuation" class="form-control" id="address">
-							<label for="value" class="control-label lbl-p">Remaining Maturity:</label>
+                            </select>
+                            <div class="range">
+                                <label for="value">Range:</label>
+                                <input type="number" placeholder="From" ng-model="el.rfrom" id="address">
+                                <input type="number" placeholder="To" ng-model="el.rto" id="address">
+                            </div>
+                            <label for="value" class="control-label lbl-p">Valuation %:</label>
+                            <input type="number" ng-model="el.valuation" class="form-control" id="address">
+                            <label for="value" class="control-label lbl-p">Remaining Maturity:</label>
                             <select ng-model="el.remMaturity" class="form-control"
                                     ng-options="item.id as item.name for item in yesNo">
-							</select>
+                            </select>
                             <div class="range" ng-if="el.remMaturity === 1">
-								<label for="value">Range:</label>
+                                <label for="value">Range:</label>
                                 <input type="number" placeholder="From" ng-model="el.remMaturityFrom" id="address">
                                 <input type="number" placeholder="To" ng-model="el.remMaturityTo" id="address">
-							</div>
-							<div class="checkbox">
-								<label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
                                     <input ng-checked="el.partyA === 1" ng-model="el.partyA" type="checkbox"> Party A
-								</label>
-							</div>
-							<div class="checkbox">
-								<label>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
                                     <input ng-checked="el.partyB === 1" ng-model="el.partyB" type="checkbox"> Party B
-								</label>
-							</div>
+                                </label>
+                            </div>
 
-							<div ng-if="sec.length > 0">
-								<table class="table table-bordered table-striped">
-									<thead>
+                            <div ng-if="sec.length > 0">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
                                     <tr>
                                         <td>Rating</td>
                                         <td>Range From</td>
@@ -966,8 +973,8 @@
                                         <td>Party A</td>
                                         <td>Party B</td>
                                     </tr>
-									</thead>
-									<tbody>
+                                    </thead>
+                                    <tbody>
                                     <tr ng-repeat="x in sec">
                                         <td>{{x.moody.name != null ? x.moody.name : (x.sp.name
                                             !=null?x.sp.name:x.fitch.name)}}
@@ -981,9 +988,9 @@
                                         <td>{{x.partyA ? "Yes":"No"}}</td>
                                         <td>{{x.partyB ? "Yes":"No"}}</td>
                                     </tr>
-									</tbody>
-								</table>
-							</div>
+                                    </tbody>
+                                </table>
+                            </div>
 
                         </div>
 
@@ -1005,7 +1012,7 @@
     <div class="modal-header">
         <h4 class="modal-title">Eligible Collateral</h4>
     </div>
-	<div>
+    <div>
         <form class="gp-firm-side-ui">
             <div class="modal-body">
                 <div class="row">
@@ -1016,23 +1023,23 @@
                             <select ng-model="el.moody" class="form-control"
                                     ng-options="item as item.name for item in moodys"
                                     ng-disabled="el.sp.id != null || el.fitch.id != null">
-							</select>
-							<label for="value" class="control-label lbl-p">S&P Rating:</label>
+                            </select>
+                            <label for="value" class="control-label lbl-p">S&P Rating:</label>
                             <select ng-model="el.sp" class="form-control" ng-options="item as item.name for item in sps"
                                     ng-disabled="el.moody.id != null || el.fitch.id != null">
-							</select>
-							<label for="value" class="control-label lbl-p">Fitch Rating:</label>
+                            </select>
+                            <label for="value" class="control-label lbl-p">Fitch Rating:</label>
                             <select ng-model="el.fitch" class="form-control"
                                     ng-options="item as item.name for item in fitchs"
                                     ng-disabled="el.sp.id != null || el.moody.id != null">
-							</select>
-							<div class="range">
-								<label for="value">Range:</label>
-								<input type="number" placeholder="From" ng-model="el.rfrom" id="address">
-								<input type="number" placeholder="To" ng-model="el.rto" id="address">
-							</div>
+                            </select>
+                            <div class="range">
+                                <label for="value">Range:</label>
+                                <input type="number" placeholder="From" ng-model="el.rfrom" id="address">
+                                <input type="number" placeholder="To" ng-model="el.rto" id="address">
+                            </div>
                             <label for="value" class="control-label lbl-p">Valuation %:</label>
-							<input type="number" ng-model="el.valuation" class="form-control" id="address">
+                            <input type="number" ng-model="el.valuation" class="form-control" id="address">
                             <label for="value" class="control-label lbl-p">Remaining Maturity:</label>
                             <select ng-model="el.remMaturity" class="form-control"
                                     ng-options="item.id as item.name for item in yesNo">
@@ -1042,20 +1049,20 @@
                                 <input type="number" placeholder="From" ng-model="el.remMaturityFrom" id="address">
                                 <input type="number" placeholder="To" ng-model="el.remMaturityTo" id="address">
                             </div>
-							<div class="checkbox">
-								<label>
+                            <div class="checkbox">
+                                <label>
                                     <input ng-checked="el.partyA === 1" ng-model="el.partyA" type="checkbox"> Party A
-								</label>
-							</div>
-							<div class="checkbox">
-								<label>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
                                     <input ng-checked="el.partyB === 1" ng-model="el.partyB" type="checkbox"> Party B
-								</label>
-							</div>
+                                </label>
+                            </div>
 
                             <div ng-if="sec.length > 0">
-								<table class="table table-bordered table-striped">
-									<thead>
+                                <table class="table table-bordered table-striped">
+                                    <thead>
                                     <tr>
                                         <td>Rating</td>
                                         <td>Range From</td>
@@ -1067,8 +1074,8 @@
                                         <td>Party A</td>
                                         <td>Party B</td>
                                     </tr>
-									</thead>
-									<tbody>
+                                    </thead>
+                                    <tbody>
                                     <tr ng-repeat="x in sec">
                                         <td>{{x.moody.name != null ? x.moody.name : (x.sp.name
                                             !=null?x.sp.name:x.fitch.name)}}
@@ -1082,9 +1089,9 @@
                                         <td>{{x.partyA ? "Yes":"No"}}</td>
                                         <td>{{x.partyB ? "Yes":"No"}}</td>
                                     </tr>
-									</tbody>
-								</table>
-							</div>
+                                    </tbody>
+                                </table>
+                            </div>
 
                         </div>
 

@@ -125,7 +125,8 @@ public class AgreementNegotiationSchema extends MappedSchema {
                              int deliveryAmount, int returnAmount, int creditSupportAmount,
                              int eligibleCollateralType, String valuationAgent, String valuationDate, String valuationTime,
                              Date notificationTime, List<String> specifiedCondition, Date substitutionDateTo,
-                             Date substitutionDateFrom, Boolean consent, List<EligibleCollateralState> eligibleCollateralStates,
+                             Date substitutionDateFrom, Boolean consent,
+                             List<EligibleCollateralState> eligibleCollateralStates,
                              List<EligibleCollateralState> threshods) {
 
             this.linearId = linearId.toString();

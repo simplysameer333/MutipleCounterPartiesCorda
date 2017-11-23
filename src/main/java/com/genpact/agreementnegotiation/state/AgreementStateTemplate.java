@@ -27,22 +27,6 @@ public class AgreementStateTemplate implements LinearState {
     private AgreementEnumState status;
     private List<SecureHash> attachmentHash;
 
-    public AgreementStateTemplate() {
-    }
-
-    public AgreementStateTemplate(String agrementName, Date agrementInitiationDate,
-                                  Date agrementAgreedDate, Party cptyInitiator, Party cptyReciever, Party lastUpdatedBy,
-                                  Date agrementLastAmendDate, AgreementEnumState status) {
-
-        this.agrementName = agrementName;
-        this.agrementInitiationDate = agrementInitiationDate;
-        this.agrementAgreedDate = agrementAgreedDate;
-        this.cptyInitiator = cptyInitiator;
-        this.cptyReciever = cptyReciever;
-        this.lastUpdatedBy = lastUpdatedBy;
-        this.agrementLastAmendDate = agrementLastAmendDate;
-        this.status = status;
-    }
 
     public void setLinearId(UniqueIdentifier linearId) {
         this.linearId = linearId;

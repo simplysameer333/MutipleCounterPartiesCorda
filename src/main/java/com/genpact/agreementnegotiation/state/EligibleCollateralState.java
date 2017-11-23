@@ -4,6 +4,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class EligibleCollateralState {
     public String currency;
+    public String ratingText;
+    public int collateralType;
     public int ratingType;
     public int rating;
     public int ratingRangeFrom;
@@ -15,24 +17,6 @@ public class EligibleCollateralState {
     public Boolean isInitiatorAccepted; //boolean 0 or 1
     public Boolean isResponderAccecpted; //boolean 0 or 1
 
-    public EligibleCollateralState() {
-    }
-
-    public EligibleCollateralState(String currency, int ratingType, int rating, int ratingRangeFrom, int ratingRangeTo,
-                                   int amount, Boolean remainingMaturity, int remMaturityFrom,
-                                   int remMaturityTo, Boolean partyA, Boolean partyB) {
-        this.currency = currency;
-        this.ratingType = ratingType;
-        this.rating = rating;
-        this.ratingRangeFrom = ratingRangeFrom;
-        this.ratingRangeTo = ratingRangeTo;
-        this.amount = amount;
-        this.remainingMaturity = remainingMaturity;
-        this.remMaturityFrom = remMaturityFrom;
-        this.remMaturityTo = remMaturityTo;
-        this.isInitiatorAccepted = partyA;
-        this.isResponderAccecpted = partyB;
-    }
 
     public String getCurrency() {
         return currency;
@@ -122,22 +106,26 @@ public class EligibleCollateralState {
         isResponderAccecpted = responderAccecpted;
     }
 
+    public String getRatingText() {
+        return ratingText;
+    }
+
+    public void setRatingText(String ratingText) {
+        this.ratingText = ratingText;
+    }
+
+    public int getCollateralType() {
+        return collateralType;
+    }
+
+    public void setCollateralType(int collateralType) {
+        this.collateralType = collateralType;
+    }
+
     @Override
     public String toString() {
-       /* return "EligibleCollateralState{" +
-                "currency=" + currency +
-                ", ratingType=" + ratingType +
-                ", rating=" + rating +
-                ", ratingRangeFrom=" + ratingRangeFrom +
-                ", ratingRangeTo=" + ratingRangeTo +
-                ", amount=" + amount +
-                ", remainingMaturity=" + remainingMaturity +
-                ", remMaturityFrom=" + remMaturityFrom +
-                ", remMaturityTo=" + remMaturityTo +
-                ", partyA=" + isInitiatorAccepted +
-                ", partyB=" + isResponderAccecpted +
-                '}';
-                */
         return ToStringBuilder.reflectionToString(this);
     }
+
+
 }

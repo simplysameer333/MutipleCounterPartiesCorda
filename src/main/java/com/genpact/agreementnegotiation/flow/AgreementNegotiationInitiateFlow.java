@@ -33,17 +33,13 @@ public class AgreementNegotiationInitiateFlow {
     @InitiatingFlow
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction> {
-
-        private final Party otherParty;
         private AgreementNegotiationState agreementNegotiationState;
 
         /**
          * Constructor.
          */
-        public Initiator(AgreementNegotiationState agreementNegotiationState, Party otherParty) {
-
+        public Initiator(AgreementNegotiationState agreementNegotiationState) {
             this.agreementNegotiationState = agreementNegotiationState;
-            this.otherParty = otherParty;
         }
 
         /**
@@ -103,14 +99,15 @@ public class AgreementNegotiationInitiateFlow {
 
             // We create the transaction components.
             agreementNegotiationState.setLinearId(new UniqueIdentifier());
+            agreementNegotiationState.setCptyInitiator(getOurIdentity());
             agreementNegotiationState.setAgrementLastAmendDate(new Date());
             agreementNegotiationState.setAgrementInitiationDate(new Date());
             agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
             agreementNegotiationState.setStatus(AgreementEnumState.INITIAL);
-            agreementNegotiationState.setCptyReciever(otherParty);
 
             StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, TEMPLATE_CONTRACT_ID);
-            List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), otherParty.getOwningKey());
+            List<PublicKey> requiredSigners = ImmutableList.of(agreementNegotiationState.getCptyInitiator().getOwningKey(),
+                    agreementNegotiationState.getCptyReciever().getOwningKey());
             Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Initiate(), requiredSigners);
 
             // We add the items to the builder.
@@ -122,6 +119,7 @@ public class AgreementNegotiationInitiateFlow {
                 }
             }
 
+
             // Verifying the transaction.
             progressTracker.setCurrentStep(TX_VERIFICATION);
             txBuilder.verify(getServiceHub());
@@ -130,7 +128,8 @@ public class AgreementNegotiationInitiateFlow {
             final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
 
             /// Creating a session with the other party.
-            FlowSession otherpartySession = initiateFlow(otherParty);
+            FlowSession otherpartySession = initiateFlow(agreementNegotiationState.getCptyReciever());
+
 
             // Obtaining the counterparty's signature.
             SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(

@@ -3,7 +3,6 @@ package com.genpact.agreementnegotiation.state;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import com.google.common.collect.ImmutableList;
-import net.corda.core.identity.Party;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
@@ -23,57 +22,18 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     private int deliveryAmount;
     private int returnAmount;
     private int creditSupportAmount;
-    private int eligibleCollateralType = 0;
+    private int eligibleCollateralType;
     private Boolean initialMargin;
     private String valuationAgent;
     private String valuationDate;
     private String valuationTime;
     private Date notificationTime;
     private List<String> specifiedCondition;
-    private Date substitutionDateFrom = null;
-    private Date substitutionDateTo = null;
+    private Date substitutionDateFrom;
+    private Date substitutionDateTo;
     private Boolean consent;
     private List<EligibleCollateralState> eligibleCollateralStates;
     private List<EligibleCollateralState> thresholds;
-    private List<String> attachmentHash;
-
-    public AgreementNegotiationState() {
-        super();
-    }
-
-    public AgreementNegotiationState(String baseCurrency, String eligibleCurrency,
-                                     int deliveryAmount, int returnAmount, int creditSupportAmount,
-                                     int eligibleCollateralType, String valuationAgent, String valuationDate,
-                                     String valuationTime, Date notificationTime,
-                                     Date substitutionDateTo, Boolean consent, List<String> specifiedCondition,
-                                     String agrementName, Date agrementInitiationDate, Date substitutionDateFrom,
-                                     Date agrementAgreedDate, Party cptyInitiator, Party cptyReciever, Party lastUpdatedBy,
-                                     Date agrementLastAmendDate, AgreementEnumState status, List<String> attachmentHash,
-                                     List<EligibleCollateralState> eligibleCollateralStates,
-                                     List<EligibleCollateralState> thresholds) {
-
-        super(agrementName, agrementInitiationDate, agrementAgreedDate, cptyInitiator, cptyReciever, lastUpdatedBy,
-                agrementLastAmendDate, status);
-
-        this.baseCurrency = baseCurrency;
-        this.eligibleCurrency = eligibleCurrency;
-        this.deliveryAmount = deliveryAmount;
-        this.returnAmount = returnAmount;
-        this.creditSupportAmount = creditSupportAmount;
-        this.eligibleCollateralType = eligibleCollateralType;
-        this.initialMargin = initialMargin;
-        this.valuationAgent = valuationAgent;
-        this.valuationDate = valuationDate;
-        this.valuationTime = valuationTime;
-        this.notificationTime = notificationTime;
-        this.substitutionDateTo = substitutionDateTo;
-        this.substitutionDateFrom = substitutionDateFrom;
-        this.specifiedCondition = specifiedCondition;
-        this.consent = consent;
-        this.eligibleCollateralStates = this.eligibleCollateralStates;
-        this.thresholds = this.thresholds;
-        this.attachmentHash = attachmentHash;
-    }
 
     public String getBaseCurrency() {
         return baseCurrency;
@@ -157,8 +117,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
     public String getNotificationTime() {
         if (notificationTime != null) {
-            String dateStr = AgreementUtil.FORMAT.format(notificationTime);
-            return dateStr;
+            return AgreementUtil.FORMAT.format(notificationTime);
         }
         return "";
     }
@@ -186,8 +145,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
     public String getSubstitutionDateFrom() {
         if (substitutionDateFrom != null) {
-            String dateStr = AgreementUtil.FORMAT.format(substitutionDateFrom);
-            return dateStr;
+            return AgreementUtil.FORMAT.format(substitutionDateFrom);
         }
         return "";
     }
@@ -202,8 +160,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
     public String getSubstitutionDateTo() {
         if (substitutionDateTo != null) {
-            String dateStr = AgreementUtil.FORMAT.format(substitutionDateTo);
-            return dateStr;
+            return AgreementUtil.FORMAT.format(substitutionDateTo);
         }
         return "";
     }
@@ -280,27 +237,6 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
     @Override
     public String toString() {
-      /*  return "AgreementNegotiationState{" +
-                "baseCurrency='" + baseCurrency + '\'' +
-                ", eligibleCurrency='" + eligibleCurrency + '\'' +
-                ", deliveryAmount=" + deliveryAmount +
-                ", returnAmount=" + returnAmount +
-                ", creditSupportAmount=" + creditSupportAmount +
-                ", eligibleCollateralType=" + eligibleCollateralType +
-                ", initialMargin=" + initialMargin +
-                ", valuationAgent='" + valuationAgent + '\'' +
-                ", valuationDate='" + valuationDate + '\'' +
-                ", valuationTime='" + valuationTime + '\'' +
-                ", notificationTime=" + notificationTime +
-                ", specifiedCondition=" + specifiedCondition +
-                ", substitutionDateFrom=" + substitutionDateFrom +
-                ", substitutionDateTo=" + substitutionDateTo +
-                ", consent=" + consent +
-                ", eligibleCollateralStates=" + eligibleCollateralStates +
-                ", thresholds=" + thresholds +
-                ", attachmentHash=" + attachmentHash +
-                '}';
-                */
         return ToStringBuilder.reflectionToString(this);
     }
 }

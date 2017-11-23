@@ -16,7 +16,8 @@ public class AgreementUtil {
     public static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
 
     public static <T> void copyAllFields(T to, T from) {
-        Class<T> clazz = (Class<T>) from.getClass();
+        Class<T> clazz;
+        clazz = (Class<T>) from.getClass();
         List<Field> fields = getAllModelFields(clazz);
 
         if (fields != null) {
@@ -56,7 +57,7 @@ public class AgreementUtil {
         agreementNegotiationState.setReturnAmount(agreement.getReturnAmount());
         agreementNegotiationState.setCreditSupportAmount(agreement.getCreditSupportAmount());
         agreementNegotiationState.setEligibleCollateralType(agreement.getEligibleCollateralType());
-        agreementNegotiationState.setInitialMargin(agreement.getInitialMargin() == 1 ? true : false);
+        agreementNegotiationState.setInitialMargin(agreement.getInitialMargin() == 1);
         agreementNegotiationState.setValuationAgent(agreement.getValuationAgent());
         agreementNegotiationState.setValuationDate(agreement.getValuationDate());
         agreementNegotiationState.setValuationTime(agreement.getValuationTime());
@@ -64,7 +65,7 @@ public class AgreementUtil {
         agreementNegotiationState.setSubstitutionDateFrom(agreement.getSubstitutionDateFrom());
         agreementNegotiationState.setSubstitutionDateTo(agreement.getSubstitutionDateTo());
         agreementNegotiationState.setSpecifiedCondition(agreement.getSpecifiedConditions());
-        agreementNegotiationState.setConsent(agreement.getConsent() == 1 ? true:false );
+        agreementNegotiationState.setConsent(agreement.getConsent() == 1);
 
         List<EligibleCollateralState> eligibleCollateralStates = new ArrayList<>();
         for (EligibleCollateral value : agreement.getEligibleCollaterals()) {
@@ -81,7 +82,7 @@ public class AgreementUtil {
         return agreementNegotiationState;
     }
 
-    public static EligibleCollateralState copyEligibleCollateralState(EligibleCollateral value) {
+    private static EligibleCollateralState copyEligibleCollateralState(EligibleCollateral value) {
         EligibleCollateralState eligibleCollateralStateValue = new EligibleCollateralState();
         eligibleCollateralStateValue.setCurrency(value.getCurrency());
         eligibleCollateralStateValue.setRatingType(value.getRatingType());
@@ -89,11 +90,14 @@ public class AgreementUtil {
         eligibleCollateralStateValue.setRatingRangeFrom(value.getRatingRangeFrom());
         eligibleCollateralStateValue.setRatingRangeTo(value.getRatingRangeTo());
         eligibleCollateralStateValue.setAmount(value.getAmount());
-        eligibleCollateralStateValue.setRemainingMaturity(value.getRemainingMaturity() == 1 ? true : false);
+        eligibleCollateralStateValue.setRemainingMaturity(value.getRemainingMaturity() == 1);
         eligibleCollateralStateValue.setRemMaturityTo(value.getRemMaturityTo());
-        eligibleCollateralStateValue.setInitiatorAccepted(value.getPartyA() == 1 ? true : false);
-        eligibleCollateralStateValue.setResponderAccecpted(value.getPartyB() == 1 ? true : false);
-
+        eligibleCollateralStateValue.setInitiatorAccepted(value.getPartyA() == 1);
+        eligibleCollateralStateValue.setResponderAccecpted(value.getPartyB() == 1);
+        eligibleCollateralStateValue.setCollateralType(value.getCollateralType());
+        eligibleCollateralStateValue.setRatingText(value.getRatingText());
+        eligibleCollateralStateValue.setRemMaturityTo(value.getRemMaturityTo());
+        eligibleCollateralStateValue.setRemMaturityFrom(value.getRemMaturityFrom());
         return eligibleCollateralStateValue;
     }
 
@@ -141,7 +145,7 @@ public class AgreementUtil {
         return agreement;
     }
 
-    public static EligibleCollateral copyEligibleCollateralStatetoVO(EligibleCollateralState value) {
+    private static EligibleCollateral copyEligibleCollateralStatetoVO(EligibleCollateralState value) {
         EligibleCollateral eligibleCollateral = new EligibleCollateral();
         eligibleCollateral.setCurrency(value.getCurrency());
         eligibleCollateral.setRatingType(value.getRatingType());
@@ -153,6 +157,10 @@ public class AgreementUtil {
         eligibleCollateral.setRemMaturityTo(value.getRemMaturityTo());
         eligibleCollateral.setPartyA(value.getInitiatorAccepted() ? 1 : 0);
         eligibleCollateral.setPartyB(value.getResponderAccecpted() ? 1 : 0);
+        eligibleCollateral.setCollateralType(value.getCollateralType());
+        eligibleCollateral.setRatingText(value.getRatingText());
+        eligibleCollateral.setRemMaturityTo(value.getRemMaturityTo());
+        eligibleCollateral.setRemMaturityFrom(value.getRemMaturityFrom());
 
         return eligibleCollateral;
     }

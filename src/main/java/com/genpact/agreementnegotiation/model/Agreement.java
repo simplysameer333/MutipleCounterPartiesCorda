@@ -41,31 +41,6 @@ public class Agreement {
     private String id = null;
     private String status = null;
 
-    public Agreement() {
-    }
-
-    public Agreement(String agrementName, CordaX500Name counterparty, String baseCurrency, String eligibleCurrency, int deliveryAmount, int returnAmount, int creditSupportAmount, int eligibleCollateralType, List<EligibleCollateral> eligibleCollaterals, List<EligibleCollateral> thresholds, int initialMargin, String valuationAgent, String valuationDate, String valuationTime, Date notificationTime, List<String> specifiedConditions, Date substitutionDateFrom, Date substitutionDateTo, int consent) {
-        this.agrementName = agrementName;
-        this.counterparty = counterparty;
-        this.baseCurrency = baseCurrency;
-        this.eligibleCurrency = eligibleCurrency;
-        this.deliveryAmount = deliveryAmount;
-        this.returnAmount = returnAmount;
-        this.creditSupportAmount = creditSupportAmount;
-        this.eligibleCollateralType = eligibleCollateralType;
-        this.eligibleCollaterals = eligibleCollaterals;
-        this.thresholds = thresholds;
-        this.initialMargin = initialMargin;
-        this.valuationAgent = valuationAgent;
-        this.valuationDate = valuationDate;
-        this.valuationTime = valuationTime;
-        this.notificationTime = notificationTime;
-        this.specifiedConditions = specifiedConditions;
-        this.substitutionDateFrom = substitutionDateFrom;
-        this.substitutionDateTo = substitutionDateTo;
-        this.consent = consent;
-    }
-
     public String getAgrementName() {
         return agrementName;
     }
@@ -284,35 +259,6 @@ public class Agreement {
 
     @Override
     public String toString() {
-        /*return "Agreement{" +
-                "agrementName='" + agrementName + '\'' +
-                ", counterparty=" + counterparty +
-                ", baseCurrency='" + baseCurrency + '\'' +
-                ", eligibleCurrency='" + eligibleCurrency + '\'' +
-                ", deliveryAmount=" + deliveryAmount +
-                ", returnAmount=" + returnAmount +
-                ", creditSupportAmount=" + creditSupportAmount +
-                ", eligibleCollateralType=" + eligibleCollateralType +
-                ", eligibleCollaterals=" + eligibleCollaterals +
-                ", thresholds=" + thresholds +
-                ", initialMargin=" + initialMargin +
-                ", valuationAgent='" + valuationAgent + '\'' +
-                ", valuationDate='" + valuationDate + '\'' +
-                ", valuationTime='" + valuationTime + '\'' +
-                ", notificationTime=" + notificationTime +
-                ", specifiedConditions=" + specifiedConditions +
-                ", substitutionDateFrom=" + substitutionDateFrom +
-                ", substitutionDateTo=" + substitutionDateTo +
-                ", consent=" + consent +
-                ", attachmentHash=" + attachmentHash +
-                ", agrementInitiationDate=" + agrementInitiationDate +
-                ", agrementAgreedDate=" + agrementAgreedDate +
-                ", cptyInitiator=" + cptyInitiator +
-                ", lastUpdatedBy=" + lastUpdatedBy +
-                ", agrementLastAmendDate=" + agrementLastAmendDate +
-                ", id='" + id + '\'' +
-                '}';
-                */
         return ToStringBuilder.reflectionToString(this);
     }
 }
