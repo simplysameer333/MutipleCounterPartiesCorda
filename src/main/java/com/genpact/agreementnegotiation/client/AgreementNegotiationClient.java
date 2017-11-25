@@ -1,6 +1,6 @@
 package com.genpact.agreementnegotiation.client;
 
-import com.genpact.agreementnegotiation.flow.AgreementNegotiationAgreeFlow;
+import com.genpact.agreementnegotiation.flow.AgreementNegotiationAcceptFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
@@ -62,21 +62,32 @@ public class AgreementNegotiationClient {
 
         if (args[2].equals("AMEND" )) {
             System.out.println("Initiating Amend Flow for Parameters" + args[3]);
-            AgreementNegotiationState amendNegotiationState = new AgreementNegotiationState(agreementParams.get(0), new Double(agreementParams.get(1)),agreementParams.get(2), AgreementNegotiationState.NegotiationStates.AMEND, cptyInitiator, cptyReciever);
+            AgreementNegotiationState amendNegotiationState = new AgreementNegotiationState
+                    (agreementParams.get(0), new Double(agreementParams.get(1)), agreementParams.get(2),
+                            cptyInitiator, cptyReciever);
+            amendNegotiationState.setNegotiationState(AgreementNegotiationState.NegotiationStates.AMEND);
             flowHandle= proxy.startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, amendNegotiationState, cptyReciever);
 
         }
         else if (args[2].equals("ACCEPT") ){
             System.out.println("Initiating Agree Flow for Parameters" + args[3]);
-            AgreementNegotiationState agreeNegotiationState = new AgreementNegotiationState(agreementParams.get(0), new Double(agreementParams.get(1)),agreementParams.get(2), AgreementNegotiationState.NegotiationStates.ACCEPT, cptyInitiator, cptyReciever);
-            flowHandle= proxy.startTrackedFlowDynamic(AgreementNegotiationAgreeFlow.Initiator.class, agreeNegotiationState, cptyReciever);
+            AgreementNegotiationState agreeNegotiationState = new AgreementNegotiationState(agreementParams.get(0),
+                    new Double(agreementParams.get(1)), agreementParams.get(2), cptyInitiator, cptyReciever);
+            flowHandle = proxy.startTrackedFlowDynamic(AgreementNegotiationAcceptFlow.Initiator.class,
+                    agreeNegotiationState, cptyReciever);
 
         }
         else if(args[2].equals( "INITIAL"))
         {
             System.out.println("Initiating Initiate Flow for Parameters" + args[3]);
-            AgreementNegotiationState initiateNegotiationState = new AgreementNegotiationState(agreementParams.get(0), new Double(agreementParams.get(1)),agreementParams.get(2), AgreementNegotiationState.NegotiationStates.INITIAL, cptyInitiator, cptyReciever);
-            initiateNegotiationState.setLinearId(new UniqueIdentifier());
+
+           // AgreementNegotiationState initiateNegotiationState = new AgreementNegotiationState(agreementParams.get(0), new Double(agreementParams.get(1)),agreementParams.get(2), AgreementNegotiationState.NegotiationStates.INITIAL, cptyInitiator, cptyReciever);
+            //initiateNegotiationState.setLinearId(new UniqueIdentifier());
+
+            AgreementNegotiationState initiateNegotiationState = new AgreementNegotiationState(agreementParams.get(0),
+                    new Double(agreementParams.get(1)), agreementParams.get(2), cptyInitiator, cptyReciever);
+            initiateNegotiationState.setNegotiationState(AgreementNegotiationState.NegotiationStates.INITIAL);
+
             flowHandle= proxy.startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, initiateNegotiationState, cptyReciever);
 
         }

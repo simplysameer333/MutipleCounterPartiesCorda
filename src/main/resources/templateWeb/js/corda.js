@@ -45,10 +45,8 @@ app.controller('AgreementController', function($http, $location, $uibModal) {
 			});
 			modalInstance.result.then(() => {}, () => {});
 		});
-		
-		
     };
-	
+
 	demoApp.amendAgreement = (agreement) => {
         const modalInstance = $uibModal.open({
             templateUrl: 'amendAgreementModal.html',
@@ -62,8 +60,8 @@ app.controller('AgreementController', function($http, $location, $uibModal) {
 
         modalInstance.result.then(() => {}, () => {});
     };
-	
-	
+
+
 	demoApp.viewAudit = (agreement) => {
         $http.get(apiBaseURL + "audit?agreementName=" + agreement.agrementName)
         .then(function(response) {
@@ -96,7 +94,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $http, $location, $uibModa
             modalInstance.formError = false;
 
             $uibModalInstance.close();
-			
+
             const createIOUEndpoint = apiBaseURL + "initFlow/" +modalInstance.form.counterparty;
 
             // Create PO and handle success / fail responses.
@@ -128,12 +126,13 @@ app.controller('ModalInstanceCtrl', function ($scope, $http, $location, $uibModa
     }
 });
 
-app.controller('AgreementCtrl', function ($scope, $http, $location, $uibModalInstance, $uibModal, apiBaseURL, agreement) {
+app.controller('AgreementCtrl', function ($scope, $http, $location, $uibModalInstance, $uibModal, apiBaseURL, agreement)
+{
     const modalInstance = this;
-	$scope.agreement = agreement;	
+	$scope.agreement = agreement;
     // Validate and create IOU.
     $scope.agree = (agreement) => {
-		console.log('Called Create '+agreement);
+		console.log('Called acceptFlow '+agreement);
 		var updAgreement ={
 			agrementName: agreement.agrementName,
 			agreementValue: agreement.agreementValue,
@@ -141,7 +140,9 @@ app.controller('AgreementCtrl', function ($scope, $http, $location, $uibModalIns
 		}
 
 		$uibModalInstance.close();
-		const createIOUEndpoint = apiBaseURL + "acceptFlow/";
+
+		const createIOUEndpoint = apiBaseURL + "acceptFlow";
+
 		// Create PO and handle success / fail responses.
 		$http.put(createIOUEndpoint, angular.toJson(updAgreement)).then(
 			(result) => $scope.displayMessage(result),
@@ -168,10 +169,10 @@ app.controller('AgreementCtrl', function ($scope, $http, $location, $uibModalIns
 
 app.controller('AmendAgreementCtrl', function ($scope, $http, $location, $uibModalInstance, $uibModal, apiBaseURL, agreement) {
     const modalInstance = this;
-	$scope.agreement = agreement;	
+	$scope.agreement = agreement;
     // Validate and create IOU.
     $scope.amendAgreement = (agreement) => {
-		console.log('Called Create '+agreement);
+		console.log('Called Amend '+agreement);
 		const updatedAgreement = {
 			agrementName: agreement.agrementName,
 			agreementValue: agreement.agreementValue,
