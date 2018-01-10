@@ -3,77 +3,138 @@ package com.genpact.agreementnegotiation.model;
 import net.corda.core.serialization.CordaSerializable;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @CordaSerializable
 public class EligibleCollateral {
-
-    private int collateralType;
-    private String currency;
-    private int ratingType;
-    private int rating;
-    private String ratingText;
-    private int ratingRangeFrom;
-    private int ratingRangeTo;
+    private String region;
+    private String category;
+    private String qualifier;
+    private String moodysMax;
+    private String moodysMin;
+    private String spMax;
+    private String spMin;
+    private String fitchMax;
+    private String fitchMin;
+    private String remMaturity;
+    private List<Range> ranges = new ArrayList<Range>();//int rangeFrom, int rangeTo, int valuation
+    private boolean partyA; //boolean 0 or 1
+    private boolean partyB; //boolean 0 or 1
+    private List<String> currencies = new ArrayList<String>();
     private int amount;
-    private int remainingMaturity; //boolean 0 or 1
-    private int remMaturityFrom;
-    private int remMaturityTo;
-    private int partyA; //boolean 0 or 1
-    private int partyB; //boolean 0 or 1
 
-    public int getCollateralType() {
-        return collateralType;
+    public String getRegion() {
+        return region;
     }
 
-    public void setCollateralType(int collateralType) {
-        this.collateralType = collateralType;
+    public void setRegion(String region) {
+        this.region = region;
     }
 
-    public String getCurrency() {
-        return currency;
+    public String getCategory() {
+        return category;
     }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
-    public int getRatingType() {
-        return ratingType;
+    public String getQualifier() {
+        return qualifier;
     }
 
-    public void setRatingType(int ratingType) {
-        this.ratingType = ratingType;
+    public void setQualifier(String qualifier) {
+        this.qualifier = qualifier;
     }
 
-    public int getRating() {
-        return rating;
+    public String getMoodysMax() {
+        return moodysMax;
     }
 
-    public void setRating(int rating) {
-        this.rating = rating;
+    public void setMoodysMax(String moodysMax) {
+        this.moodysMax = moodysMax;
     }
 
-    public String getRatingText() {
-        return ratingText;
+    public String getMoodysMin() {
+        return moodysMin;
     }
 
-    public void setRatingText(String ratingText) {
-        this.ratingText = ratingText;
+    public void setMoodysMin(String moodysMin) {
+        this.moodysMin = moodysMin;
     }
 
-    public int getRatingRangeFrom() {
-        return ratingRangeFrom;
+    public String getSpMax() {
+        return spMax;
     }
 
-    public void setRatingRangeFrom(int ratingRangeFrom) {
-        this.ratingRangeFrom = ratingRangeFrom;
+    public void setSpMax(String spMax) {
+        this.spMax = spMax;
     }
 
-    public int getRatingRangeTo() {
-        return ratingRangeTo;
+    public String getSpMin() {
+        return spMin;
     }
 
-    public void setRatingRangeTo(int ratingRangeTo) {
-        this.ratingRangeTo = ratingRangeTo;
+    public void setSpMin(String spMin) {
+        this.spMin = spMin;
+    }
+
+    public String getFitchMax() {
+        return fitchMax;
+    }
+
+    public void setFitchMax(String fitchMax) {
+        this.fitchMax = fitchMax;
+    }
+
+    public String getFitchMin() {
+        return fitchMin;
+    }
+
+    public void setFitchMin(String fitchMin) {
+        this.fitchMin = fitchMin;
+    }
+
+    public String getRemMaturity() {
+        return remMaturity;
+    }
+
+    public void setRemMaturity(String remMaturity) {
+        this.remMaturity = remMaturity;
+    }
+
+    public List<Range> getRanges() {
+        return ranges;
+    }
+
+    public void setRanges(List<Range> ranges) {
+        this.ranges = ranges;
+    }
+
+
+    public boolean getPartyA() {
+        return partyA;
+    }
+
+    public void setPartyA(boolean partyA) {
+        this.partyA = partyA;
+    }
+
+    public boolean getPartyB() {
+        return partyB;
+    }
+
+    public void setPartyB(boolean partyB) {
+        this.partyB = partyB;
+    }
+
+    public List<String> getCurrencies() {
+        return currencies;
+    }
+
+    public void setCurrencies(List<String> currencies) {
+        this.currencies = currencies;
     }
 
     public int getAmount() {
@@ -82,46 +143,6 @@ public class EligibleCollateral {
 
     public void setAmount(int amount) {
         this.amount = amount;
-    }
-
-    public int getRemainingMaturity() {
-        return remainingMaturity;
-    }
-
-    public void setRemainingMaturity(int remainingMaturity) {
-        this.remainingMaturity = remainingMaturity;
-    }
-
-    public int getRemMaturityFrom() {
-        return remMaturityFrom;
-    }
-
-    public void setRemMaturityFrom(int remMaturityFrom) {
-        this.remMaturityFrom = remMaturityFrom;
-    }
-
-    public int getRemMaturityTo() {
-        return remMaturityTo;
-    }
-
-    public void setRemMaturityTo(int remMaturityTo) {
-        this.remMaturityTo = remMaturityTo;
-    }
-
-    public int getPartyA() {
-        return partyA;
-    }
-
-    public void setPartyA(int partyA) {
-        this.partyA = partyA;
-    }
-
-    public int getPartyB() {
-        return partyB;
-    }
-
-    public void setPartyB(int partyB) {
-        this.partyB = partyB;
     }
 
     @Override

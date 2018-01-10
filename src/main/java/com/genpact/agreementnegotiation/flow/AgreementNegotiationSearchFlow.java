@@ -6,6 +6,7 @@ import net.corda.core.flows.FlowException;
 import net.corda.core.flows.FlowLogic;
 import net.corda.core.flows.InitiatingFlow;
 import net.corda.core.flows.StartableByRPC;
+import net.corda.core.identity.Party;
 import net.corda.core.utilities.ProgressTracker;
 import net.corda.core.utilities.ProgressTracker.Step;
 
@@ -22,10 +23,13 @@ public class AgreementNegotiationSearchFlow {
     @InitiatingFlow
     @StartableByRPC
     public static class Initiator extends FlowLogic<List<String>> {
+        private final Party otherParty;
         private final String value;
 
-        public Initiator(String value) {
+        public Initiator(String value, Party otherParty) {
+
             this.value = value;
+            this.otherParty = otherParty;
         }
 
         /**

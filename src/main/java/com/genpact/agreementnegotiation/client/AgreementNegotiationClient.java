@@ -61,21 +61,20 @@ public class AgreementNegotiationClient {
         Party cptyReciever = proxyCpty.nodeInfo().getLegalIdentities().get(0);
         FlowProgressHandle<SignedTransaction> flowHandle = null;
 
-        if (args[2].equals("AMEND" )) {
+        if (args[2].equals("Amended")) {
             System.out.println("Initiating Amend Flow for Parameters" + args[3]);
             AgreementNegotiationState amendNegotiationState = DummyData.getDummyDataForAgreementNegotiationState();
             amendNegotiationState.setStatus(AgreementEnumState.AMEND);
             flowHandle= proxy.startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, amendNegotiationState, cptyReciever);
 
-        }
-        else if (args[2].equals("ACCEPT") ){
+        } else if (args[2].equals("Agreed")) {
             System.out.println("Initiating Agree Flow for Parameters" + args[3]);
             AgreementNegotiationState agreeNegotiationState = DummyData.getDummyDataForAgreementNegotiationState();
             agreeNegotiationState.setStatus(AgreementEnumState.PARTIAL_ACCEPTED);
             flowHandle = proxy.startTrackedFlowDynamic(AgreementNegotiationAcceptFlow.Initiator.class,
                     agreeNegotiationState, cptyReciever);
 
-        } else if (args[2].equals("INITIAL")) {
+        } else if (args[2].equals("Initiated")) {
             System.out.println("Initiating Initiate Flow for Parameters" + args[3]);
 
             AgreementNegotiationState initiateNegotiationState = DummyData.getDummyDataForAgreementNegotiationState();

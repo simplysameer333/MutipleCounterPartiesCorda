@@ -2,13 +2,17 @@ package com.genpact.agreementnegotiation.utils;
 
 import com.genpact.agreementnegotiation.model.Agreement;
 import com.genpact.agreementnegotiation.model.EligibleCollateral;
+import com.genpact.agreementnegotiation.model.Range;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.genpact.agreementnegotiation.state.EligibleCollateralState;
+import com.genpact.agreementnegotiation.state.ThresholdState;
+import net.corda.core.identity.CordaX500Name;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,8 +20,7 @@ public class AgreementUtil {
     public static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
 
     public static <T> void copyAllFields(T to, T from) {
-        Class<T> clazz;
-        clazz = (Class<T>) from.getClass();
+        Class<T> clazz = (Class<T>) from.getClass();
         List<Field> fields = getAllModelFields(clazz);
 
         if (fields != null) {
@@ -48,6 +51,12 @@ public class AgreementUtil {
         return null;
     }
 
+    /**
+     * Convert VO to Domain Object
+     *
+     * @param agreement
+     * @return
+     */
     public static AgreementNegotiationState copyState(Agreement agreement) {
         AgreementNegotiationState agreementNegotiationState = new AgreementNegotiationState();
         agreementNegotiationState.setAgrementName(agreement.getAgrementName());
@@ -56,8 +65,8 @@ public class AgreementUtil {
         agreementNegotiationState.setDeliveryAmount(agreement.getDeliveryAmount());
         agreementNegotiationState.setReturnAmount(agreement.getReturnAmount());
         agreementNegotiationState.setCreditSupportAmount(agreement.getCreditSupportAmount());
-        agreementNegotiationState.setEligibleCollateralType(agreement.getEligibleCollateralType());
-        agreementNegotiationState.setInitialMargin(agreement.getInitialMargin() == 1);
+        agreementNegotiationState.setProducts(agreement.getProducts());
+        agreementNegotiationState.setInitialMargin(agreement.getInitialMargin() == 1 ? true : false);
         agreementNegotiationState.setValuationAgent(agreement.getValuationAgent());
         agreementNegotiationState.setValuationDate(agreement.getValuationDate());
         agreementNegotiationState.setValuationTime(agreement.getValuationTime());
@@ -65,7 +74,8 @@ public class AgreementUtil {
         agreementNegotiationState.setSubstitutionDateFrom(agreement.getSubstitutionDateFrom());
         agreementNegotiationState.setSubstitutionDateTo(agreement.getSubstitutionDateTo());
         agreementNegotiationState.setSpecifiedCondition(agreement.getSpecifiedConditions());
-        agreementNegotiationState.setConsent(agreement.getConsent() == 1);
+        agreementNegotiationState.setConsent(agreement.getConsent() == 1 ? true : false);
+        agreementNegotiationState.setVersion(agreement.getVersion());
 
         List<EligibleCollateralState> eligibleCollateralStates = new ArrayList<>();
         for (EligibleCollateral value : agreement.getEligibleCollaterals()) {
@@ -73,34 +83,97 @@ public class AgreementUtil {
         }
         agreementNegotiationState.setEligibleCollateralStates(eligibleCollateralStates);
 
-        List<EligibleCollateralState> thresholds = new ArrayList<>();
+        List<ThresholdState> thresholds = new ArrayList<>();
         for (EligibleCollateral value : agreement.getThresholds()) {
-            thresholds.add(copyEligibleCollateralState(value));
+            thresholds.add(copyThresholdState(value));
         }
         agreementNegotiationState.setThresholds(thresholds);
 
         return agreementNegotiationState;
     }
 
-    private static EligibleCollateralState copyEligibleCollateralState(EligibleCollateral value) {
+    /**
+     * Convert EligibleCollateral VO to EligibleCollateral DO.
+     *
+     * @param value
+     * @return
+     */
+    public static EligibleCollateralState copyEligibleCollateralState(EligibleCollateral value) {
         EligibleCollateralState eligibleCollateralStateValue = new EligibleCollateralState();
-        eligibleCollateralStateValue.setCurrency(value.getCurrency());
-        eligibleCollateralStateValue.setRatingType(value.getRatingType());
-        eligibleCollateralStateValue.setRating(value.getRating());
-        eligibleCollateralStateValue.setRatingRangeFrom(value.getRatingRangeFrom());
-        eligibleCollateralStateValue.setRatingRangeTo(value.getRatingRangeTo());
-        eligibleCollateralStateValue.setAmount(value.getAmount());
-        eligibleCollateralStateValue.setRemainingMaturity(value.getRemainingMaturity() == 1);
-        eligibleCollateralStateValue.setRemMaturityTo(value.getRemMaturityTo());
-        eligibleCollateralStateValue.setInitiatorAccepted(value.getPartyA() == 1);
-        eligibleCollateralStateValue.setResponderAccecpted(value.getPartyB() == 1);
-        eligibleCollateralStateValue.setCollateralType(value.getCollateralType());
-        eligibleCollateralStateValue.setRatingText(value.getRatingText());
-        eligibleCollateralStateValue.setRemMaturityTo(value.getRemMaturityTo());
-        eligibleCollateralStateValue.setRemMaturityFrom(value.getRemMaturityFrom());
+        eligibleCollateralStateValue.setCategory(value.getCategory());
+        eligibleCollateralStateValue.setFitchMax(value.getFitchMax());
+        eligibleCollateralStateValue.setFitchMin(value.getFitchMin());
+        eligibleCollateralStateValue.setMoodysMax(value.getMoodysMax());
+        eligibleCollateralStateValue.setMoodysMin(value.getMoodysMin());
+        eligibleCollateralStateValue.setQualifier(value.getQualifier());
+
+        eligibleCollateralStateValue.setRegion(value.getRegion());
+        eligibleCollateralStateValue.setInitiatorAccepted(value.getPartyA());
+        eligibleCollateralStateValue.setResponderAccecpted(value.getPartyB());
+        eligibleCollateralStateValue.setRemMaturity(value.getRemMaturity());
+        eligibleCollateralStateValue.setSpMax(value.getSpMax());
+        eligibleCollateralStateValue.setSpMin(value.getSpMin());
+
+        StringBuffer ranges = new StringBuffer();
+        for (Range range : value.getRanges()) {
+            //permanent fix
+            ranges.append("" + range.getRangeFrom() + "," + range.getRangeTo() + "," + range.getValuation() + "END");
+        }
+        eligibleCollateralStateValue.setRanges(ranges.toString());
+
+        StringBuffer currencies = new StringBuffer();
+        int count = 1;
+        for (String currency : value.getCurrencies()) {
+            currencies.append(currency);
+            if (count != value.getCurrencies().size()) {
+                currencies.append(",");
+            }
+            count++;
+        }
+        eligibleCollateralStateValue.setCurrencies(currencies.toString());
+
+
         return eligibleCollateralStateValue;
     }
 
+    /**
+     * Convert EligibleCollateral VO to ThresholdState DO.
+     *
+     * @param value
+     * @return
+     */
+    public static ThresholdState copyThresholdState(EligibleCollateral value) {
+        ThresholdState thresholdStateValue = new ThresholdState();
+
+        thresholdStateValue.setFitchMax(value.getFitchMax());
+        thresholdStateValue.setFitchMin(value.getFitchMin());
+        thresholdStateValue.setMoodysMax(value.getMoodysMax());
+        thresholdStateValue.setMoodysMin(value.getMoodysMin());
+        thresholdStateValue.setSpMax(value.getSpMax());
+        thresholdStateValue.setSpMin(value.getSpMin());
+        thresholdStateValue.setInitiatorAccepted(value.getPartyA());
+        thresholdStateValue.setResponderAccecpted(value.getPartyB());
+
+        StringBuffer currencies = new StringBuffer();
+        int count = 1;
+        for (String currency : value.getCurrencies()) {
+            currencies.append(currency);
+            if (count != value.getCurrencies().size()) {
+                currencies.append(",");
+            }
+            count++;
+        }
+        thresholdStateValue.setCurrencies(currencies.toString());
+        thresholdStateValue.setAmount(value.getAmount());
+
+        return thresholdStateValue;
+    }
+
+    /**
+     * Copy AgreementNegotiationState DO to AgreementNegotiationStateVO
+     * @param agreementNegotiationState
+     * @return
+     */
     public static Agreement copyStateToVO(AgreementNegotiationState agreementNegotiationState) {
         Agreement agreement = new Agreement();
         agreement.setAgrementName(agreementNegotiationState.getAgrementName());
@@ -109,7 +182,7 @@ public class AgreementUtil {
         agreement.setDeliveryAmount(agreementNegotiationState.getDeliveryAmount());
         agreement.setReturnAmount(agreementNegotiationState.getReturnAmount());
         agreement.setCreditSupportAmount(agreementNegotiationState.getCreditSupportAmount());
-        agreement.setEligibleCollateralType(agreementNegotiationState.getEligibleCollateralType());
+        agreement.setProducts(agreementNegotiationState.getProducts());
         agreement.setInitialMargin(agreementNegotiationState.getInitialMargin() ? 1 : 0);
         agreement.setValuationAgent(agreementNegotiationState.getValuationAgent());
         agreement.setValuationDate(agreementNegotiationState.getValuationDate());
@@ -119,14 +192,15 @@ public class AgreementUtil {
         agreement.setSubstitutionDateTo(agreementNegotiationState.getSubstitutionDateToAsDate());
         agreement.setSpecifiedConditions(agreementNegotiationState.getSpecifiedCondition());
         agreement.setConsent(agreementNegotiationState.getConsent() ? 1 : 0);
+        agreement.setVersion(agreementNegotiationState.getVersion());
 
         //Additional
         agreement.setAgrementInitiationDate(agreementNegotiationState.getAgrementInitiationDateAsDate());
         agreement.setAgrementAgreedDate(agreementNegotiationState.getAgrementAgreedDateAsDate());
         agreement.setAgrementLastAmendDate(agreementNegotiationState.getAgrementLastAmendDateAsDate());
-        agreement.setCptyInitiator(agreementNegotiationState.getCptyInitiator().getName());
-        agreement.setCounterparty(agreementNegotiationState.getCptyReciever().getName());
-        agreement.setLastUpdatedBy(agreementNegotiationState.getLastUpdatedBy().getName());
+        agreement.setCptyInitiator(agreementNegotiationState.getCptyInitiator().getName().getOrganisation());
+        agreement.setCounterparty(agreementNegotiationState.getCptyReciever().getName().getOrganisation());
+        agreement.setLastUpdatedBy(agreementNegotiationState.getLastUpdatedBy().getName().getOrganisation());
         agreement.setId(agreementNegotiationState.getLinearId().getId().toString());
         agreement.setStatus(agreementNegotiationState.getStatus().toString());
 
@@ -137,31 +211,191 @@ public class AgreementUtil {
         agreement.setEligibleCollaterals(eligibleCollateralStates);
 
         List<EligibleCollateral> thresholds = new ArrayList<>();
-        for (EligibleCollateralState value : agreementNegotiationState.getThresholds()) {
-            thresholds.add(copyEligibleCollateralStatetoVO(value));
+        for (ThresholdState value : agreementNegotiationState.getThresholds()) {
+            thresholds.add(copyThresholdStateVO(value));
         }
         agreement.setThresholds(thresholds);
 
         return agreement;
     }
 
-    private static EligibleCollateral copyEligibleCollateralStatetoVO(EligibleCollateralState value) {
+    /**
+     * Copy EligibleCollateralState DO to EligibleCollateralState VO
+     *
+     * @param value
+     * @return
+     */
+    public static EligibleCollateral copyEligibleCollateralStatetoVO(EligibleCollateralState value) {
         EligibleCollateral eligibleCollateral = new EligibleCollateral();
-        eligibleCollateral.setCurrency(value.getCurrency());
-        eligibleCollateral.setRatingType(value.getRatingType());
-        eligibleCollateral.setRating(value.getRating());
-        eligibleCollateral.setRatingRangeFrom(value.getRatingRangeFrom());
-        eligibleCollateral.setRatingRangeTo(value.getRatingRangeTo());
-        eligibleCollateral.setAmount(value.getAmount());
-        eligibleCollateral.setRemainingMaturity(value.getRemainingMaturity() ? 1 : 0);
-        eligibleCollateral.setRemMaturityTo(value.getRemMaturityTo());
-        eligibleCollateral.setPartyA(value.getInitiatorAccepted() ? 1 : 0);
-        eligibleCollateral.setPartyB(value.getResponderAccecpted() ? 1 : 0);
-        eligibleCollateral.setCollateralType(value.getCollateralType());
-        eligibleCollateral.setRatingText(value.getRatingText());
-        eligibleCollateral.setRemMaturityTo(value.getRemMaturityTo());
-        eligibleCollateral.setRemMaturityFrom(value.getRemMaturityFrom());
+
+        eligibleCollateral.setPartyA(value.getInitiatorAccepted());
+        eligibleCollateral.setPartyB(value.getResponderAccecpted());
+        eligibleCollateral.setCategory(value.getCategory());
+        eligibleCollateral.setFitchMax(value.getFitchMax());
+        eligibleCollateral.setFitchMin(value.getFitchMin());
+        eligibleCollateral.setMoodysMax(value.getMoodysMax());
+        eligibleCollateral.setMoodysMin(value.getMoodysMin());
+        eligibleCollateral.setQualifier(value.getQualifier());
+        eligibleCollateral.setRegion(value.getRegion());
+
+        eligibleCollateral.setRemMaturity(value.getRemMaturity());
+        eligibleCollateral.setSpMax(value.getSpMax());
+        eligibleCollateral.setSpMin(value.getSpMin());
+
+        List<Range> rangeList = new ArrayList<>();
+        String rangesStateDate = value.getRanges();
+        String rangeArray[] = rangesStateDate.split("END");
+        for (String rangeValue : rangeArray) {
+            String rangeValueArray[] = rangeValue.split(",");
+            if (rangeValueArray.length == 3) {
+                Range rangeVo = new Range();
+                if (!"".equals(rangeValueArray[0])) {
+                    rangeVo.setRangeFrom(Integer.valueOf(rangeValueArray[0]));
+                }
+                if (!"".equals(rangeValueArray[1])) {
+                    rangeVo.setRangeTo(Integer.valueOf(rangeValueArray[1]));
+                }
+                if (!"".equals(rangeValueArray[2])) {
+                    rangeVo.setValuation(Integer.valueOf(rangeValueArray[2]));
+                }
+                rangeList.add(rangeVo);
+            }
+        }
+        eligibleCollateral.setRanges(rangeList);
+
+
+        List<String> currenciesList = new ArrayList<>();
+        String currencies = value.getCurrencies();
+        String currenciesArray[] = currencies.split(",");
+        for (String currency : currenciesArray) {
+            currenciesList.add(currency);
+        }
+        eligibleCollateral.setCurrencies(currenciesList);
 
         return eligibleCollateral;
+    }
+
+    /**
+     * Create ThresholdStateVO to ThresholdState DO
+     *
+     * @param value
+     * @return
+     */
+    public static EligibleCollateral copyThresholdStateVO(ThresholdState value) {
+        EligibleCollateral eligibleCollateral = new EligibleCollateral();
+
+        eligibleCollateral.setPartyA(value.getInitiatorAccepted());
+        eligibleCollateral.setPartyB(value.getResponderAccecpted());
+
+        eligibleCollateral.setFitchMax(value.getFitchMax());
+        eligibleCollateral.setFitchMin(value.getFitchMin());
+        eligibleCollateral.setMoodysMax(value.getMoodysMax());
+        eligibleCollateral.setMoodysMin(value.getMoodysMin());
+
+        eligibleCollateral.setSpMax(value.getSpMax());
+        eligibleCollateral.setSpMin(value.getSpMin());
+
+        List<String> currenciesList = new ArrayList<>();
+        String currencies = value.getCurrencies();
+        String currenciesArray[] = currencies.split(",");
+        for (String currency : currenciesArray) {
+            currenciesList.add(currency);
+        }
+        eligibleCollateral.setCurrencies(currenciesList);
+        eligibleCollateral.setAmount(value.getAmount());
+
+        return eligibleCollateral;
+    }
+
+
+    /**
+     * This is to get teh list of changed attributes
+     *
+     * @param newInstance
+     * @param oldInstance
+     * @param <T>
+     * @return
+     */
+    public static <T> HashMap<Object, Object> compare(T newInstance, T oldInstance) {
+        Class<T> clazz = (Class<T>) oldInstance.getClass();
+        List<Field> fields = getAllModelFields(clazz);
+        HashMap<Object, Object> changedFields = new HashMap<>();
+
+        try {
+            if (fields != null) {
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    if ("agrementLastAmendDate".equals(field.getName()) || "status".equals(field.getName())
+                            || "changedFields".equals(field.getName()) || "version".equals(field.getName())) {
+                        continue;
+                    }
+                    if (field.get(newInstance) != null && field.get(oldInstance) != null) {
+                        if ((field.get(newInstance) instanceof Comparable)) {
+                            Comparable toComparable = (Comparable) field.get(newInstance);
+                            Comparable fromComparable = (Comparable) field.get(oldInstance);
+                            int result = toComparable.compareTo(fromComparable);
+                            if (result != 0) {
+                                changedFields.put(field.getName(), fromComparable);
+                            }
+
+                        } else if (field.get(newInstance) instanceof String) {
+                            String toComparable = (String) field.get(newInstance);
+                            String fromComparable = (String) field.get(oldInstance);
+                            boolean result = toComparable.equals(fromComparable.toString());
+                            if (!result) {
+                                changedFields.put(field.getName(), fromComparable);
+                            }
+                        } else if (field.get(newInstance) instanceof CordaX500Name) {
+                            CordaX500Name toComparable = (CordaX500Name) field.get(newInstance);
+                            CordaX500Name fromComparable = (CordaX500Name) field.get(oldInstance);
+                            boolean result = toComparable.toString().equals(fromComparable.toString());
+                            if (!result) {
+                                changedFields.put(field.getName(), fromComparable);
+                            }
+                        } else if (field.get(newInstance) instanceof List) {
+                            List newListField = (List) field.get(newInstance);
+                            List oldListField = (List) field.get(oldInstance);
+
+                            //check the size of both Lists
+                            if (newListField.size() != oldListField.size()) {
+                                if (oldListField.size() == 0) {
+                                    changedFields.put(field.getName(), "empty");
+                                } else {
+                                    changedFields.put(field.getName(), oldListField.toString());
+                                }
+                                continue;
+                            }
+                            int count = 0;
+                            for (Object value : newListField) {
+                                if (value instanceof EligibleCollateral) {
+                                    continue;
+                                } else if (value instanceof String) {
+                                    if (!oldListField.contains(value)) {
+                                        changedFields.put(field.getName(), oldListField.toString());
+                                        continue;
+                                    }
+                                }
+                                count++;
+                            }
+                        } else {
+                            System.out.println("No matching found for casting, Need investigation ==================> " + field.getName());
+                            continue;
+                        }
+                    } else {
+                        if (field.get(oldInstance) == null && field.get(newInstance) != null) {
+                            changedFields.put(field.getName(), "empty");
+                        } else if (!(field.get(oldInstance) == null && field.get(newInstance) == null)) {
+                            changedFields.put(field.getName(), field.get(oldInstance));
+                        } else if (field.get(oldInstance) != null && field.get(newInstance) == null) {
+                            changedFields.put(field.getName(), field.get(oldInstance));
+                        }
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        System.out.println("changedFields ===================> " + changedFields);
+        return changedFields;
     }
 }

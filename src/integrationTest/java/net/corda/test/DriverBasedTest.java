@@ -40,15 +40,15 @@ public class DriverBasedTest {
         //dp.setIsDebug(true);
         driver(new DriverParameters().setExtraCordappPackagesToScan(Arrays.asList("com.genpact.agreementnegotiation")).setIsDebug(true
         ), dsl -> {
-                HashSet<ServiceInfo> notaryServices = Sets.newHashSet(new ServiceInfo(ValidatingNotaryService.Companion.getType(), null));
+            HashSet<ServiceInfo> notaryServices = Sets.newHashSet(new ServiceInfo(ValidatingNotaryService.Companion.getType(), null));
 
-                // This starts three nodes simultaneously with startNode, which returns a future that completes when the node
-                // has completed startup. Then these are all resolved with getOrThrow which returns the NodeHandle list.
-                List<CordaFuture<NodeHandle>> handles = ImmutableList.of(
-                        dsl.startNode(new NodeParameters().setProvidedName(notary.getName()).setAdvertisedServices(notaryServices)),
-                        dsl.startNode(new NodeParameters().setProvidedName(bankA.getName())),
-                        dsl.startNode(new NodeParameters().setProvidedName(bankB.getName()))
-                );
+            // This starts three nodes simultaneously with startNode, which returns a future that completes when the node
+            // has completed startup. Then these are all resolved with getOrThrow which returns the NodeHandle list.
+            List<CordaFuture<NodeHandle>> handles = ImmutableList.of(
+                    dsl.startNode(new NodeParameters().setProvidedName(notary.getName()).setAdvertisedServices(notaryServices)),
+                    dsl.startNode(new NodeParameters().setProvidedName(bankA.getName())),
+                    dsl.startNode(new NodeParameters().setProvidedName(bankB.getName()))
+            );
 
             try {
                 NodeHandle notaryHandle = handles.get(0).get();

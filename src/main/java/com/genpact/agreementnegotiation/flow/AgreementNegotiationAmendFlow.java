@@ -36,10 +36,13 @@ public class AgreementNegotiationAmendFlow {
     @InitiatingFlow
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction> {
+        private final Party otherParty;
         private final AgreementNegotiationState agreementNegotiationState;
 
-        public Initiator(AgreementNegotiationState state) {
+        public Initiator(AgreementNegotiationState state, Party otherParty) {
+
             this.agreementNegotiationState = state;
+            this.otherParty = otherParty;
         }
 
         /**
@@ -118,22 +121,23 @@ public class AgreementNegotiationAmendFlow {
                 AgreementNegotiationState previousState= previousStatesAndRef.getState().getData();
                 System.out.println("================================> previousState "+ previousState.toString());
 
-                // We create a transaction builder.
                 progressTracker.setCurrentStep(TX_BUILDING);
+                // We create a transaction builder.
                 final TransactionBuilder txBuilder = new TransactionBuilder();
                 txBuilder.setNotary(notary);
 
-                // We create the transaction components.
                 progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
+                // We create the transaction components.
                 //AgreementUtil.copyAllFields(agreementNegotiationState, previousState);
                 agreementNegotiationState.setLinearId(previousState.getLinearId());
-                agreementNegotiationState.setStatus(AgreementEnumState.AMEND);
-                agreementNegotiationState.setAgrementLastAmendDate(new Date());
-                agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
-                agreementNegotiationState.setAgrementName(previousState.getAgrementName());
                 agreementNegotiationState.setAgrementInitiationDate(previousState.getAgrementInitiationDateAsDate());
                 agreementNegotiationState.setCptyInitiator(previousState.getCptyInitiator());
                 agreementNegotiationState.setCptyReciever(previousState.getCptyReciever());
+                agreementNegotiationState.setStatus(AgreementEnumState.AMEND);
+                agreementNegotiationState.setAgrementLastAmendDate(new Date());
+                agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
+                //increment the version coming from UI
+                agreementNegotiationState.setVersion(agreementNegotiationState.getVersion() + 1);
 
                 String outputContract = AgreementNegotiationContract.class.getName();
                 List<PublicKey> requiredSigners = ImmutableList.of(previousState.getCptyReciever().getOwningKey(), previousState.getCptyInitiator().getOwningKey());
@@ -144,9 +148,7 @@ public class AgreementNegotiationAmendFlow {
                 txBuilder.addInputState(previousStatesAndRef);
                 txBuilder.addCommand(cmd);
 
-                // Verifying the transaction.
                 progressTracker.setCurrentStep(TX_VERIFICATION);
-                txBuilder.verify(getServiceHub());
 
                 // Signing the transaction.
                 progressTracker.setCurrentStep(TX_SIGNING);

@@ -33,13 +33,17 @@ public class AgreementNegotiationInitiateFlow {
     @InitiatingFlow
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction> {
+
+        private final Party otherParty;
         private AgreementNegotiationState agreementNegotiationState;
 
         /**
          * Constructor.
          */
-        public Initiator(AgreementNegotiationState agreementNegotiationState) {
+        public Initiator(AgreementNegotiationState agreementNegotiationState, Party otherParty) {
+
             this.agreementNegotiationState = agreementNegotiationState;
+            this.otherParty = otherParty;
         }
 
         /**
@@ -99,11 +103,12 @@ public class AgreementNegotiationInitiateFlow {
 
             // We create the transaction components.
             agreementNegotiationState.setLinearId(new UniqueIdentifier());
-            agreementNegotiationState.setCptyInitiator(getOurIdentity());
             agreementNegotiationState.setAgrementLastAmendDate(new Date());
             agreementNegotiationState.setAgrementInitiationDate(new Date());
             agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
             agreementNegotiationState.setStatus(AgreementEnumState.INITIAL);
+            agreementNegotiationState.setCptyReciever(otherParty);
+            agreementNegotiationState.setVersion(1);
 
             StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, TEMPLATE_CONTRACT_ID);
             List<PublicKey> requiredSigners = ImmutableList.of(agreementNegotiationState.getCptyInitiator().getOwningKey(),

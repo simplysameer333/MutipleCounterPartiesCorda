@@ -40,11 +40,13 @@ public class AgreementNegotiationAcceptFlow {
     @InitiatingFlow
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction> {
-
+        private final Party otherParty;
         private final AgreementNegotiationState agreementNegotiationState;
 
-        public Initiator(AgreementNegotiationState state) {
+        public Initiator(AgreementNegotiationState state, Party otherParty) {
+
             this.agreementNegotiationState = state;
+            this.otherParty = otherParty;
         }
 
         /**
@@ -132,15 +134,18 @@ public class AgreementNegotiationAcceptFlow {
                 // We create the transaction components - restore all data from previous state
 
                 AgreementUtil.copyAllFields(agreementNegotiationState, previousState);
+                //increment the version
+                agreementNegotiationState.setVersion(previousState.getVersion() + 1);
                 agreementNegotiationState.setAgrementLastAmendDate(new Date());
                 agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
 
                 //Update transaction data
                 agreementNegotiationState.setAgrementLastAmendDate(new Date());
-                agreementNegotiationState.setLastUpdatedBy(getOurIdentity());
+                agreementNegotiationState.setLastUpdatedBy(otherParty);
                 agreementNegotiationState.setStatus(AgreementEnumState.PARTIAL_ACCEPTED);
                 if (previousState.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED) {
                     agreementNegotiationState.setStatus(AgreementEnumState.FULLY_ACCEPTED);
+                    agreementNegotiationState.setAgrementAgreedDate(new Date());
                 }
 
                 List<PublicKey> requiredSigners = ImmutableList.of(previousState.getCptyReciever().getOwningKey(), previousState.getCptyInitiator().getOwningKey());
@@ -153,19 +158,16 @@ public class AgreementNegotiationAcceptFlow {
                 final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
                 SignedTransaction twiceSignedTx = getServiceHub().addSignature(signedTx);
 
-                // Verifying the transaction.
-                progressTracker.setCurrentStep(TX_VERIFICATION);
-                txBuilder.verify(getServiceHub());
-
                 // Creating a session with the other party.
+
                 Party counterParty = previousState.getCptyReciever();
                 if (counterParty.getName().equals(getOurIdentity().getName())) {
                     counterParty = previousState.getCptyInitiator();
                 }
                 FlowSession otherPartySession = initiateFlow(counterParty);
 
-                // Obtaining the counterparty's signature.
                 progressTracker.setCurrentStep(SIGS_GATHERING);
+                // Obtaining the counterparty's signature.
                 SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(
                         twiceSignedTx, ImmutableList.of(otherPartySession), SIGS_GATHERING.childProgressTracker()));
 

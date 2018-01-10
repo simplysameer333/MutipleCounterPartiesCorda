@@ -1,10 +1,10 @@
 package com.genpact.agreementnegotiation.state;
 
 public enum AgreementEnumState {
-    INITIAL("INITIAL"),
-    AMEND("AMEND"),
-    PARTIAL_ACCEPTED("PARTIAL ACCEPTED"),
-    FULLY_ACCEPTED("FULLY ACCEPTED");
+    INITIAL("Initiated"),
+    AMEND("Amended"),
+    PARTIAL_ACCEPTED("Partially Agreed"),
+    FULLY_ACCEPTED("Agreed");
 
     private final String name;
     private AgreementEnumState(String s) {

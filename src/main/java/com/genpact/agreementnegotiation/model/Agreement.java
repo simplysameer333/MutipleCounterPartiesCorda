@@ -1,23 +1,21 @@
 package com.genpact.agreementnegotiation.model;
 
-import net.corda.core.identity.CordaX500Name;
 import net.corda.core.serialization.CordaSerializable;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @CordaSerializable
 public class Agreement {
     private String agrementName = null;
-    private CordaX500Name counterparty = null;
+    private String counterparty = null;
     private String baseCurrency = null;
-    private String eligibleCurrency = null;
+    private List<String> eligibleCurrency = new ArrayList<String>();
+    private List<String> products = new ArrayList<String>();
     private int deliveryAmount = 0;
     private int returnAmount = 0;
     private int creditSupportAmount = 0;
-    private int eligibleCollateralType = 0;
+    // private int eligibleCollateralType = 0;
     private List<EligibleCollateral> eligibleCollaterals = new ArrayList<EligibleCollateral>();
     private List<EligibleCollateral> thresholds = new ArrayList<EligibleCollateral>();
     private int initialMargin = 0; //boolean 0 or 1
@@ -35,11 +33,17 @@ public class Agreement {
     //Additional Added fields
     private Date agrementInitiationDate = null;
     private Date agrementAgreedDate = null;
-    private CordaX500Name cptyInitiator = null;
-    private CordaX500Name lastUpdatedBy = null;
+    private String cptyInitiator = null;
+    private String lastUpdatedBy = null;
     private Date agrementLastAmendDate = null;
     private String id = null;
     private String status = null;
+    private int version;
+
+    private Map<Object, Object> changedFields = new HashMap<>();
+
+    public Agreement() {
+    }
 
     public String getAgrementName() {
         return agrementName;
@@ -49,11 +53,11 @@ public class Agreement {
         this.agrementName = agrementName;
     }
 
-    public CordaX500Name getCounterparty() {
+    public String getCounterparty() {
         return counterparty;
     }
 
-    public void setCounterparty(CordaX500Name counterparty) {
+    public void setCounterparty(String counterparty) {
         this.counterparty = counterparty;
     }
 
@@ -65,11 +69,11 @@ public class Agreement {
         this.baseCurrency = baseCurrency;
     }
 
-    public String getEligibleCurrency() {
+    public List<String> getEligibleCurrency() {
         return eligibleCurrency;
     }
 
-    public void setEligibleCurrency(String eligibleCurrency) {
+    public void setEligibleCurrency(List<String> eligibleCurrency) {
         this.eligibleCurrency = eligibleCurrency;
     }
 
@@ -97,12 +101,12 @@ public class Agreement {
         this.creditSupportAmount = creditSupportAmount;
     }
 
-    public int getEligibleCollateralType() {
-        return eligibleCollateralType;
+    public List<String> getProducts() {
+        return products;
     }
 
-    public void setEligibleCollateralType(int eligibleCollateralType) {
-        this.eligibleCollateralType = eligibleCollateralType;
+    public void setProducts(List<String> products) {
+        this.products = products;
     }
 
     public List<EligibleCollateral> getEligibleCollaterals() {
@@ -217,19 +221,19 @@ public class Agreement {
         this.agrementAgreedDate = agrementAgreedDate;
     }
 
-    public CordaX500Name getCptyInitiator() {
+    public String getCptyInitiator() {
         return cptyInitiator;
     }
 
-    public void setCptyInitiator(CordaX500Name cptyInitiator) {
+    public void setCptyInitiator(String cptyInitiator) {
         this.cptyInitiator = cptyInitiator;
     }
 
-    public CordaX500Name getLastUpdatedBy() {
+    public String getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(CordaX500Name lastUpdatedBy) {
+    public void setLastUpdatedBy(String lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -255,6 +259,22 @@ public class Agreement {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Map<Object, Object> getChangedFields() {
+        return changedFields;
+    }
+
+    public void setChangedFields(Map<Object, Object> changedFields) {
+        this.changedFields = changedFields;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     @Override

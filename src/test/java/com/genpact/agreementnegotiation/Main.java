@@ -44,13 +44,13 @@ public class Main {
                             .setAdvertisedServices(singleton(new ServiceInfo(ValidatingNotaryService.Companion.getType(), null))));
 
                     CordaFuture<NodeHandle> nodeAFuture = dsl.startNode(new NodeParameters()
-                            .setProvidedName(new CordaX500Name("PartyA", "London", "GB"))
+                            .setProvidedName(new CordaX500Name("JPMorgan Chase", "London", "GB"))
                             .setRpcUsers(ImmutableList.of(user)));
                     CordaFuture<NodeHandle> nodeB = dsl.startNode(new NodeParameters()
-                            .setProvidedName(new CordaX500Name("PartyB", "New York", "US"))
+                            .setProvidedName(new CordaX500Name("Bank of America", "New York", "US"))
                             .setRpcUsers(ImmutableList.of(user)));
             CordaFuture<NodeHandle> nodeC = dsl.startNode(new NodeParameters()
-                    .setProvidedName(new CordaX500Name("PartyC", "New Delhi", "IN"))
+                    .setProvidedName(new CordaX500Name("Genpact", "New Delhi", "IN"))
                     .setRpcUsers(ImmutableList.of(user)));
 
                     try {

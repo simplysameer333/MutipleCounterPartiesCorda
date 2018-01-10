@@ -128,3 +128,9 @@
  }
  .thr{ padding: 12px 0px;}
  .lbl-p{padding-top:10px}
+ .in-select td{
+	width: 25% !important;
+ }
+ .highlight{
+     background-color: YELLOW;
+ }

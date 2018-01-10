@@ -26,7 +26,25 @@ public class AgreementStateTemplate implements LinearState {
     private Date agrementLastAmendDate = null;
     private AgreementEnumState status;
     private List<SecureHash> attachmentHash;
+    //first value of version
+    private int version;
 
+    public AgreementStateTemplate() {
+    }
+
+    public AgreementStateTemplate(String agrementName, Date agrementInitiationDate,
+                                  Date agrementAgreedDate, Party cptyInitiator, Party cptyReciever, Party lastUpdatedBy,
+                                  Date agrementLastAmendDate, AgreementEnumState status) {
+
+        this.agrementName = agrementName;
+        this.agrementInitiationDate = agrementInitiationDate;
+        this.agrementAgreedDate = agrementAgreedDate;
+        this.cptyInitiator = cptyInitiator;
+        this.cptyReciever = cptyReciever;
+        this.lastUpdatedBy = lastUpdatedBy;
+        this.agrementLastAmendDate = agrementLastAmendDate;
+        this.status = status;
+    }
 
     public void setLinearId(UniqueIdentifier linearId) {
         this.linearId = linearId;
@@ -142,7 +160,17 @@ public class AgreementStateTemplate implements LinearState {
         return ImmutableList.of(cptyInitiator, cptyReciever);
     }
 
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
     @Override
+
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }

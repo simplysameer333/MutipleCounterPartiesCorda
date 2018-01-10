@@ -1,6 +1,7 @@
 package com.genpact.agreementnegotiation.schema;
 
 import com.genpact.agreementnegotiation.state.EligibleCollateralState;
+import com.genpact.agreementnegotiation.state.ThresholdState;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
@@ -55,8 +56,11 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @Column(name = "baseCurrency")
         private String baseCurrency;
 
-        @Column(name = "eligibleCurrency")
-        private String eligibleCurrency;
+
+        @Embedded
+        @ElementCollection
+        @CollectionTable(name = "LIST_ELIGIBLE_CURRENCIES")
+        private List<String> eligibleCurrency;
 
         @Column(name = "deliveryAmount")
         private int deliveryAmount;
@@ -67,8 +71,10 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @Column(name = "creditSupportAmount")
         private int creditSupportAmount;
 
-        @Column(name = "eligibleCollateral")
-        private int eligibleCollateralType;
+        @Embedded
+        @ElementCollection
+        @CollectionTable(name = "LIST_PRODUCTS")
+        private List<String> products;
 
         @Column(name = "thresholdRating")
         private int thresholdRating;
@@ -113,7 +119,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @Embedded
         @ElementCollection
         @CollectionTable(name = "Agreement_Thresholds")
-        List<EligibleCollateralState> threshods;
+        List<ThresholdState> threshods;
 
         public PersistentIOU() {
         }
@@ -121,13 +127,12 @@ public class AgreementNegotiationSchema extends MappedSchema {
         public PersistentIOU(UUID linearId, String agrementName,
                              String agrementInitiationDate, String agrementAgreedDate, String lastUpdatedBy,
                              String agrementLastAmendDate, String negotiationState, String cptyInitiator,
-                             String cptyReciever, String baseCurrency, String eligibleCurrency,
+                             String cptyReciever, String baseCurrency, List<String> eligibleCurrency,
                              int deliveryAmount, int returnAmount, int creditSupportAmount,
-                             int eligibleCollateralType, String valuationAgent, String valuationDate, String valuationTime,
+                             List<String> products, String valuationAgent, String valuationDate, String valuationTime,
                              Date notificationTime, List<String> specifiedCondition, Date substitutionDateTo,
-                             Date substitutionDateFrom, Boolean consent,
-                             List<EligibleCollateralState> eligibleCollateralStates,
-                             List<EligibleCollateralState> threshods) {
+                             Date substitutionDateFrom, Boolean consent, List<EligibleCollateralState> eligibleCollateralStates,
+                             List<ThresholdState> threshods) {
 
             this.linearId = linearId.toString();
             this.agrementName = agrementName;
@@ -143,7 +148,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.deliveryAmount = deliveryAmount;
             this.returnAmount = returnAmount;
             this.creditSupportAmount = creditSupportAmount;
-            this.eligibleCollateralType = eligibleCollateralType;
+            this.products = products;
             this.valuationAgent = valuationAgent;
             this.valuationDate = valuationDate;
             this.valuationTime = valuationTime;
@@ -236,11 +241,11 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.baseCurrency = baseCurrency;
         }
 
-        public String getEligibleCurrency() {
+        public List<String> getEligibleCurrency() {
             return eligibleCurrency;
         }
 
-        public void setEligibleCurrency(String eligibleCurrency) {
+        public void setEligibleCurrency(List<String> eligibleCurrency) {
             this.eligibleCurrency = eligibleCurrency;
         }
 
@@ -268,12 +273,12 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.creditSupportAmount = creditSupportAmount;
         }
 
-        public int getEligibleCollateralType() {
-            return eligibleCollateralType;
+        public List<String> getProducts() {
+            return products;
         }
 
-        public void setEligibleCollateralType(int eligibleCollateralType) {
-            this.eligibleCollateralType = eligibleCollateralType;
+        public void setProducts(List<String> products) {
+            this.products = products;
         }
 
         public Date getSubstitutionDateFrom() {
@@ -300,11 +305,11 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.eligibleCollateralStates = eligibleCollateralStates;
         }
 
-        public List<EligibleCollateralState> getThreshods() {
+        public List<ThresholdState> getThreshods() {
             return threshods;
         }
 
-        public void setThreshods(List<EligibleCollateralState> threshods) {
+        public void setThreshods(List<ThresholdState> threshods) {
             this.threshods = threshods;
         }
 
