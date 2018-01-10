@@ -143,6 +143,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
     modalInstance.peers = peers;
     modalInstance.form = {baseCurrency: 'GBP',valuationPercentageCash:100};
     $scope.agreement = {baseCurrency: 'GBP',valuationPercentageCash:100, eligibleCollaterals: [], thresholds: [],specifiedConditions: []};
+
     modalInstance.formError = false;
 	modalInstance.deliveryAmount = $rootScope.deliveryAmount;
 	modalInstance.collateral = $rootScope.collateral;
@@ -263,6 +264,12 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 			(result) => modalInstance.displayMessage(result, agreement)
 		);
 
+            // Create PO and handle success / fail responses.
+            $http.put(createIOUEndpoint, angular.toJson(modalInstance.form)).then(
+                (result) => modalInstance.displayMessage(result),
+                (result) => modalInstance.displayMessage(result)
+            );
+        }
     };
 
     modalInstance.displayMessage = (message, agreement) => {
