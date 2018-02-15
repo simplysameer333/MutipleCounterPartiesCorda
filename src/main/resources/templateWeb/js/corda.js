@@ -264,12 +264,12 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 			(result) => modalInstance.displayMessage(result, agreement)
 		);
 
-            // Create PO and handle success / fail responses.
-            $http.put(createIOUEndpoint, angular.toJson(modalInstance.form)).then(
-                (result) => modalInstance.displayMessage(result),
-                (result) => modalInstance.displayMessage(result)
-            );
-        }
+        // Create PO and handle success / fail responses.
+        $http.put(createIOUEndpoint, angular.toJson(modalInstance.form)).then(
+            (result) => modalInstance.displayMessage(result),
+            (result) => modalInstance.displayMessage(result)
+        );
+
     };
 
     modalInstance.displayMessage = (message, agreement) => {
