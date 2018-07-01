@@ -8,7 +8,7 @@ import java.util.*;
 @CordaSerializable
 public class Agreement {
     private String agrementName = null;
-    private String counterparty = null;
+    private List<String> counterparty;
     private String baseCurrency = null;
     private List<String> eligibleCurrency = new ArrayList<String>();
     private List<String> products = new ArrayList<String>();
@@ -29,6 +29,7 @@ public class Agreement {
     private Date substitutionDateTo = null;
     private int consent = 0;//boolean 0 or 1
     private List<String> attachmentHash;
+    private String pendingParticipants;
 
     //Additional Added fields
     private Date agrementInitiationDate = null;
@@ -53,11 +54,11 @@ public class Agreement {
         this.agrementName = agrementName;
     }
 
-    public String getCounterparty() {
+    public List<String> getCounterparty() {
         return counterparty;
     }
 
-    public void setCounterparty(String counterparty) {
+    public void setCounterparty(List<String> counterparty) {
         this.counterparty = counterparty;
     }
 
@@ -275,6 +276,14 @@ public class Agreement {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public String getPendingParticipants() {
+        return pendingParticipants;
+    }
+
+    public void setPendingParticipants(String pendingParticipants) {
+        this.pendingParticipants = pendingParticipants;
     }
 
     @Override

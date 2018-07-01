@@ -66,8 +66,8 @@
                 <thead style="font-weight: bold">
                 <tr>
                     <th>Agreement Name</th>
-                    <th>Designated Party A</th>
-                    <th>Designated Party B</th>
+                    <th>Initiator</th>
+                    <th>Counter Party Names(s)</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -77,7 +77,7 @@
 
                     <td>{{x.agrementName}}</td>
                     <td>{{x.cptyInitiator}}</td>
-                    <td>{{x.counterparty}}</td>
+                    <td>{{x.counterparty.join(', ')}}</td>
                     <td>{{x.status}}</td>
                     <td>
                         <button type="button" ng-click="demoApp.viewAgreement(x, true)" class="btn btn-primary">View
@@ -98,8 +98,8 @@
                 <tr>
                     <td>Agreement Name</td>
                     <td>Agreement Initiation Date</td>
-                    <td>Firm Name (Party A)</td>
-                    <td>Counter Party (Party B)</td>
+                    <td>Initiator</td>
+                    <td>Counter Party Name(s)</td>
                     <td>Status</td>
                     <td>Last Updated By</td>
                     <td>Last Updated On</td>
@@ -111,7 +111,7 @@
                     <td>{{x.agrementName}}</td>
                     <td>{{getDateValue(x.agrementInitiationDate)}}</td>
                     <td>{{x.cptyInitiator}}</td>
-                    <td>{{x.counterparty}}</td>
+                    <td>{{x.counterparty.join(', ')}}</td>
                     <td>{{x.status}}</td>
                     <td>{{x.lastUpdatedBy}}</td>
                     <td>{{getDateValue(x.agrementLastAmendDate)}}</td>
@@ -141,7 +141,7 @@
 
                         <div class="form-group">
                             <label for="value" class="control-label lbl-p">Counterparty:</label>
-                            <select ng-model="agreement.counterparty" class="form-control" id="counterparty"
+                            <select ng-model="agreement.counterparty" multiple class="form-control" id="counterparty"
                                     ng-options="peer as peer for peer in modalInstance.peers">
                             </select>
 
@@ -332,7 +332,7 @@
                             </select>
 
                             <label for="value" class="control-label lbl-p">Valuation Agent:</label>
-                            <select ng-model="agreement.valuationAgent" class="form-control" id="counterparty"
+                            <select ng-model="agreement.valuationAgent" class="form-control" id="valuationAgent"
                                     ng-options="peer as peer for peer in modalInstance.peers">
                             </select>
 
@@ -378,11 +378,39 @@
                                        id="address">
                             </div>
 
+                            <div>
+                                <label for="value" class="control-label lbl-p">Consent:</label>
+                                <select ng-model="agreement.consent" class="form-control"
+                                        ng-options="item.id as item.name for item in modalInstance.yesNo track by item.id">
+                                </select>
+                            </div>
 
-                            <label for="value" class="control-label lbl-p">Consent:</label>
-                            <select ng-model="agreement.consent" class="form-control"
-                                    ng-options="item.id as item.name for item in modalInstance.yesNo track by item.id">
-                            </select>
+                            </BR>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <input type="file" select-files-ng ng-model="agreement.fileArray" multiple
+                                           accept=".pdf">
+
+                                    <button ng-click="modalInstance.upload()" type="button" class="btn btn-primary">
+                                        Upload
+                                    </button>
+                                    <code>
+                                        <table ng-show="agreement.fileArray.length">
+                                            <tr>
+                                                <td>Name</td>
+                                                <td>Size</td>
+                                                <td>Type</td>
+                                            <tr>
+                                            <tr ng-repeat="file in agreement.fileArray">
+                                                <td>{{file.name}}</td>
+                                                <td>{{file.size}}</td>
+                                                <td>{{file.type}}</td>
+                                            </tr>
+                                        </table>
+                                    </code>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -400,6 +428,13 @@
             <button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
         </div>
     </form>
+
+    <form action="/api/template/upload" enctype="multipart/form-data" method="post">
+        <label>Select File</label><input type="file" name="file"/> <br/><br/>
+        <label>Tags</label> <input name="tags" maxlength="10"/> <br/><br/>
+        <input type="submit" title="Save"/>
+    </form>
+
 
 </script>
 
@@ -437,7 +472,7 @@
                                 </tr>
                                 <tr>
                                     <td class="col-lg-3">Counterparty Name</td>
-                                    <td class="col-lg-9">{{agreement.counterparty}}</td>
+                                    <td class="col-lg-9">{{agreement.counterparty.join(', ')}}</td>
                                 </tr>
                                 <tr>
                                     <td class="col-lg-3">Base Currency</td>
@@ -708,6 +743,13 @@
                                         {{agreement.consent == 1? "Yes":"No"}}
                                     </td>
                                 </tr>
+
+                                <tr ng-show="agreement.status == 'Partially Agreed'">
+                                    <td class="col-lg-3">Pending Participants</td>
+                                    <td ng-class="col-lg-9">
+                                        {{agreement.pendingParticipants }}
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -719,7 +761,8 @@
                     <button type="button" ng-show="showAmendAgree" ng-disabled="agreement.status == 'Agreed'"
                             class="btn btn-primary" ng-click="cancel(); amendAgreement(agreement)">Amend
                     </button>
-                    <button type="button" ng-show="showAmendAgree" ng-disabled="agreement.status == 'Agreed'"
+                    <button type="button" ng-show="showAmendAgree"
+                            ng-disabled="agreement.status == 'Agreed' ||( !isAgreeAllowed && agreement.status == 'Partially Agreed')"
                             ng-click="agree(agreement)" class="btn btn-primary">Agree
                     </button>
                     <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
@@ -730,7 +773,6 @@
 </script>
 
 <script type="text/ng-template" id="amendAgreementModal.html">
-
     <div class="modal-header">
         <h4 class="modal-title">Amend Agreement</h4>
     </div>
@@ -740,8 +782,8 @@
                 <div class="col-lg-12">
                     <div class="form-group">
                         <label for="value" class="control-label lbl-p">Counterparty:</label>
-                        <select disabled ng-model="agreement.counterparty" class="form-control" id="counterparty"
-                                ng-options="peer as peer for peer in peers">
+                        <select multiple ng-model="agreement.counterparty" class="form-control" id="counterparty"
+                                ng-options="party for party in allCounterParties">
                         </select>
                         <label for="value" class="control-label lbl-p">Agreement Name:</label>
                         <input disabled type="text" ng-model="agreement.agrementName" class="form-control" id="address">
@@ -771,12 +813,13 @@
                                 ng-options="item.id as item.name for item in deliveryAmount">
                         </select>
 
+                        <label for="value" class="control-label lbl-p">Eligible Collateral:</label>
                         <div class="control-label thr">
                             <button ng-click="changedValue()" type="button" class="btn btn-primary">Add Eligible
                                 Collateral
                             </button>
                         </div>
-                        <div class="gp-table-div">
+                        <div class="gp-table-div" ng-show="agreement.eligibleCollaterals.length > 0">
                             <table class="table table-bordered table-striped">
                                 <thead style="font-weight: bold">
                                 <tr>
@@ -937,7 +980,7 @@
                         </select>
 
                         <label for="value" class="control-label lbl-p">Valuation Agent:</label>
-                        <select ng-model="agreement.valuationAgent" class="form-control" id="counterparty"
+                        <select ng-model="agreement.valuationAgent" class="form-control" id="valuationAgent"
                                 ng-options="peer as peer for peer in peers">
                         </select>
 

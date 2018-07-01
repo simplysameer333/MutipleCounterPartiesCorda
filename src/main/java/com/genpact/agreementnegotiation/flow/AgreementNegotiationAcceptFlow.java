@@ -6,7 +6,6 @@ import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.genpact.agreementnegotiation.utils.AgreementUtil;
-import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndContract;
 import net.corda.core.contracts.StateAndRef;
@@ -24,6 +23,8 @@ import net.corda.core.utilities.ProgressTracker.Step;
 
 import java.lang.reflect.Field;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -40,13 +41,10 @@ public class AgreementNegotiationAcceptFlow {
     @InitiatingFlow
     @StartableByRPC
     public static class Initiator extends FlowLogic<SignedTransaction> {
-        private final Party otherParty;
         private final AgreementNegotiationState agreementNegotiationState;
 
-        public Initiator(AgreementNegotiationState state, Party otherParty) {
-
+        public Initiator(AgreementNegotiationState state) {
             this.agreementNegotiationState = state;
-            this.otherParty = otherParty;
         }
 
         /**
@@ -141,15 +139,43 @@ public class AgreementNegotiationAcceptFlow {
 
                 //Update transaction data
                 agreementNegotiationState.setAgrementLastAmendDate(new Date());
-                agreementNegotiationState.setLastUpdatedBy(otherParty);
+                //Update the status of current party
+                Party currentParty = getOurIdentity();
+                agreementNegotiationState.getAllPartiesStatus().put(currentParty.getName().getOrganisation(),
+                        AgreementEnumState.FULLY_ACCEPTED.toString());
+
+                agreementNegotiationState.setLastUpdatedBy(currentParty);
+
+                //set default status
                 agreementNegotiationState.setStatus(AgreementEnumState.PARTIAL_ACCEPTED);
+
+                //if it's been accepted by all participants then mark it as FULLY _ACCEPTED
                 if (previousState.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED) {
-                    agreementNegotiationState.setStatus(AgreementEnumState.FULLY_ACCEPTED);
-                    agreementNegotiationState.setAgrementAgreedDate(new Date());
+                    boolean isAllAccepted = true;
+                    for (String partyStatus : agreementNegotiationState.getAllPartiesStatus().values()) {
+                        if (!AgreementEnumState.FULLY_ACCEPTED.toString().equals(partyStatus)) {
+                            isAllAccepted = false;
+                            break;
+                        }
+                    }
+                    if (isAllAccepted) {
+                        agreementNegotiationState.setStatus(AgreementEnumState.FULLY_ACCEPTED);
+                        agreementNegotiationState.setAgrementAgreedDate(new Date());
+                    }
                 }
 
-                List<PublicKey> requiredSigners = ImmutableList.of(previousState.getCptyReciever().getOwningKey(), previousState.getCptyInitiator().getOwningKey());
-                Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Accept(), requiredSigners);
+                //  List<PublicKey> requiredSigners = ImmutableList.of(previousState.getCptyReciever().get(0).getOwningKey(), previousState.getCptyInitiator().getOwningKey());
+                // Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Accept(), requiredSigners);
+
+                List<PublicKey> requiredSigners = new ArrayList<>();
+                requiredSigners.add(agreementNegotiationState.getCptyInitiator().getOwningKey());
+                for (Party party : agreementNegotiationState.getCptyReciever()) {
+                    requiredSigners.add(party.getOwningKey());
+                }
+                //sign command with all public keys
+                Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Amend(),
+                        Collections.unmodifiableList(requiredSigners));
+
                 StateAndContract outputSateAndContract = new StateAndContract(agreementNegotiationState, TEMPLATE_CONTRACT_ID);
                 txBuilder.withItems(previousStatesAndRef, outputSateAndContract, cmd);
 
@@ -159,17 +185,30 @@ public class AgreementNegotiationAcceptFlow {
                 SignedTransaction twiceSignedTx = getServiceHub().addSignature(signedTx);
 
                 // Creating a session with the other party.
-
-                Party counterParty = previousState.getCptyReciever();
+                /*
+                Party counterParty = previousState.getCptyReciever().get(0);
                 if (counterParty.getName().equals(getOurIdentity().getName())) {
                     counterParty = previousState.getCptyInitiator();
                 }
                 FlowSession otherPartySession = initiateFlow(counterParty);
+                */
 
-                progressTracker.setCurrentStep(SIGS_GATHERING);
                 // Obtaining the counterparty's signature.
+                progressTracker.setCurrentStep(SIGS_GATHERING);
+                List<Party> allParties = new ArrayList<>(agreementNegotiationState.getCptyReciever());
+                allParties.add(agreementNegotiationState.getCptyInitiator());
+
+                List<FlowSession> otherPartySessionList = new ArrayList<>();
+                for (Party party : allParties) {
+                    if (!party.getName().getOrganisation().equals(getOurIdentity().getName().getOrganisation())) {
+                        System.out.println("getAgreement Accept Ch ============================= > " + party.getName().getOrganisation());
+                        otherPartySessionList.add(initiateFlow(party));
+                    }
+                }
+
                 SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(
-                        twiceSignedTx, ImmutableList.of(otherPartySession), SIGS_GATHERING.childProgressTracker()));
+                        twiceSignedTx, Collections.unmodifiableList(otherPartySessionList),
+                        SIGS_GATHERING.childProgressTracker()));
 
                 progressTracker.setCurrentStep(FINALISATION);
 

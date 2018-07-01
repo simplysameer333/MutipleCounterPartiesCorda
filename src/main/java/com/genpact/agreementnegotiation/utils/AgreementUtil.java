@@ -3,17 +3,18 @@ package com.genpact.agreementnegotiation.utils;
 import com.genpact.agreementnegotiation.model.Agreement;
 import com.genpact.agreementnegotiation.model.EligibleCollateral;
 import com.genpact.agreementnegotiation.model.Range;
+import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.genpact.agreementnegotiation.state.EligibleCollateralState;
 import com.genpact.agreementnegotiation.state.ThresholdState;
 import net.corda.core.identity.CordaX500Name;
+import net.corda.core.identity.Party;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.*;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AgreementUtil {
@@ -53,7 +54,6 @@ public class AgreementUtil {
 
     /**
      * Convert VO to Domain Object
-     *
      * @param agreement
      * @return
      */
@@ -66,7 +66,7 @@ public class AgreementUtil {
         agreementNegotiationState.setReturnAmount(agreement.getReturnAmount());
         agreementNegotiationState.setCreditSupportAmount(agreement.getCreditSupportAmount());
         agreementNegotiationState.setProducts(agreement.getProducts());
-        agreementNegotiationState.setInitialMargin(agreement.getInitialMargin() == 1 ? true : false);
+        agreementNegotiationState.setInitialMargin(agreement.getInitialMargin() == 1);
         agreementNegotiationState.setValuationAgent(agreement.getValuationAgent());
         agreementNegotiationState.setValuationDate(agreement.getValuationDate());
         agreementNegotiationState.setValuationTime(agreement.getValuationTime());
@@ -74,7 +74,7 @@ public class AgreementUtil {
         agreementNegotiationState.setSubstitutionDateFrom(agreement.getSubstitutionDateFrom());
         agreementNegotiationState.setSubstitutionDateTo(agreement.getSubstitutionDateTo());
         agreementNegotiationState.setSpecifiedCondition(agreement.getSpecifiedConditions());
-        agreementNegotiationState.setConsent(agreement.getConsent() == 1 ? true : false);
+        agreementNegotiationState.setConsent(agreement.getConsent() == 1);
         agreementNegotiationState.setVersion(agreement.getVersion());
 
         List<EligibleCollateralState> eligibleCollateralStates = new ArrayList<>();
@@ -94,7 +94,6 @@ public class AgreementUtil {
 
     /**
      * Convert EligibleCollateral VO to EligibleCollateral DO.
-     *
      * @param value
      * @return
      */
@@ -138,7 +137,6 @@ public class AgreementUtil {
 
     /**
      * Convert EligibleCollateral VO to ThresholdState DO.
-     *
      * @param value
      * @return
      */
@@ -199,7 +197,11 @@ public class AgreementUtil {
         agreement.setAgrementAgreedDate(agreementNegotiationState.getAgrementAgreedDateAsDate());
         agreement.setAgrementLastAmendDate(agreementNegotiationState.getAgrementLastAmendDateAsDate());
         agreement.setCptyInitiator(agreementNegotiationState.getCptyInitiator().getName().getOrganisation());
-        agreement.setCounterparty(agreementNegotiationState.getCptyReciever().getName().getOrganisation());
+        List<String> counterParties = new ArrayList<>();
+        for (Party party : agreementNegotiationState.getCptyReciever()) {
+            counterParties.add(party.getName().getOrganisation());
+        }
+        agreement.setCounterparty(counterParties);
         agreement.setLastUpdatedBy(agreementNegotiationState.getLastUpdatedBy().getName().getOrganisation());
         agreement.setId(agreementNegotiationState.getLinearId().getId().toString());
         agreement.setStatus(agreementNegotiationState.getStatus().toString());
@@ -216,12 +218,19 @@ public class AgreementUtil {
         }
         agreement.setThresholds(thresholds);
 
+        List pendingParticipants = new ArrayList();
+        for (Map.Entry<String, String> partyStatus : agreementNegotiationState.getAllPartiesStatus().entrySet()) {
+            if (!AgreementEnumState.FULLY_ACCEPTED.toString().equals(partyStatus.getValue())) {
+                pendingParticipants.add(partyStatus.getKey());
+            }
+        }
+        agreement.setPendingParticipants(StringUtils.join(pendingParticipants, ','));
+
         return agreement;
     }
 
     /**
      * Copy EligibleCollateralState DO to EligibleCollateralState VO
-     *
      * @param value
      * @return
      */
@@ -277,7 +286,6 @@ public class AgreementUtil {
 
     /**
      * Create ThresholdStateVO to ThresholdState DO
-     *
      * @param value
      * @return
      */
@@ -310,7 +318,6 @@ public class AgreementUtil {
 
     /**
      * This is to get teh list of changed attributes
-     *
      * @param newInstance
      * @param oldInstance
      * @param <T>
@@ -397,5 +404,27 @@ public class AgreementUtil {
         }
         System.out.println("changedFields ===================> " + changedFields);
         return changedFields;
+    }
+
+    // save uploaded file to new location
+    public static void writeToFile(InputStream uploadedInputStream, String uploadedFileLocation) {
+
+        try {
+            OutputStream out = new FileOutputStream(new File(uploadedFileLocation));
+            int read = 0;
+            byte[] bytes = new byte[1024];
+
+            out = new FileOutputStream(new File(uploadedFileLocation));
+            while ((read = uploadedInputStream.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
+            }
+            out.flush();
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

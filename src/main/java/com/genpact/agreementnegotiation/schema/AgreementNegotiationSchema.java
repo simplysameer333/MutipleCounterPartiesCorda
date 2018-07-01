@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -50,8 +51,10 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @Column(name = "cptyInitiator")
         private String cptyInitiator;
 
-        @Column(name = "cptyReciever")
-        private String cptyReciever;
+        @Embedded
+        @ElementCollection
+        @CollectionTable(name = "LIST_COUNTERPARTIES")
+        private List<String> cptyReciever;
 
         @Column(name = "baseCurrency")
         private String baseCurrency;
@@ -61,6 +64,10 @@ public class AgreementNegotiationSchema extends MappedSchema {
         @ElementCollection
         @CollectionTable(name = "LIST_ELIGIBLE_CURRENCIES")
         private List<String> eligibleCurrency;
+
+        @ElementCollection
+        @CollectionTable(name = "PARTICIPANTS_STATUS")
+        private Map<String, String> allPartiesStatus;
 
         @Column(name = "deliveryAmount")
         private int deliveryAmount;
@@ -127,12 +134,12 @@ public class AgreementNegotiationSchema extends MappedSchema {
         public PersistentIOU(UUID linearId, String agrementName,
                              String agrementInitiationDate, String agrementAgreedDate, String lastUpdatedBy,
                              String agrementLastAmendDate, String negotiationState, String cptyInitiator,
-                             String cptyReciever, String baseCurrency, List<String> eligibleCurrency,
+                             List<String> cptyReciever, String baseCurrency, List<String> eligibleCurrency,
                              int deliveryAmount, int returnAmount, int creditSupportAmount,
                              List<String> products, String valuationAgent, String valuationDate, String valuationTime,
                              Date notificationTime, List<String> specifiedCondition, Date substitutionDateTo,
                              Date substitutionDateFrom, Boolean consent, List<EligibleCollateralState> eligibleCollateralStates,
-                             List<ThresholdState> threshods) {
+                             List<ThresholdState> threshods, Map<String, String> allPartiesStatus) {
 
             this.linearId = linearId.toString();
             this.agrementName = agrementName;
@@ -159,6 +166,7 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.consent = consent;
             this.eligibleCollateralStates = eligibleCollateralStates;
             this.threshods = threshods;
+            this.allPartiesStatus = allPartiesStatus;
         }
 
         public String getLinearId() {
@@ -225,11 +233,11 @@ public class AgreementNegotiationSchema extends MappedSchema {
             this.cptyInitiator = cptyInitiator;
         }
 
-        public String getCptyReciever() {
+        public List<String> getCptyReciever() {
             return cptyReciever;
         }
 
-        public void setCptyReciever(String cptyReciever) {
+        public void setCptyReciever(List<String> cptyReciever) {
             this.cptyReciever = cptyReciever;
         }
 
@@ -383,6 +391,14 @@ public class AgreementNegotiationSchema extends MappedSchema {
 
         public void setConsent(Boolean consent) {
             this.consent = consent;
+        }
+
+        public Map<String, String> getAllPartiesStatus() {
+            return allPartiesStatus;
+        }
+
+        public void setAllPartiesStatus(Map<String, String> allPartiesStatus) {
+            this.allPartiesStatus = allPartiesStatus;
         }
     }
 }

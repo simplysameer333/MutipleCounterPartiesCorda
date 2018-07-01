@@ -1,7 +1,6 @@
 package com.genpact.agreementnegotiation.state;
 
 import com.genpact.agreementnegotiation.utils.AgreementUtil;
-import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.LinearState;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.SecureHash;
@@ -10,8 +9,7 @@ import net.corda.core.identity.Party;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class AgreementStateTemplate implements LinearState {
 
@@ -21,20 +19,22 @@ public class AgreementStateTemplate implements LinearState {
     private Date agrementInitiationDate = null;
     private Date agrementAgreedDate = null;
     private Party cptyInitiator = null;
-    private Party cptyReciever = null;
+    private List<Party> cptyReciever = null;
     private Party lastUpdatedBy = null;
     private Date agrementLastAmendDate = null;
     private AgreementEnumState status;
     private List<SecureHash> attachmentHash;
+    private Map<String, String> allPartiesStatus = null;
     //first value of version
     private int version;
 
     public AgreementStateTemplate() {
     }
 
-    public AgreementStateTemplate(String agrementName, Date agrementInitiationDate,
-                                  Date agrementAgreedDate, Party cptyInitiator, Party cptyReciever, Party lastUpdatedBy,
-                                  Date agrementLastAmendDate, AgreementEnumState status) {
+    public AgreementStateTemplate(String agrementName, Date agrementInitiationDate, Date agrementAgreedDate,
+                                  Party cptyInitiator, List<Party> cptyReciever, Party lastUpdatedBy,
+                                  Date agrementLastAmendDate, AgreementEnumState status,
+                                  Map<String, String> allPartiesStatus) {
 
         this.agrementName = agrementName;
         this.agrementInitiationDate = agrementInitiationDate;
@@ -44,14 +44,19 @@ public class AgreementStateTemplate implements LinearState {
         this.lastUpdatedBy = lastUpdatedBy;
         this.agrementLastAmendDate = agrementLastAmendDate;
         this.status = status;
-    }
-
-    public void setLinearId(UniqueIdentifier linearId) {
-        this.linearId = linearId;
+        this.allPartiesStatus = allPartiesStatus;
     }
 
     public String getAgrementName() {
         return agrementName;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     public void setAgrementName(String agrementName) {
@@ -66,12 +71,12 @@ public class AgreementStateTemplate implements LinearState {
         return "";
     }
 
-    public Date getAgrementInitiationDateAsDate() {
-        return agrementInitiationDate;
-    }
-
     public void setAgrementInitiationDate(Date agrementInitiationDate) {
         this.agrementInitiationDate = agrementInitiationDate;
+    }
+
+    public Date getAgrementInitiationDateAsDate() {
+        return agrementInitiationDate;
     }
 
     public Date getAgrementAgreedDateAsDate() {
@@ -98,11 +103,11 @@ public class AgreementStateTemplate implements LinearState {
         this.cptyInitiator = cptyInitiator;
     }
 
-    public Party getCptyReciever() {
+    public List<Party> getCptyReciever() {
         return cptyReciever;
     }
 
-    public void setCptyReciever(Party cptyReciever) {
+    public void setCptyReciever(List<Party> cptyReciever) {
         this.cptyReciever = cptyReciever;
     }
 
@@ -153,24 +158,27 @@ public class AgreementStateTemplate implements LinearState {
         return linearId;
     }
 
+    public void setLinearId(UniqueIdentifier linearId) {
+        this.linearId = linearId;
+    }
 
     @NotNull
     @Override
     public List<AbstractParty> getParticipants() {
-        return ImmutableList.of(cptyInitiator, cptyReciever);
+        List allParticipants = new ArrayList(cptyReciever);
+        allParticipants.add(cptyInitiator);
+        return Collections.unmodifiableList(allParticipants);
     }
 
-
-    public int getVersion() {
-        return version;
+    public Map<String, String> getAllPartiesStatus() {
+        return allPartiesStatus;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
+    public void setAllPartiesStatus(Map<String, String> allPartiesStatus) {
+        this.allPartiesStatus = allPartiesStatus;
     }
 
     @Override
-
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }

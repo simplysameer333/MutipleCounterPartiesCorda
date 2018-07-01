@@ -7,6 +7,7 @@ import com.genpact.agreementnegotiation.flow.AgreementNegotiationSearchFlow;
 import com.genpact.agreementnegotiation.model.Agreement;
 import com.genpact.agreementnegotiation.model.ResponseException;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
+import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import com.google.common.collect.ImmutableList;
@@ -29,7 +30,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -42,9 +42,16 @@ import static java.util.stream.Collectors.toList;
 // This API is accessible from /api/template. The endpoint paths specified below are relative to it.
 @Path("template")
 public class AgreementNegotiationApi {
+
+    /**
+     * The path to the folder where we want to store the uploaded files
+     */
+    private static final String UPLOAD_FOLDER = "C:\\SAM_TEMP\\upload\\";
+
     private final CordaRPCOps rpcOps;
     private final CordaX500Name myLegalName;
     private final Map<String, CordaX500Name> cordaX500NameMap;
+    private final Map<String, CordaX500Name> cordaX500AllNodesMap;
 
     private final List<String> serviceNames = ImmutableList.of("Controller", "Network Map Service");
 
@@ -52,6 +59,7 @@ public class AgreementNegotiationApi {
         this.rpcOps = services;
         this.myLegalName = rpcOps.nodeInfo().getLegalIdentities().get(0).getName();
         this.cordaX500NameMap = getPeersMap();
+        this.cordaX500AllNodesMap = createCordaX500NameAllParties();
 
     }
 
@@ -75,33 +83,21 @@ public class AgreementNegotiationApi {
 
         try {
             System.out.println("initFlow ==============================>" + agreement.toString());
-            AgreementNegotiationState agreementDummy = AgreementUtil.copyState(agreement);
-            agreementDummy.setCptyInitiator(rpcOps.wellKnownPartyFromX500Name(myLegalName));
+            //Create Domain Model from VO
+            AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
+            agreementNegotiationState.setCptyInitiator(rpcOps.wellKnownPartyFromX500Name(myLegalName));
+            agreementNegotiationState.setCptyReciever(extractCounterParties(agreement));
 
-            if (agreement.getAttachmentHash() != null && !agreement.getAttachmentHash().isEmpty()) {
-                List<SecureHash> attachmentHashes = new ArrayList<SecureHash>();
-                for (String url : agreement.getAttachmentHash()) {
-                    SecureHash ourAttachmentHash = null;
-                    try {
-                        /*InputStream inputStream = new FileInputStream(new File(
-                                "C:\\Users\\hamesam\\Downloads\\tomcat.zip"));*/
-                        InputStream inputStream = new FileInputStream(new File(url));
-                        ourAttachmentHash = rpcOps.uploadAttachment(inputStream);
-                        attachmentHashes.add(ourAttachmentHash);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                        //TODO add handling
-                    }
-                }
-                if (!attachmentHashes.isEmpty()) {
-                    agreementDummy.setAttachmentHash(attachmentHashes);
-                }
-            }
+            //Reset status of all participants
+            resetParticipantsStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
+
+            //attach file if added and does not exists
+            attachAttachmentHash(agreement, agreementNegotiationState);
 
             //get the attachment path
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, agreementDummy,
-                            rpcOps.wellKnownPartyFromX500Name(cordaX500NameMap.get(agreement.getCounterparty())));
+                    .startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class,
+                            agreementNegotiationState, agreementNegotiationState.getCptyReciever());
 
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
@@ -111,7 +107,7 @@ public class AgreementNegotiationApi {
             final String msg = String.format("Submitted Transaction id %s committed to ledger.\n", result.getId());
             System.out.println("message " + msg);
 
-            return Response.ok(msg).build();
+            return Response.ok("OK").build();
 
         } catch (Throwable ex) {
             ex.printStackTrace();
@@ -133,10 +129,18 @@ public class AgreementNegotiationApi {
     public Response startAmendFlow(Agreement agreement) {
         try {
             AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
+            agreementNegotiationState.setCptyReciever(extractCounterParties(agreement));
+
+            //attach file if added and does not exists
+            attachAttachmentHash(agreement, agreementNegotiationState);
+
+            //Initial status of all participants, this is required so that new participants get the status.
+            //Later old partipants staus would be copied from previous state, check Amend flow
+            resetParticipantsStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
 
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class, agreementNegotiationState,
-                            rpcOps.nodeInfo().getLegalIdentities().get(0));
+                    .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class,
+                            agreementNegotiationState, agreementNegotiationState.getCptyReciever());
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
             // The line below blocks and waits for the flow to return.
@@ -164,13 +168,11 @@ public class AgreementNegotiationApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response accept(Agreement agreement) {
         try {
-
-            final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
-
             AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationAcceptFlow.Initiator.class, agreementNegotiationState,
-                            otherParty);
+                    .startTrackedFlowDynamic(AgreementNegotiationAcceptFlow.Initiator.class,
+                            agreementNegotiationState);
+
             flowHandle.getProgress().subscribe(evt -> System.out.printf(">> %s\n", evt));
 
             // The line below blocks and waits for the flow to return.
@@ -179,7 +181,11 @@ public class AgreementNegotiationApi {
             final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
             System.out.println("message" + msg);
 
-            return Response.ok(msg).build();
+            Agreement newAgreement = getAgreement(agreement.getAgrementName());
+            Map<String, String> response = new HashMap<>();
+            response.put("transactionId", result.getId().toString());
+            response.put("status", newAgreement.getStatus());
+            return Response.ok(response).build();
         } catch (Throwable ex) {
             System.out.println("Exception" + ex.toString());
 
@@ -191,17 +197,15 @@ public class AgreementNegotiationApi {
         }
     }
 
-
     @GET
-    @Path("getAgreements")
+    // @Path("getAgreements")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Agreement> getAgreements() {
+    public List<Agreement> getOpenAgreements() {
         List<Agreement> agreementsList = new ArrayList<>();
         try {
             QueryCriteria criteria = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
             List<StateAndRef<AgreementNegotiationState>> agreementNegotiationStates =
                     rpcOps.vaultQueryByCriteria(criteria, AgreementNegotiationState.class).getStates();
-
 
             for (StateAndRef<AgreementNegotiationState> value : agreementNegotiationStates) {
                 Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
@@ -226,7 +230,7 @@ public class AgreementNegotiationApi {
     @Path("getAgreement/{agreementName}")
     @Produces(MediaType.APPLICATION_JSON)
     public Agreement getAgreement(@PathParam("agreementName") String agreementName) {
-        List<StateAndRef<AgreementNegotiationState>> result = null;
+        List<StateAndRef<AgreementNegotiationState>> result;
         try {
 
             Field uniqueAttributeName = AgreementNegotiationSchema.PersistentIOU.class.getDeclaredField("agrementName");
@@ -247,7 +251,6 @@ public class AgreementNegotiationApi {
                 }
                 return agreement;
             }
-
         } catch (Exception ex) {
 
             System.out.println("Exception" + ex.toString());
@@ -274,28 +277,41 @@ public class AgreementNegotiationApi {
     }
 
     /**
-     * This is to create parties Map at startup.
-     *
-     * @return
+     * Returns all parties registered with the [NetworkMapService]. These names can be used to look up identities
+     * using the [IdentityService].
      */
-    private Map<String, CordaX500Name> getPeersMap() {
-        List<NodeInfo> nodeInfoSnapshot = rpcOps.networkMapSnapshot();
-        Map<String, List<CordaX500Name>> peers = ImmutableMap.of("peers", nodeInfoSnapshot
-                .stream()
-                .map(node -> node.getLegalIdentities().get(0).getName())
-                .filter(name -> !name.equals(myLegalName) && !serviceNames.contains(name.getOrganisation()))
-                .collect(toList()));
+    @GET
+    @Path("allparties")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, List<String>> getAllParties() {
+        List<String> peersName = new ArrayList<>();
+        peersName.addAll(this.cordaX500AllNodesMap.keySet());
 
-        Map<String, CordaX500Name> cordaX500NameMap = new HashMap<>();
-        List<CordaX500Name> cordaX500NameList = peers.get("peers");
-        for (CordaX500Name cordaX500Name : cordaX500NameList) {
-            cordaX500NameMap.put(cordaX500Name.getOrganisation(), cordaX500Name);
-        }
+        Map<String, List<String>> peersNameMap = new HashMap<>();
+        peersNameMap.put("allParties", peersName);
 
-        return cordaX500NameMap;
+        return peersNameMap;
     }
 
 
+    private Map<String, CordaX500Name> createCordaX500NameAllParties() {
+
+        List<NodeInfo> nodeInfoSnapshot = rpcOps.networkMapSnapshot();
+        Map<String, List<CordaX500Name>> allParties = ImmutableMap.of("allParties", nodeInfoSnapshot
+                .stream()
+                .map(node -> node.getLegalIdentities().get(0).getName())
+                .filter(name -> !serviceNames.contains(name.getOrganisation()))
+                .collect(toList()));
+
+        Map<String, CordaX500Name> cordaX500NameMap = new HashMap<>();
+        List<CordaX500Name> cordaX500NameList = allParties.get("allParties");
+        for (CordaX500Name cordaX500Name : cordaX500NameList) {
+            cordaX500NameMap.put(cordaX500Name.getOrganisation(), cordaX500Name);
+        }
+        return cordaX500NameMap;
+
+
+    }
     /**
      * Returns the node's name.
      */
@@ -324,10 +340,10 @@ public class AgreementNegotiationApi {
             Vault.Page<AgreementNegotiationState> results = rpcOps.vaultQueryByCriteria(vaultCriteria, AgreementNegotiationState.class);
             Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class);
 
+            //All agreements states UNCONSUMED & CONSUMED
             results1.getStates().addAll(results.getStates());
 
             int count = 1;
-
             for (StateAndRef<AgreementNegotiationState> value : results1.getStates()) {
                 Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
                 if (count > 1) {
@@ -335,9 +351,66 @@ public class AgreementNegotiationApi {
                     agreement.setChangedFields(AgreementUtil.compare(agreement, oldAgreement));
                 }
                 agreementsList.add(agreement);
-                count ++;
+                count++;
+            }
+            return agreementsList;
+        } catch (Exception ex) {
+            System.out.println("Exception" + ex.toString());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @GET
+    //  @Path("getAllLedgerAgreements")
+    @Path("getAgreements")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Agreement> getAllAgreements() {
+
+        List<Agreement> agreementsList = new ArrayList<>();
+        Map<String, List<Agreement>> allAgreements = new HashMap();
+        try {
+            QueryCriteria criteriaClosed = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
+            QueryCriteria criteriaOpen = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.CONSUMED);
+
+            Vault.Page<AgreementNegotiationState> results = rpcOps.vaultQueryByCriteria(criteriaClosed, AgreementNegotiationState.class);
+            Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(criteriaOpen, AgreementNegotiationState.class);
+
+            //All agreements states UNCONSUMED & CONSUMED
+            results1.getStates().addAll(results.getStates());
+
+            //iterate over all and put them in Map as per the name
+            for (StateAndRef<AgreementNegotiationState> value : results1.getStates()) {
+                Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
+                List<Agreement> foundAgreementsData = allAgreements.get(agreement.getAgrementName());
+
+                if (foundAgreementsData == null) {
+                    List<Agreement> commonAgreementsData = new ArrayList<>();
+                    allAgreements.put(agreement.getAgrementName(), commonAgreementsData);
+                }
+                allAgreements.get(agreement.getAgrementName()).add(agreement);
             }
 
+            //Extract latest cody of Agreement
+            for (Map.Entry<String, List<Agreement>> entry : allAgreements.entrySet()) {
+                List<Agreement> commonAgreementsData = entry.getValue();
+                if (commonAgreementsData.size() > 1) {
+                    //Latest on top of list, zero position
+                    commonAgreementsData.sort((Agreement arg1, Agreement arg2) ->
+                            arg2.getAgrementLastAmendDate().compareTo(arg1.getAgrementLastAmendDate()));
+                }
+
+                Agreement latestlatestCopyOfAgreement = commonAgreementsData.get(0);
+
+                //Add the list of change variables
+                List<Agreement> history = getAudit(latestlatestCopyOfAgreement.getAgrementName());
+                int auditSize = history.size();
+                if (auditSize > 1) {
+                    latestlatestCopyOfAgreement.setChangedFields(AgreementUtil.compare(history.get(auditSize - 1),
+                            history.get(auditSize - 2)));
+                }
+                agreementsList.add(latestlatestCopyOfAgreement);
+            }
             return agreementsList;
         } catch (Exception ex) {
             System.out.println("Exception" + ex.toString());
@@ -356,8 +429,7 @@ public class AgreementNegotiationApi {
             final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
 
             FlowProgressHandle<List<String>> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationSearchFlow.Initiator.class, listSearch,
-                            otherParty);
+                    .startTrackedFlowDynamic(AgreementNegotiationSearchFlow.Initiator.class, listSearch);
             final List<String> linerIds = flowHandle.getReturnValue().get();
 
             if (linerIds != null && !linerIds.isEmpty()) {
@@ -386,8 +458,90 @@ public class AgreementNegotiationApi {
             ex.printStackTrace();
             return null;
         }
-
         return agreementsList;
+    }
 
+    /*
+        http://localhost:10007/api/template/upload
+        http://localhost:10010/attachments/attachmentid
+
+     */
+    @POST
+    @Path("upload2")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response uploadFile(File file) {
+        try {
+            File newFile = new File("C:\\Users\\oldhamesam.old\\Downloads\\tomcat.zip");
+            InputStream inputStream = new FileInputStream(newFile);
+            String fileName = UPLOAD_FOLDER + newFile.getName();
+            System.out.println("Upload Location ===================== > " + fileName);
+            AgreementUtil.writeToFile(inputStream, fileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // save it
+        return Response.status(200).entity("OK").build();
+    }
+
+
+    /**
+     * This is to create parties Map at startup.
+     *
+     * @return
+     */
+    private Map<String, CordaX500Name> getPeersMap() {
+        List<NodeInfo> nodeInfoSnapshot = rpcOps.networkMapSnapshot();
+        Map<String, List<CordaX500Name>> peers = ImmutableMap.of("peers", nodeInfoSnapshot
+                .stream()
+                .map(node -> node.getLegalIdentities().get(0).getName())
+                .filter(name -> !name.equals(myLegalName) && !serviceNames.contains(name.getOrganisation()))
+                .collect(toList()));
+
+        Map<String, CordaX500Name> cordaX500NameMap = new HashMap<>();
+        List<CordaX500Name> cordaX500NameList = peers.get("peers");
+        for (CordaX500Name cordaX500Name : cordaX500NameList) {
+            cordaX500NameMap.put(cordaX500Name.getOrganisation(), cordaX500Name);
+        }
+        return cordaX500NameMap;
+    }
+
+    private void attachAttachmentHash(Agreement agreement, AgreementNegotiationState agreementNegotiationState) {
+        if (agreement.getAttachmentHash() != null && !agreement.getAttachmentHash().isEmpty()) {
+            List<SecureHash> attachmentHashes = new ArrayList<>();
+            for (String url : agreement.getAttachmentHash()) {
+                SecureHash ourAttachmentHash;
+                try {
+                    /*InputStream inputStream = new FileInputStream(new File(
+                            "C:\\Users\\oldhamesam.old\\Downloads\\tomcat.zip"));
+                       http://localhost:10010/attachments/attachmentid
+                     */
+                    InputStream inputStream = new FileInputStream(new File(url));
+                    ourAttachmentHash = rpcOps.uploadAttachment(inputStream);
+                    attachmentHashes.add(ourAttachmentHash);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (!attachmentHashes.isEmpty()) {
+                agreementNegotiationState.setAttachmentHash(attachmentHashes);
+            }
+        }
+    }
+
+    private List<Party> extractCounterParties(Agreement agreement) {
+        List<Party> counterParties = new ArrayList<>();
+        for (String partyName : agreement.getCounterparty()) {
+            counterParties.add(rpcOps.wellKnownPartyFromX500Name(cordaX500AllNodesMap.get(partyName)));
+        }
+        return counterParties;
+    }
+
+
+    private void resetParticipantsStatus(AgreementNegotiationState agreementNegotiationState, AgreementEnumState status) {
+        Map<String, String> allPartiesStatus = new HashMap<>();
+        for (Party party : agreementNegotiationState.getCptyReciever()) {
+            allPartiesStatus.put(party.getName().getOrganisation(), status.toString());
+        }
+        agreementNegotiationState.setAllPartiesStatus(allPartiesStatus);
     }
 }

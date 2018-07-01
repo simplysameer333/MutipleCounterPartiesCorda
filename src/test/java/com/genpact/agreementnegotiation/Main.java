@@ -52,11 +52,15 @@ public class Main {
             CordaFuture<NodeHandle> nodeC = dsl.startNode(new NodeParameters()
                     .setProvidedName(new CordaX500Name("Genpact", "New Delhi", "IN"))
                     .setRpcUsers(ImmutableList.of(user)));
+            CordaFuture<NodeHandle> nodeD = dsl.startNode(new NodeParameters()
+                    .setProvidedName(new CordaX500Name("Macquarie", "Sydney", "AU"))
+                    .setRpcUsers(ImmutableList.of(user)));
 
                     try {
                         dsl.startWebserver(nodeAFuture.get());
                         dsl.startWebserver(nodeB.get());
                         dsl.startWebserver(nodeC.get());
+                        dsl.startWebserver(nodeD.get());
                     } catch (Throwable e) {
                         System.err.println("Encountered exception in node startup: " + e.getMessage());
                         e.printStackTrace();

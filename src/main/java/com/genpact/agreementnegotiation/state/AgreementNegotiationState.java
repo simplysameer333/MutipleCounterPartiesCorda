@@ -10,8 +10,10 @@ import net.corda.core.schemas.QueryableState;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Define your state object here.
@@ -47,13 +49,13 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
                                      String valuationTime, Date notificationTime,
                                      Date substitutionDateTo, Boolean consent, List<String> specifiedCondition,
                                      String agrementName, Date agrementInitiationDate, Date substitutionDateFrom,
-                                     Date agrementAgreedDate, Party cptyInitiator, Party cptyReciever, Party lastUpdatedBy,
+                                     Date agrementAgreedDate, Party cptyInitiator, List<Party> cptyReciever, Party lastUpdatedBy,
                                      Date agrementLastAmendDate, AgreementEnumState status, List<String> attachmentHash,
                                      List<EligibleCollateralState> eligibleCollateralStates,
-                                     List<ThresholdState> thresholds) {
+                                     List<ThresholdState> thresholds, Map<String, String> allPartiesStatus) {
 
         super(agrementName, agrementInitiationDate, agrementAgreedDate, cptyInitiator, cptyReciever, lastUpdatedBy,
-                agrementLastAmendDate, status);
+                agrementLastAmendDate, status, allPartiesStatus);
 
         this.baseCurrency = baseCurrency;
         this.eligibleCurrency = eligibleCurrency;
@@ -246,6 +248,10 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     @Override
     public PersistentState generateMappedObject(MappedSchema schema) {
         if (schema instanceof AgreementNegotiationSchema) {
+            List<String> counterParties = new ArrayList<>();
+            for (Party party : this.getCptyReciever()) {
+                counterParties.add(party.getName().getCommonName());
+            }
             return new AgreementNegotiationSchema.PersistentIOU(
                     this.getLinearId().getId(),
                     this.getAgrementName(),
@@ -255,7 +261,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
                     this.getAgrementLastAmendDate(),
                     this.getStatus().toString(),
                     this.getCptyInitiator().getName().getCommonName(),
-                    this.getCptyReciever().getName().getCommonName(),
+                    counterParties,
                     this.baseCurrency,
                     this.eligibleCurrency,
                     this.deliveryAmount,
@@ -270,8 +276,10 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
                     this.substitutionDateTo,
                     this.substitutionDateFrom,
                     this.consent,
-                    eligibleCollateralStates,
-                    thresholds
+                    this.eligibleCollateralStates,
+                    this.thresholds,
+                    this.getAllPartiesStatus()
+
             );
         } else {
             throw new IllegalArgumentException("Unrecognised schema $schema");

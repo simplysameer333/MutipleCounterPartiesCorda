@@ -11,6 +11,7 @@ import java.util.List;
 
 // Serialization whitelist.
 public class AgreementNegotiationSerializationWhitelist implements SerializationWhitelist {
+
     @NotNull
     @Override
     public List<Class<?>> getWhitelist() {
@@ -24,6 +25,12 @@ public class AgreementNegotiationSerializationWhitelist implements Serialization
         whiteList.add(net.corda.core.identity.Party.class);
         whiteList.add(java.util.HashSet.class);
         whiteList.add(java.util.Set.class);
+        whiteList.add(java.util.HashMap.class);
+        whiteList.add(java.util.Map.class);
+        whiteList.add(java.util.Map.Entry.class);
+        whiteList.add(java.io.File.class);
+        whiteList.add(org.hibernate.MappingException.class);
+        whiteList.add(org.hibernate.AnnotationException.class);
         return whiteList;
     }
 }

@@ -76,6 +76,22 @@ dependencies {
     cordapp "net.corda:corda-finance:$corda_release_version"
 
     compile "org.apache.commons:commons-lang3:3.6"
+
+    // https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-multipart
+    // compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.5'
+
+
+    // https://mvnrepository.com/artifact/com.sun.jersey.contribs/jersey-multipart
+    compile group: 'com.sun.jersey.contribs', name: 'jersey-multipart', version: '1.19.4'
+    compile.exclude group : "javax.ws.rs:jsr311-api:1.1.1"
+
+    compile 'org.springframework.boot:spring-boot-starter-web',
+            'org.springframework.boot:spring-boot-starter-jersey',
+            'org.glassfish.jersey.media:jersey-media-multipart:2.+',
+            'org.springframework.boot:spring-boot-starter-jdbc',
+            'org.springframework.boot:spring-boot-devtools'
+
+
 }
 
 task integrationTest(type: Test, dependsOn: []) {
@@ -125,6 +141,15 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         p2pPort 10011
         rpcPort 10012
         webPort 10013
+        cordapps = ["net.corda:corda-finance:$corda_release_version"]
+        rpcUsers = [[ user: "user1", "password": "test", "permissions": ["StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow\$Initiator"]]]
+    }
+    node {
+        name "O=Macquarie,L=Sydney,C=AU"
+        advertisedServices = []
+        p2pPort 10014
+        rpcPort 10015
+        webPort 10016
         cordapps = ["net.corda:corda-finance:$corda_release_version"]
         rpcUsers = [[ user: "user1", "password": "test", "permissions": ["StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow\$Initiator"]]]
     }

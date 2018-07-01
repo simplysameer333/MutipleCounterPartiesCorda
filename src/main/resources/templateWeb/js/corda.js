@@ -10,10 +10,17 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
     // We identify the node.
     $rootScope.apiBaseURL = "/api/template/";
     $rootScope.peers = [];
+	$rootScope.allParties = [];
 	let agreements = [];
 
 	$http.get($rootScope.apiBaseURL + "getAgreements").then((response) => agreements = response.data.me);
 	$http.get($rootScope.apiBaseURL + "peers").then((response) => $rootScope.peers = response.data.peers);
+
+	$http.get($rootScope.apiBaseURL + "allparties")
+        .then(function(response) {
+			$rootScope.allParties = response.data.allParties;
+		});
+
 	$http.get($rootScope.apiBaseURL + "me")
         .then(function(response) {
 			$rootScope.thisNode = response.data.me;
@@ -69,7 +76,8 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
 				collateral: () => $rootScope.collateral,
 				threshold: () => $rootScope.threshold,
 				peers: () => $rootScope.peers,
-				yesNo: () => $rootScope.yesNo
+				yesNo: () => $rootScope.yesNo,
+				allParties: () => allParties
             }
         });
 
@@ -133,7 +141,8 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
     };
 });
 
-app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $location, $uibModalInstance, $uibModal, peers) {
+app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $location,
+    $uibModalInstance, $uibModal, peers) {
     const modalInstance = this;
 
 	$scope.moodys = $rootScope.moodys;
@@ -141,9 +150,9 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 	$scope.fitchs = $rootScope.fitchs;
 
     modalInstance.peers = peers;
+	modalInstance.allParties = $rootScope.allParties;
     modalInstance.form = {baseCurrency: 'GBP',valuationPercentageCash:100};
     $scope.agreement = {baseCurrency: 'GBP',valuationPercentageCash:100, eligibleCollaterals: [], thresholds: [],specifiedConditions: []};
-
     modalInstance.formError = false;
 	modalInstance.deliveryAmount = $rootScope.deliveryAmount;
 	modalInstance.collateral = $rootScope.collateral;
@@ -228,7 +237,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 	}
     // Validate and create IOU.
     modalInstance.create = () => {
-		console.log('Called Create');
+		console.log('Called Create 4' + JSON.stringify($scope.agreement));
 		modalInstance.formError = false;
 		$uibModalInstance.close();
 		var agreement = {
@@ -253,22 +262,18 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 			substitutionDateFrom:$scope.agreement.substitutionDateFrom,
 			substitutionDateTo:$scope.agreement.substitutionDateTo,
 			consent:$scope.agreement.consent
+
 		};
 		//$rootScope.dummy = agreement;//SanjayTest
 		console.log(agreement);
-		const createIOUEndpoint = $rootScope.apiBaseURL + "initFlow";
+		const createIOUEndpoint = $rootScope.apiBaseURL +  "initFlow";
 
 		// Create PO and handle success / fail responses.
 		$http.post(createIOUEndpoint, angular.toJson(agreement)).then(
 			(result) => modalInstance.displayMessage(result, agreement),
-			(result) => modalInstance.displayMessage(result, agreement)
-		);
+			(result) => modalInstance.displayMessage(result, agreement),
 
-        // Create PO and handle success / fail responses.
-        $http.put(createIOUEndpoint, angular.toJson(modalInstance.form)).then(
-            (result) => modalInstance.displayMessage(result),
-            (result) => modalInstance.displayMessage(result)
-        );
+		);
 
     };
 
@@ -296,22 +301,28 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 app.controller('messageCtrlInit', function ($uibModalInstance, message, agreement) {
     const modalInstanceInit = this;
     //modalInstanceInit.message = message.data;
-	modalInstanceInit.message = "You have initiated the agreement '"+agreement.agrementName+"' with "+agreement.counterparty+". Both parties can now amend the terms untill both agree.";
+	modalInstanceInit.message = "You have initiated the agreement '"+agreement.agrementName+"'. Parties can now amend the terms untill all parties agrees.";
 });
 
 app.controller('messageCtrlAmend', function ($uibModalInstance, message, agreement, $rootScope) {
     const modalInstanceAmend = this;
     //modalInstanceInit.message = message.data;
 	var otherParty = $rootScope.thisNode == agreement.cptyInitiator ? agreement.counterparty : agreement.cptyInitiator;
-	modalInstanceAmend.message = "You have amended the agreement '"+agreement.agrementName+"' with "+otherParty+". Both parties can now amend the terms untill both agree.";
+	modalInstanceAmend.message = "You have amended the agreement '"+agreement.agrementName+"'. Parties can now amend the terms untill all parties agrees.";
 });
+
 
 app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $location, $uibModalInstance, $uibModal, agreement) {
     const modalInstance = this;
-	//$scope.agreement = $rootScope.dummy; //SanjayTest
-    $scope.agreement = agreement; //SanjayTest
+    $scope.agreement = agreement;
 	$scope.currencies = $rootScope.currencies;
 	$scope.products = $rootScope.products;
+	$scope.isAgreeAllowed = true;
+
+	if ((agreement.pendingParticipants && agreement.pendingParticipants.indexOf($rootScope.thisNode) === -1)) {
+		$scope.isAgreeAllowed = false;
+	}
+
 	// Validate and create IOU.
 	$scope.amendAgreement = (agreement) => {
         const modalInstance1 = $uibModal.open({
@@ -324,7 +335,8 @@ app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $locati
 				collateral: () => $rootScope.collateral,
 				threshold: () => $rootScope.threshold,
 				peers: () => $rootScope.peers,
-				yesNo: () => $rootScope.yesNo
+				yesNo: () => $rootScope.yesNo,
+				allParties: () => $rootScope.allParties
             }
         });
 		modalInstance1.ag = agreement;
@@ -368,7 +380,7 @@ app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $locati
     };
 
     $scope.agree = (agreement) => {
-		console.log('Called Create '+agreement);
+		console.log('Called Agree '+agreement);
 		var updAgreement ={
 			agrementName: agreement.agrementName,
 			agreementValue: agreement.agreementValue,
@@ -378,8 +390,8 @@ app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $locati
 		const createIOUEndpoint = $rootScope.apiBaseURL + "acceptFlow";
 		// Create PO and handle success / fail responses.
 		$http.put(createIOUEndpoint, angular.toJson(updAgreement)).then(
-			(result) => $scope.displayMessage(result),
-			(result) => $scope.displayMessage(result)
+			(result) => $scope.displayMessage(result, agreement),
+			(result) => $scope.displayMessage(result, agreement)
 		);
 		//$scope.cancel();
     };
@@ -417,12 +429,12 @@ app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $locati
 		}
     };
 
-    $scope.displayMessage = (message) => {
+    $scope.displayMessage = (message, agreement) => {
         const modalInstanceTwo = $uibModal.open({
             templateUrl: 'messageContent.html',
             controller: 'messageCtrl',
             controllerAs: 'modalInstanceTwo',
-            resolve: { message: () => message }
+            resolve: { message: () => message , agreement: () => agreement }
         });
 
         // No behaviour on close / dismiss.
@@ -433,15 +445,24 @@ app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $locati
     $scope.cancel = () => $uibModalInstance.dismiss();
 });
 
-app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $location, $uibModalInstance, $uibModal, agreement,deliveryAmount,collateral,threshold,peers,yesNo) {
+app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $location, $uibModalInstance, $uibModal, agreement,deliveryAmount,collateral,threshold,peers,yesNo, allParties) {
     const modalInstance = this;
 	$scope.deliveryAmount=deliveryAmount;
 	$scope.collateral= collateral;
 	$scope.threshold= threshold;
 	$scope.peers= peers;
+	$scope.allParties = allParties;
 	$scope.yesNo= yesNo;
 	$scope.currencies = $rootScope.currencies;
 	$scope.products = $rootScope.products;
+	$scope.allCounterParties = [];
+
+	for (var i = 0; i < $scope.allParties.length; i++) {
+		if ($scope.allParties[i] != agreement.cptyInitiator)
+		{
+			$scope.allCounterParties.push(allParties[i]);
+		}
+	}
 
 	//$scope.agreement = $rootScope.dummy; //SanjayTest
     $scope.agreement = agreement;
@@ -606,19 +627,18 @@ app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $locat
 		}
 	}
 
-
-
-
-
     // Close create IOU modal dialogue.
     $scope.cancel = () => $uibModalInstance.dismiss();
 });
 
 // Controller for success/fail modal dialogue.
-app.controller('messageCtrl', function ($uibModalInstance, message) {
+app.controller('messageCtrl', function ($uibModalInstance, message, agreement) {
     const modalInstanceTwo = this;
-    modalInstanceTwo.message = message.data;
+	var msg = message.data.status == "Agreed" ? "All parties are now agreed on '"+agreement.agrementName+"'."
+	: "You are agreed on "+agreement.agrementName+"', please wait for others to approve the agreement.";
+     modalInstanceTwo.message = msg;
 });
+
 
 app.controller('cashCtrl', function ($scope,$rootScope, $http, $location, $uibModalInstance, $uibModal, apiBaseURL, agreementModel, data) {
 

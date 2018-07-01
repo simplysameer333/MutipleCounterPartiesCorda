@@ -2,14 +2,17 @@ package com.genpact.agreementnegotiation.contract;
 
 import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
-import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.CommandData;
 import net.corda.core.contracts.CommandWithParties;
 import net.corda.core.contracts.Contract;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.LedgerTransaction;
 
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import static net.corda.core.contracts.ContractsDSL.requireThat;
 
@@ -53,18 +56,19 @@ public class AgreementNegotiationContract implements Contract {
                 // IOU-specific constraints.
                 if (out.getStatus() == AgreementEnumState.INITIAL) {
                     final Party cptyA = out.getCptyInitiator();
-                    final Party cptyB = out.getCptyReciever();
+                    final List<Party> cptyB = out.getCptyReciever();
 
-                    System.out.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> cptyA " + cptyA);
-                    System.out.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> cptyB " + cptyB);
+                    //Public keys all all participants to compared with participant that signed it.
+                    final List<PublicKey> allParties = new ArrayList<>();
+                    for (Party party : cptyB) {
+                        allParties.add(party.getOwningKey());
+                    }
 
-                    //   check.using("The Agreement Parameters's value must be Initialized.",out.getValue().isInitialized()==true);
-                    check.using("The Initiator and the Reciever cannot be the same entity.", cptyA != cptyB);
-
+                    allParties.add(cptyA.getOwningKey());
                     // Constraints on the signers.
-                    check.using("There must only be two signer.", command.getSigners().size() == 2);
-                    check.using("The signer must be the cptyA.", command.getSigners().containsAll(
-                            ImmutableList.of(cptyA.getOwningKey(), cptyB.getOwningKey())));
+                    // check.using("There must only be two signer.", command.getSigners().size() == 2);
+                    check.using("The signer must signed by All.", command.getSigners().containsAll(
+                            Collections.unmodifiableList(allParties)));
 
                     checkMandatoryFields(out);
 
@@ -84,6 +88,9 @@ public class AgreementNegotiationContract implements Contract {
                 final AgreementNegotiationState out = ((AgreementNegotiationState) tx.getOutputStates().get(0));
                 final AgreementNegotiationState in = ((AgreementNegotiationState) tx.getInputStates().get(0));
 
+                check.using("Must have ouput State", out != null);
+                check.using("Must have input State", in != null);
+
                 //Amend will always output state, so need to test nul check
                 if (out.getStatus() == AgreementEnumState.AMEND) {
                     checkMandatoryFields(out);
@@ -96,6 +103,8 @@ public class AgreementNegotiationContract implements Contract {
                         //checks all for AMEND state tx rules as input state
                     }
                 }
+                //This is becasue version is already incremented inside 'out' in Flow logic
+                check.using("You are not updating teh latest version", out.getVersion() == (in.getVersion() + 1));
                 return null;
             });
         } /*Commands.Accept will always have input as well as output state.
@@ -121,6 +130,7 @@ public class AgreementNegotiationContract implements Contract {
                             out.getParticipants().stream().filter(party -> ((Party) party).getName().equals(lastUpdatedBy.getName()))
                                     .findFirst().isPresent());
 
+
                     //Accept will always output state, so need to test nul check
                     if (out.getStatus() == AgreementEnumState.FULLY_ACCEPTED) {
                         check.using("For FULLY_ACCEPTED, INPUT state must be PARTIAL_ACCEPTED",
@@ -134,7 +144,8 @@ public class AgreementNegotiationContract implements Contract {
                     } else if (out.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED) {
                         check.using("For PARTIAL_ACCEPTED, INPUT state must either be INITIAL OR AMEND",
                                 in.getStatus() == AgreementEnumState.INITIAL
-                                        || in.getStatus() == AgreementEnumState.AMEND);
+                                        || in.getStatus() == AgreementEnumState.AMEND
+                                        || in.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED);
                     }
                 }
                 if (in != null) {
@@ -160,7 +171,8 @@ public class AgreementNegotiationContract implements Contract {
                 } else if (out.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED) {
                     check.using("For PARTIAL_ACCEPTED, INPUT state must either be INITIAL OR AMEND",
                             in.getStatus() == AgreementEnumState.INITIAL
-                                    || in.getStatus() == AgreementEnumState.AMEND);
+                                    || in.getStatus() == AgreementEnumState.AMEND
+                                    || in.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED);
                 }
                 //input can either be INITIAL OR AMEND
                 else if (in != null) {
@@ -211,14 +223,9 @@ public class AgreementNegotiationContract implements Contract {
     private void checkMandatoryFields(AgreementNegotiationState out) {
         requireThat(check -> {
 
-       /*     check.using("Base Currency cannot be empty", out.getBaseCurrency() != null);
-            check.using("Delivery Amount cannot be empty", out.getDeliveryAmount() != 0);
-            check.using("Return Amount cannot be empty", out.getReturnAmount() != 0);
-            check.using("Eligible Collateral cannot be empty", out.getEligibleCollateral() != null);
-            check.using("Valuation Percentage cannot be less than 0", out.getValuationPercentage() != -99);
-            check.using("Independent Amount Amount cannot be empty", out.getIndependentAmount().signum() != -99);
-            check.using("Minimum Transfer Amount cannot be empty", out.getMinimumTransferAmount() != null);
-        */
+            check.using("Must need Initiator", out.getCptyInitiator() != null);
+            check.using("Counpter parties cannot be empty", (out.getCptyReciever() != null || out.getCptyReciever().isEmpty()));
+            check.using("Agreement name is must", out.getAgrementName() != null);
             return null;
         });
     }
