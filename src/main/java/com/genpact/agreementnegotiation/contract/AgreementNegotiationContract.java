@@ -30,7 +30,6 @@ public class AgreementNegotiationContract implements Contract {
             throw new IllegalArgumentException("Iterable has more than one element!");
         }
         return item;
-
     }
 
     /**
@@ -40,7 +39,6 @@ public class AgreementNegotiationContract implements Contract {
     @Override
     public void verify(LedgerTransaction tx) {
         final CommandWithParties<CommandData> command = onlyElementOf(tx.getCommands());
-
 
         // Commands.Initiate will never have input state and will always have output state.
         // only valid NegotiationStates is NegotiationStates.INITIAL

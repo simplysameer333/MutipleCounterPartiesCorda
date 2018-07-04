@@ -29,6 +29,7 @@ public class Agreement {
     private Date substitutionDateTo = null;
     private int consent = 0;//boolean 0 or 1
     private List<String> attachmentHash;
+    private List<String> attachmentFileNames;
     private String pendingParticipants;
 
     //Additional Added fields
@@ -284,6 +285,14 @@ public class Agreement {
 
     public void setPendingParticipants(String pendingParticipants) {
         this.pendingParticipants = pendingParticipants;
+    }
+
+    public List<String> getAttachmentFileNames() {
+        return attachmentFileNames;
+    }
+
+    public void setAttachmentFileNames(List<String> attachmentFileNames) {
+        this.attachmentFileNames = attachmentFileNames;
     }
 
     @Override

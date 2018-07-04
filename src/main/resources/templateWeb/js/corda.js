@@ -9,9 +9,11 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
 
     // We identify the node.
     $rootScope.apiBaseURL = "/api/template/";
+	$rootScope.apiBaseAtatchmentURL = "/attachments/";
     $rootScope.peers = [];
 	$rootScope.allParties = [];
 	let agreements = [];
+	$rootScope.fileArray = [];
 
 	$http.get($rootScope.apiBaseURL + "getAgreements").then((response) => agreements = response.data.me);
 	$http.get($rootScope.apiBaseURL + "peers").then((response) => $rootScope.peers = response.data.peers);
@@ -41,6 +43,7 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
 	$rootScope.categories = ["Cash","Agency Debt","Bond"];
 	$rootScope.conditions = ["Illegality","Credit Event Upon Merger","Additional Termination Events"];
     demoApp.openModal = () => {
+		$rootScope.fileArray = [];
         const modalInstance = $uibModal.open({
             templateUrl: 'initiateAgreementModal.html',
             controller: 'ModalInstanceCtrl',
@@ -66,6 +69,14 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
     };
 
 	demoApp.amendAgreement = (agreement) => {
+        for (var i = 0; i < agreement.attachmentHash.length; i++) {
+            var fileInfo = {filehashUrl :"", filehash :"", filename :""};
+        	fileInfo.filehashUrl = $rootScope.apiBaseAtatchmentURL + agreement.attachmentHash[i];
+        	fileInfo.filehash = agreement.attachmentHash[i];
+        	fileInfo.filename = agreement.attachmentFileNames[i];
+        	$rootScope.fileArray.push(fileInfo);
+        }
+
         const modalInstance = $uibModal.open({
             templateUrl: 'amendAgreementModal.html',
             controller: 'AmendAgreementCtrl',
@@ -139,9 +150,14 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
 			}
 		}
     };
+
+	$scope.updateFileNameSection = (fileInfo) => {
+		fileInfo.filehashUrl = $rootScope.apiBaseAtatchmentURL + fileInfo.filehash;
+		$rootScope.fileArray.push(fileInfo);
+    };
 });
 
-app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $location,
+app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $location, $window,
     $uibModalInstance, $uibModal, peers) {
     const modalInstance = this;
 
@@ -235,10 +251,28 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 		}
 
 	}
+
+	 modalInstance.removefile = (filename) => {
+		 alert(filename +" is Removed." );
+		 for (var i in $rootScope.fileArray) {
+			if ($rootScope.fileArray[i].filename === filename) {
+				 $rootScope.fileArray.splice(i, 1);
+			}
+        }
+	 }
+
     // Validate and create IOU.
     modalInstance.create = () => {
 		console.log('Called Create 4' + JSON.stringify($scope.agreement));
 		modalInstance.formError = false;
+		var uploadedFilesHash = [];
+		var uploadedFilesName = [];
+		for (var i in $rootScope.fileArray) {
+          uploadedFilesHash.push($rootScope.fileArray[i].filehash);
+        }
+		for (var i in $rootScope.fileArray) {
+          uploadedFilesName.push($rootScope.fileArray[i].filename);
+        }
 		$uibModalInstance.close();
 		var agreement = {
 			agrementName:$scope.agreement.agrementName,
@@ -261,7 +295,9 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 			notificationTime:$scope.agreement.notificationTime,
 			substitutionDateFrom:$scope.agreement.substitutionDateFrom,
 			substitutionDateTo:$scope.agreement.substitutionDateTo,
-			consent:$scope.agreement.consent
+			consent:$scope.agreement.consent,
+			attachmentHash : uploadedFilesHash,
+			attachmentFileNames : uploadedFilesName
 
 		};
 		//$rootScope.dummy = agreement;//SanjayTest
@@ -270,9 +306,8 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 
 		// Create PO and handle success / fail responses.
 		$http.post(createIOUEndpoint, angular.toJson(agreement)).then(
-			(result) => modalInstance.displayMessage(result, agreement),
-			(result) => modalInstance.displayMessage(result, agreement),
-
+			(result) =>  modalInstance.displayMessage(result, agreement),
+			(result) =>  modalInstance.displayErrorMessage(result, agreement),
 		);
 
     };
@@ -282,6 +317,18 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
             templateUrl: 'messageContentInit.html',
             controller: 'messageCtrlInit',
             controllerAs: 'modalInstanceInit',
+            resolve: { message: () => message,  agreement: () => agreement}
+        });
+
+        // No behaviour on close / dismiss.
+        modalInstanceTwo.result.then(() => {}, () => {});
+    };
+
+	 modalInstance.displayErrorMessage = (message, agreement) => {
+        const modalInstanceTwo = $uibModal.open({
+            templateUrl: 'messageContentError.html',
+            controller: 'messageError',
+            controllerAs: 'modalInstanceError',
             resolve: { message: () => message,  agreement: () => agreement}
         });
 
@@ -300,17 +347,19 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 
 app.controller('messageCtrlInit', function ($uibModalInstance, message, agreement) {
     const modalInstanceInit = this;
-    //modalInstanceInit.message = message.data;
 	modalInstanceInit.message = "You have initiated the agreement '"+agreement.agrementName+"'. Parties can now amend the terms untill all parties agrees.";
 });
 
 app.controller('messageCtrlAmend', function ($uibModalInstance, message, agreement, $rootScope) {
     const modalInstanceAmend = this;
-    //modalInstanceInit.message = message.data;
 	var otherParty = $rootScope.thisNode == agreement.cptyInitiator ? agreement.counterparty : agreement.cptyInitiator;
 	modalInstanceAmend.message = "You have amended the agreement '"+agreement.agrementName+"'. Parties can now amend the terms untill all parties agrees.";
 });
 
+app.controller('messageError', function ($uibModalInstance, message, agreement, $rootScope) {
+    const modalInstanceError = this;
+	modalInstanceError.message = message.data.error;
+});
 
 app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $location, $uibModalInstance, $uibModal, agreement) {
     const modalInstance = this;
@@ -318,9 +367,18 @@ app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $locati
 	$scope.currencies = $rootScope.currencies;
 	$scope.products = $rootScope.products;
 	$scope.isAgreeAllowed = true;
+	$rootScope.fileArray = [];
 
 	if ((agreement.pendingParticipants && agreement.pendingParticipants.indexOf($rootScope.thisNode) === -1)) {
 		$scope.isAgreeAllowed = false;
+	}
+
+	for (var i = 0; i < agreement.attachmentHash.length; i++) {
+		var fileInfo = {filehashUrl :"", filehash :"", filename :""};
+		fileInfo.filehashUrl = $rootScope.apiBaseAtatchmentURL + agreement.attachmentHash[i];
+		fileInfo.filehash = agreement.attachmentHash[i];
+		fileInfo.filename = agreement.attachmentFileNames[i];
+		$rootScope.fileArray.push(fileInfo);
 	}
 
 	// Validate and create IOU.
@@ -379,6 +437,8 @@ app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $locati
 		return false;
     };
 
+
+
     $scope.agree = (agreement) => {
 		console.log('Called Agree '+agreement);
 		var updAgreement ={
@@ -395,6 +455,8 @@ app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $locati
 		);
 		//$scope.cancel();
     };
+
+
 	$scope.getAmtValue = (id) => {
 		if(id != 0){
 			var v = $rootScope.deliveryAmount.find(x => x.id === id);
@@ -464,7 +526,6 @@ app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $locat
 		}
 	}
 
-	//$scope.agreement = $rootScope.dummy; //SanjayTest
     $scope.agreement = agreement;
 	$scope.agreement.substitutionDateFrom = $rootScope.convertToDt($scope.agreement.substitutionDateFrom);
 	$scope.agreement.substitutionDateTo = $rootScope.convertToDt($scope.agreement.substitutionDateTo);
@@ -474,6 +535,18 @@ app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $locat
 	// Validate and create IOU.
     $scope.amendAgreement = (agreement) => {
 		console.log('Called Amend ',agreement);
+
+		var uploadedFilesHash = [];
+        var uploadedFilesName = [];
+        for (var i in $rootScope.fileArray) {
+            uploadedFilesHash.push($rootScope.fileArray[i].filehash);
+        }
+        for (var i in $rootScope.fileArray) {
+            uploadedFilesName.push($rootScope.fileArray[i].filename);
+        }
+        agreement.attachmentHash = uploadedFilesHash;
+        agreement.attachmentFileNames = uploadedFilesName;
+
 		const updatedAgreement = {
 			agrementName: agreement.agrementName,
 			agreementValue: agreement.agreementValue,
@@ -485,7 +558,7 @@ app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $locat
 		// Create PO and handle success / fail responses.
 		$http.put(createIOUEndpoint, angular.toJson(agreement)).then(
 			(result) => $scope.displayMessage(result, agreement),
-			(result) => $scope.displayMessage(result, agreement)
+			(result) => $scope.displayErrorMessage(result, agreement)
 		);
 		//$scope.cancel();
     };
@@ -494,6 +567,18 @@ app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $locat
             templateUrl: 'messageContentAmend.html',
             controller: 'messageCtrlAmend',
             controllerAs: 'modalInstanceAmend',
+            resolve: { message: () => message, agreement: () => agreement }
+        });
+
+        // No behaviour on close / dismiss.
+        modalInstanceTwo.result.then(() => {}, () => {});
+    };
+
+	$scope.displayErrorMessage = (message, agreement) => {
+        const modalInstanceTwo = $uibModal.open({
+            templateUrl: 'messageContentError.html',
+            controller: 'messageError',
+            controllerAs: 'modalInstanceError',
             resolve: { message: () => message, agreement: () => agreement }
         });
 
@@ -629,6 +714,15 @@ app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $locat
 
     // Close create IOU modal dialogue.
     $scope.cancel = () => $uibModalInstance.dismiss();
+
+    $scope.removeFile = (filename) => {
+    	alert(filename +" is Removed." );
+    	for (var i in $rootScope.fileArray) {
+    	    if ($rootScope.fileArray[i].filename === filename) {
+    			$rootScope.fileArray.splice(i, 1);
+    		}
+        }
+    }
 });
 
 // Controller for success/fail modal dialogue.
@@ -685,23 +779,6 @@ app.controller('cashCtrl', function ($scope,$rootScope, $http, $location, $uibMo
 	$scope.add = (el) => {
 		console.log('1');
 		$scope.cash.push(el);
-		/*var eligibleCash = {
-			collateralType: 1,
-			currency: el.currency,
-			ratingType: 0,
-			rating: 0,
-			ratingText: "",
-			ratingRangeFrom: 0,
-			ratingRangeTo: 0,
-			amount: el.valuation,
-			remainingMaturity: 0,
-			remMaturityFrom: 0,
-			remMaturityTo: 0,
-			partyA: el.partyA ? 1:0,
-			partyB: el.partyB ? 1:0
-		}
-		console.log('Adding Cash EC ',eligibleCash);
-		agreementModel.eligibleCollaterals.push(eligibleCash);*/
 		$scope.el = {collateralType: 1, currency: "", moody: "",sp: "",fitch:"",rfrom:"",rto:"",valuation:100,remMaturity:"",remMaturityFrom:"",remMaturityTo:"",partyA: true,partyB: true};
     };
 	$scope.cancel = () => {
@@ -759,23 +836,6 @@ app.controller('cashUpdCtrl', function ($scope,$rootScope, $http, $location, $ui
     };
 	$scope.addCash = (el) => {
 		$scope.cash.push(el);
-		/*var eligibleCash = {
-			collateralType: 1,
-			currency: el.currency,
-			ratingType: 0,
-			rating: 0,
-			ratingText: "",
-			ratingRangeFrom: 0,
-			ratingRangeTo: 0,
-			amount: el.valuation,
-			remainingMaturity: 0,
-			remMaturityFrom: 0,
-			remMaturityTo: 0,
-			partyA: el.partyA ? 1:0,
-			partyB: el.partyB ? 1:0
-		}
-		//agreementModel.eligibleCollaterals.push(eligibleCash);*/
-		//$uibModalInstance.dismiss();
 		$scope.el = {collateralType: 1, currency: "", moody: "",sp: "",fitch:"",rfrom:"",rto:"",valuation:100,remMaturity:"",remMaturityFrom:"",remMaturityTo:"",partyA: true,partyB: true};
     };
 	$scope.cancel = () => {

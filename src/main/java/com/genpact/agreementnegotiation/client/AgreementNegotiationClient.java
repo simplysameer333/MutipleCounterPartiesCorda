@@ -52,7 +52,6 @@ public class AgreementNegotiationClient {
             agreementParams.add(st.nextToken());
         }
 
-
         // Can be amended in the Main file.
         final CordaRPCOps proxy = client.start("user1", "test").getProxy();
         final CordaRPCOps proxyCpty = clientCpty.start("user1", "test").getProxy();
@@ -79,30 +78,22 @@ public class AgreementNegotiationClient {
 
             AgreementNegotiationState initiateNegotiationState = DummyData.getDummyDataForAgreementNegotiationState();
             initiateNegotiationState.setStatus(AgreementEnumState.INITIAL);
-
             flowHandle= proxy.startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, initiateNegotiationState, cptyReciever);
 
         } else {
 
             throw new IllegalArgumentException("Usage: AgreementNegotiationClient <Initiator Host:Port> <Reciever Host:Port> <INITIAL/AMEND/ACCEPT> <AgreementName:AgreementValue:Collateral>");
         }
-
-
         try {
-
             flowHandle.getProgress().subscribe(evt -> System.out.printf("Transactiomn Event >> %s\n", evt));
-
 
             // The line below blocks and waits for the flow to return.
             final SignedTransaction result = flowHandle.getReturnValue().get();
-
-
             final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
             System.out.println(msg);
         }catch (Exception e)
         {
             e.printStackTrace();
         }
-
     }
 }

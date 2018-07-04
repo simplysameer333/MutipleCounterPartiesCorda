@@ -184,20 +184,12 @@ public class AgreementNegotiationAcceptFlow {
                 final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
                 SignedTransaction twiceSignedTx = getServiceHub().addSignature(signedTx);
 
-                // Creating a session with the other party.
-                /*
-                Party counterParty = previousState.getCptyReciever().get(0);
-                if (counterParty.getName().equals(getOurIdentity().getName())) {
-                    counterParty = previousState.getCptyInitiator();
-                }
-                FlowSession otherPartySession = initiateFlow(counterParty);
-                */
-
                 // Obtaining the counterparty's signature.
                 progressTracker.setCurrentStep(SIGS_GATHERING);
                 List<Party> allParties = new ArrayList<>(agreementNegotiationState.getCptyReciever());
                 allParties.add(agreementNegotiationState.getCptyInitiator());
 
+                // Creating a session with the other party.
                 List<FlowSession> otherPartySessionList = new ArrayList<>();
                 for (Party party : allParties) {
                     if (!party.getName().getOrganisation().equals(getOurIdentity().getName().getOrganisation())) {

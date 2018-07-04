@@ -7,11 +7,13 @@ import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.genpact.agreementnegotiation.state.EligibleCollateralState;
 import com.genpact.agreementnegotiation.state.ThresholdState;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -54,6 +56,7 @@ public class AgreementUtil {
 
     /**
      * Convert VO to Domain Object
+     *
      * @param agreement
      * @return
      */
@@ -94,6 +97,7 @@ public class AgreementUtil {
 
     /**
      * Convert EligibleCollateral VO to EligibleCollateral DO.
+     *
      * @param value
      * @return
      */
@@ -137,6 +141,7 @@ public class AgreementUtil {
 
     /**
      * Convert EligibleCollateral VO to ThresholdState DO.
+     *
      * @param value
      * @return
      */
@@ -169,6 +174,7 @@ public class AgreementUtil {
 
     /**
      * Copy AgreementNegotiationState DO to AgreementNegotiationStateVO
+     *
      * @param agreementNegotiationState
      * @return
      */
@@ -226,11 +232,24 @@ public class AgreementUtil {
         }
         agreement.setPendingParticipants(StringUtils.join(pendingParticipants, ','));
 
+        Map<String, String> uploadedFileInfo = new HashMap<>();
+        List<String> fileHashCodes = new ArrayList<>();
+        List<String> fileNames = new ArrayList<>();
+
+        if (MapUtils.isNotEmpty(agreementNegotiationState.getAttachmentHash())) {
+            for (SecureHash fileHash : agreementNegotiationState.getAttachmentHash().keySet()) {
+                fileHashCodes.add(fileHash.toString());
+                fileNames.add(agreementNegotiationState.getAttachmentHash().get(fileHash));
+            }
+        }
+        agreement.setAttachmentFileNames(fileNames);
+        agreement.setAttachmentHash(fileHashCodes);
         return agreement;
     }
 
     /**
      * Copy EligibleCollateralState DO to EligibleCollateralState VO
+     *
      * @param value
      * @return
      */
@@ -286,6 +305,7 @@ public class AgreementUtil {
 
     /**
      * Create ThresholdStateVO to ThresholdState DO
+     *
      * @param value
      * @return
      */
@@ -318,6 +338,7 @@ public class AgreementUtil {
 
     /**
      * This is to get teh list of changed attributes
+     *
      * @param newInstance
      * @param oldInstance
      * @param <T>
@@ -406,25 +427,32 @@ public class AgreementUtil {
         return changedFields;
     }
 
-    // save uploaded file to new location
-    public static void writeToFile(InputStream uploadedInputStream, String uploadedFileLocation) {
+    /**
+     * Stored in NODE_ATTACHMENTS table
+     * working - http://localhost:10007/attachments/60A0C867531F09A53D38F2EED2946F7E536C5D3D7CBF0209CBD98317A6551A45
+     */
+    public static void attachAttachmentHash(Agreement agreement, AgreementNegotiationState agreementNegotiationState) {
+        if (CollectionUtils.isNotEmpty(agreement.getAttachmentHash()) && CollectionUtils.isNotEmpty(agreement.getAttachmentFileNames())
+                && agreement.getAttachmentFileNames().size() == agreement.getAttachmentHash().size()) {
 
-        try {
-            OutputStream out = new FileOutputStream(new File(uploadedFileLocation));
-            int read = 0;
-            byte[] bytes = new byte[1024];
+            Map<SecureHash, String> fileInfo = new HashMap<>();
 
-            out = new FileOutputStream(new File(uploadedFileLocation));
-            while ((read = uploadedInputStream.read(bytes)) != -1) {
-                out.write(bytes, 0, read);
+            for (int i = 0; i < agreement.getAttachmentHash().size(); i++) {
+                String hash = agreement.getAttachmentHash().get(i);
+                System.out.println("hash=======================>" + hash.trim());
+                fileInfo.put(SecureHash.parse(hash.trim()), agreement.getAttachmentFileNames().get(i));
             }
-            out.flush();
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (!fileInfo.isEmpty()) {
+                agreementNegotiationState.setAttachmentHash(fileInfo);
+            }
         }
+    }
 
+    public static void resetParticipantsStatus(AgreementNegotiationState agreementNegotiationState, AgreementEnumState status) {
+        Map<String, String> allPartiesStatus = new HashMap<>();
+        for (Party party : agreementNegotiationState.getCptyReciever()) {
+            allPartiesStatus.put(party.getName().getOrganisation(), status.toString());
+        }
+        agreementNegotiationState.setAllPartiesStatus(allPartiesStatus);
     }
 }

@@ -4,10 +4,12 @@ public enum AgreementEnumState {
     INITIAL("Initiated"),
     AMEND("Amended"),
     PARTIAL_ACCEPTED("Partially Agreed"),
+    REMOVED("Removed"),
     FULLY_ACCEPTED("Agreed");
 
     private final String name;
-    private AgreementEnumState(String s) {
+
+    AgreementEnumState(String s) {
         name = s;
     }
     public boolean equalsName(String otherName) {

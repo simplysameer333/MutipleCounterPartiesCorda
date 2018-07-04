@@ -129,11 +129,11 @@ public class AgreementNegotiationInitiateFlow {
             txBuilder.withItems(outputContractAndState, cmd);
             if (agreementNegotiationState.getAttachmentHash() != null &&
                     !agreementNegotiationState.getAttachmentHash().isEmpty()) {
-                for (SecureHash secureHasId : agreementNegotiationState.getAttachmentHash()) {
+                for (SecureHash secureHasId : agreementNegotiationState.getAttachmentHash().keySet()) {
                     txBuilder.addAttachment(secureHasId);
+                    System.out.println("Add atatchments =======> " + secureHasId);
                 }
             }
-
             // Verifying the transaction.
             progressTracker.setCurrentStep(TX_VERIFICATION);
             txBuilder.verify(getServiceHub());
@@ -146,9 +146,7 @@ public class AgreementNegotiationInitiateFlow {
             List<FlowSession> otherPartySessionList = new ArrayList<>();
             for (Party party : otherParties) {
                 otherPartySessionList.add(initiateFlow(party));
-
             }
-
 
             // Obtaining the counterparty's signature.
             SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(

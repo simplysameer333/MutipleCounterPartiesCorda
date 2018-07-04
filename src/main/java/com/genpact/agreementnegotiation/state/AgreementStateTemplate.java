@@ -23,7 +23,9 @@ public class AgreementStateTemplate implements LinearState {
     private Party lastUpdatedBy = null;
     private Date agrementLastAmendDate = null;
     private AgreementEnumState status;
-    private List<SecureHash> attachmentHash;
+    private Map<SecureHash, String> attachmentHash;
+    private List<String> attachmentHashCode;
+    private List<String> attachmentFileNames;
     private Map<String, String> allPartiesStatus = null;
     //first value of version
     private int version;
@@ -144,11 +146,11 @@ public class AgreementStateTemplate implements LinearState {
         this.status = status;
     }
 
-    public List<SecureHash> getAttachmentHash() {
+    public Map<SecureHash, String> getAttachmentHash() {
         return attachmentHash;
     }
 
-    public void setAttachmentHash(List<SecureHash> attachmentHash) {
+    public void setAttachmentHash(Map<SecureHash, String> attachmentHash) {
         this.attachmentHash = attachmentHash;
     }
 
@@ -176,6 +178,22 @@ public class AgreementStateTemplate implements LinearState {
 
     public void setAllPartiesStatus(Map<String, String> allPartiesStatus) {
         this.allPartiesStatus = allPartiesStatus;
+    }
+
+    public List<String> getAttachmentHashCode() {
+        return attachmentHashCode;
+    }
+
+    public void setAttachmentHashCode(List<String> attachmentHashCode) {
+        this.attachmentHashCode = attachmentHashCode;
+    }
+
+    public List<String> getAttachmentFileNames() {
+        return attachmentFileNames;
+    }
+
+    public void setAttachmentFileNames(List<String> attachmentFileNames) {
+        this.attachmentFileNames = attachmentFileNames;
     }
 
     @Override

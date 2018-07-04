@@ -5,7 +5,6 @@ import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationSearchFlow;
 import com.genpact.agreementnegotiation.model.Agreement;
-import com.genpact.agreementnegotiation.model.ResponseException;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
@@ -13,7 +12,6 @@ import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.corda.core.contracts.StateAndRef;
-import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
@@ -24,13 +22,11 @@ import net.corda.core.node.services.vault.Builder;
 import net.corda.core.node.services.vault.CriteriaExpression;
 import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
+import org.json.simple.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,11 +38,6 @@ import static java.util.stream.Collectors.toList;
 // This API is accessible from /api/template. The endpoint paths specified below are relative to it.
 @Path("template")
 public class AgreementNegotiationApi {
-
-    /**
-     * The path to the folder where we want to store the uploaded files
-     */
-    private static final String UPLOAD_FOLDER = "C:\\SAM_TEMP\\upload\\";
 
     private final CordaRPCOps rpcOps;
     private final CordaX500Name myLegalName;
@@ -60,7 +51,6 @@ public class AgreementNegotiationApi {
         this.myLegalName = rpcOps.nodeInfo().getLegalIdentities().get(0).getName();
         this.cordaX500NameMap = getPeersMap();
         this.cordaX500AllNodesMap = createCordaX500NameAllParties();
-
     }
 
     /**
@@ -89,10 +79,10 @@ public class AgreementNegotiationApi {
             agreementNegotiationState.setCptyReciever(extractCounterParties(agreement));
 
             //Reset status of all participants
-            resetParticipantsStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
+            AgreementUtil.resetParticipantsStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
 
             //attach file if added and does not exists
-            attachAttachmentHash(agreement, agreementNegotiationState);
+            AgreementUtil.attachAttachmentHash(agreement, agreementNegotiationState);
 
             //get the attachment path
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
@@ -107,14 +97,18 @@ public class AgreementNegotiationApi {
             final String msg = String.format("Submitted Transaction id %s committed to ledger.\n", result.getId());
             System.out.println("message " + msg);
 
-            return Response.ok("OK").build();
-
+            Agreement newAgreement = getAgreement(agreement.getAgrementName());
+            Map<String, String> response = new HashMap<>();
+            response.put("transactionId", result.getId().toString());
+            response.put("status", newAgreement.getStatus());
+            return Response.ok(response).build();
         } catch (Throwable ex) {
             ex.printStackTrace();
-            ResponseException responseException = new ResponseException("initFlow", "Failed while submitted a Request.",
-                    ex);
             Response.ResponseBuilder reposnse = Response.status(400);
-            reposnse.entity(responseException.toString());
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error occurred while submitted a Request.");
+            JSONObject jsonObj = new JSONObject(error);
+            reposnse.entity(jsonObj);
             return reposnse.build();
         }
 
@@ -127,16 +121,17 @@ public class AgreementNegotiationApi {
     @Path("amendFlow")
     @Produces(MediaType.APPLICATION_JSON)
     public Response startAmendFlow(Agreement agreement) {
+
         try {
             AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
             agreementNegotiationState.setCptyReciever(extractCounterParties(agreement));
 
             //attach file if added and does not exists
-            attachAttachmentHash(agreement, agreementNegotiationState);
+            AgreementUtil.attachAttachmentHash(agreement, agreementNegotiationState);
 
             //Initial status of all participants, this is required so that new participants get the status.
-            //Later old partipants staus would be copied from previous state, check Amend flow
-            resetParticipantsStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
+            //Later old participants staus would be copied from previous state, check Amend flow
+            AgreementUtil.resetParticipantsStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
 
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
                     .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class,
@@ -147,15 +142,20 @@ public class AgreementNegotiationApi {
             final SignedTransaction result = flowHandle.getReturnValue().get();
 
             final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
-            System.out.println("message" + msg);
+            System.out.println("message " + msg);
 
-            return Response.ok(msg).build();
+            Agreement newAgreement = getAgreement(agreement.getAgrementName());
+            Map<String, String> response = new HashMap<>();
+            response.put("transactionId", result.getId().toString());
+            response.put("status", newAgreement.getStatus());
+            return Response.ok(response).build();
         } catch (Throwable ex) {
-            System.out.println("Exception" + ex.toString());
-            ResponseException responseException = new ResponseException("amendFlow", "Failed while submitted Amend Request.",
-                    ex);
+            ex.printStackTrace();
             Response.ResponseBuilder reposnse = Response.status(400);
-            reposnse.entity(responseException.toString());
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error occurred while Amending a Request.");
+            JSONObject jsonObj = new JSONObject(error);
+            reposnse.entity(jsonObj);
             return reposnse.build();
         }
     }
@@ -187,12 +187,12 @@ public class AgreementNegotiationApi {
             response.put("status", newAgreement.getStatus());
             return Response.ok(response).build();
         } catch (Throwable ex) {
-            System.out.println("Exception" + ex.toString());
-
-            ResponseException responseException = new ResponseException("acceptFlow", "Failed while submitted Accepting Request.",
-                    ex);
+            ex.printStackTrace();
             Response.ResponseBuilder reposnse = Response.status(400);
-            reposnse.entity(responseException.toString());
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error occurred while Accepting a Request.");
+            JSONObject jsonObj = new JSONObject(error);
+            reposnse.entity(jsonObj);
             return reposnse.build();
         }
     }
@@ -218,7 +218,6 @@ public class AgreementNegotiationApi {
                 agreementsList.add(agreement);
             }
         } catch (Exception ex) {
-
             System.out.println("Exception" + ex.toString());
             ex.printStackTrace();
             return null;
@@ -243,7 +242,7 @@ public class AgreementNegotiationApi {
                 Agreement agreement = AgreementUtil.copyStateToVO(result.get(0).getState().getData());
                 System.out.println("getAgreement ============================= > " + agreement.toString());
 
-                //Add teh list of change variables
+                //Add the list of change variables
                 List<Agreement> history = getAudit(agreementName);
                 int auditSize = history.size();
                 if (auditSize > 1) {
@@ -252,7 +251,6 @@ public class AgreementNegotiationApi {
                 return agreement;
             }
         } catch (Exception ex) {
-
             System.out.println("Exception" + ex.toString());
             ex.printStackTrace();
         }
@@ -309,8 +307,6 @@ public class AgreementNegotiationApi {
             cordaX500NameMap.put(cordaX500Name.getOrganisation(), cordaX500Name);
         }
         return cordaX500NameMap;
-
-
     }
     /**
      * Returns the node's name.
@@ -370,11 +366,17 @@ public class AgreementNegotiationApi {
         List<Agreement> agreementsList = new ArrayList<>();
         Map<String, List<Agreement>> allAgreements = new HashMap();
         try {
-            QueryCriteria criteriaClosed = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
-            QueryCriteria criteriaOpen = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.CONSUMED);
+            QueryCriteria criteriaOpen = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
+            QueryCriteria criteriaClosed = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.CONSUMED);
 
             Vault.Page<AgreementNegotiationState> results = rpcOps.vaultQueryByCriteria(criteriaClosed, AgreementNegotiationState.class);
             Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(criteriaOpen, AgreementNegotiationState.class);
+
+            //create List of Open items
+            List<String> openAgreements = new ArrayList<>();
+            for (StateAndRef<AgreementNegotiationState> value : results1.getStates()) {
+                openAgreements.add(value.getState().getData().getAgrementName());
+            }
 
             //All agreements states UNCONSUMED & CONSUMED
             results1.getStates().addAll(results.getStates());
@@ -408,6 +410,13 @@ public class AgreementNegotiationApi {
                 if (auditSize > 1) {
                     latestlatestCopyOfAgreement.setChangedFields(AgreementUtil.compare(history.get(auditSize - 1),
                             history.get(auditSize - 2)));
+                }
+
+                // If the latest  copy of agreement is NOT in Open List(UNCONSUMED) of agreement then it means
+                // this given node is removed from agreement negotiation. This logic needs to be changed if we
+                // decides to close (mark agreement as CONSUMED) after agreement is fully agreed.
+                if (!openAgreements.contains(latestlatestCopyOfAgreement.getAgrementName())) {
+                    latestlatestCopyOfAgreement.setStatus(AgreementEnumState.REMOVED.toString());
                 }
                 agreementsList.add(latestlatestCopyOfAgreement);
             }
@@ -461,28 +470,6 @@ public class AgreementNegotiationApi {
         return agreementsList;
     }
 
-    /*
-        http://localhost:10007/api/template/upload
-        http://localhost:10010/attachments/attachmentid
-
-     */
-    @POST
-    @Path("upload2")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response uploadFile(File file) {
-        try {
-            File newFile = new File("C:\\Users\\oldhamesam.old\\Downloads\\tomcat.zip");
-            InputStream inputStream = new FileInputStream(newFile);
-            String fileName = UPLOAD_FOLDER + newFile.getName();
-            System.out.println("Upload Location ===================== > " + fileName);
-            AgreementUtil.writeToFile(inputStream, fileName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // save it
-        return Response.status(200).entity("OK").build();
-    }
-
 
     /**
      * This is to create parties Map at startup.
@@ -505,29 +492,6 @@ public class AgreementNegotiationApi {
         return cordaX500NameMap;
     }
 
-    private void attachAttachmentHash(Agreement agreement, AgreementNegotiationState agreementNegotiationState) {
-        if (agreement.getAttachmentHash() != null && !agreement.getAttachmentHash().isEmpty()) {
-            List<SecureHash> attachmentHashes = new ArrayList<>();
-            for (String url : agreement.getAttachmentHash()) {
-                SecureHash ourAttachmentHash;
-                try {
-                    /*InputStream inputStream = new FileInputStream(new File(
-                            "C:\\Users\\oldhamesam.old\\Downloads\\tomcat.zip"));
-                       http://localhost:10010/attachments/attachmentid
-                     */
-                    InputStream inputStream = new FileInputStream(new File(url));
-                    ourAttachmentHash = rpcOps.uploadAttachment(inputStream);
-                    attachmentHashes.add(ourAttachmentHash);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            if (!attachmentHashes.isEmpty()) {
-                agreementNegotiationState.setAttachmentHash(attachmentHashes);
-            }
-        }
-    }
-
     private List<Party> extractCounterParties(Agreement agreement) {
         List<Party> counterParties = new ArrayList<>();
         for (String partyName : agreement.getCounterparty()) {
@@ -536,12 +500,4 @@ public class AgreementNegotiationApi {
         return counterParties;
     }
 
-
-    private void resetParticipantsStatus(AgreementNegotiationState agreementNegotiationState, AgreementEnumState status) {
-        Map<String, String> allPartiesStatus = new HashMap<>();
-        for (Party party : agreementNegotiationState.getCptyReciever()) {
-            allPartiesStatus.put(party.getName().getOrganisation(), status.toString());
-        }
-        agreementNegotiationState.setAllPartiesStatus(allPartiesStatus);
-    }
 }
