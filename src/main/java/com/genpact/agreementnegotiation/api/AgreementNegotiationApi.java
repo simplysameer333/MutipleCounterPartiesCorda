@@ -5,6 +5,7 @@ import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationSearchFlow;
 import com.genpact.agreementnegotiation.model.Agreement;
+import com.genpact.agreementnegotiation.model.ResponseException;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
@@ -130,7 +131,7 @@ public class AgreementNegotiationApi {
             AgreementUtil.attachAttachmentHash(agreement, agreementNegotiationState);
 
             //Initial status of all participants, this is required so that new participants get the status.
-            //Later old participants staus would be copied from previous state, check Amend flow
+            //Later old partipants staus would be copied from previous state, check Amend flow
             AgreementUtil.resetParticipantsStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
 
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
@@ -147,7 +148,9 @@ public class AgreementNegotiationApi {
             Agreement newAgreement = getAgreement(agreement.getAgrementName());
             Map<String, String> response = new HashMap<>();
             response.put("transactionId", result.getId().toString());
-            response.put("status", newAgreement.getStatus());
+            if (newAgreement != null) {
+                response.put("status", newAgreement.getStatus());
+            }
             return Response.ok(response).build();
         } catch (Throwable ex) {
             ex.printStackTrace();
@@ -197,9 +200,10 @@ public class AgreementNegotiationApi {
         }
     }
 
-    @GET
-    // @Path("getAgreements")
-    @Produces(MediaType.APPLICATION_JSON)
+    /**
+     * For future use for Open agreements only
+     * @return
+     */
     public List<Agreement> getOpenAgreements() {
         List<Agreement> agreementsList = new ArrayList<>();
         try {
@@ -241,6 +245,7 @@ public class AgreementNegotiationApi {
             if (result.size() > 0) {
                 Agreement agreement = AgreementUtil.copyStateToVO(result.get(0).getState().getData());
                 System.out.println("getAgreement ============================= > " + agreement.toString());
+
 
                 //Add the list of change variables
                 List<Agreement> history = getAudit(agreementName);
@@ -307,6 +312,8 @@ public class AgreementNegotiationApi {
             cordaX500NameMap.put(cordaX500Name.getOrganisation(), cordaX500Name);
         }
         return cordaX500NameMap;
+
+
     }
     /**
      * Returns the node's name.
@@ -358,7 +365,6 @@ public class AgreementNegotiationApi {
     }
 
     @GET
-    //  @Path("getAllLedgerAgreements")
     @Path("getAgreements")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Agreement> getAllAgreements() {
@@ -367,7 +373,7 @@ public class AgreementNegotiationApi {
         Map<String, List<Agreement>> allAgreements = new HashMap();
         try {
             QueryCriteria criteriaOpen = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
-            QueryCriteria criteriaClosed = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.CONSUMED);
+            QueryCriteria criteriaClosed= new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.CONSUMED);
 
             Vault.Page<AgreementNegotiationState> results = rpcOps.vaultQueryByCriteria(criteriaClosed, AgreementNegotiationState.class);
             Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(criteriaOpen, AgreementNegotiationState.class);
@@ -415,7 +421,8 @@ public class AgreementNegotiationApi {
                 // If the latest  copy of agreement is NOT in Open List(UNCONSUMED) of agreement then it means
                 // this given node is removed from agreement negotiation. This logic needs to be changed if we
                 // decides to close (mark agreement as CONSUMED) after agreement is fully agreed.
-                if (!openAgreements.contains(latestlatestCopyOfAgreement.getAgrementName())) {
+                if (!openAgreements.contains(latestlatestCopyOfAgreement.getAgrementName()))
+                {
                     latestlatestCopyOfAgreement.setStatus(AgreementEnumState.REMOVED.toString());
                 }
                 agreementsList.add(latestlatestCopyOfAgreement);
@@ -491,6 +498,9 @@ public class AgreementNegotiationApi {
         }
         return cordaX500NameMap;
     }
+
+
+
 
     private List<Party> extractCounterParties(Agreement agreement) {
         List<Party> counterParties = new ArrayList<>();
