@@ -31,7 +31,10 @@ This is demo application of Blockchain that uses Corda Plateform. For single cou
 	b) Windows for command line intraction with Corda. (Total 4 windows - 1 for each party and 1 for Controller (notary)).
 		
 6.  Urls for templates -
-	JPMorganChase - http://localhost:10007/web/template/	
+
+	JPMorganChase - http://localhost:10007/web/template/
+	
 	BankofAmerica - http://localhost:10010/web/template/	
+	
 	Genpact - http://localhost:10013/web/template/
 
