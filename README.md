@@ -33,8 +33,8 @@ This is demo application of Blockchain that uses Corda Plateform. For single cou
 6.  Urls for templates -
 
 	JPMorganChase - http://localhost:10007/web/template/
-	
-	BankofAmerica - http://localhost:10010/web/template/	
-	
-	Genpact - http://localhost:10013/web/template/
 
+	BankofAmerica - http://localhost:10010/web/template/
+
+	Genpact - http://localhost:10013/web/template/
+	
