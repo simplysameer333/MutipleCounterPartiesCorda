@@ -1,5 +1,5 @@
 # BlockChainPOCApplication
-This is demo application of Blockchain that uses Corda Plateform. This is V2 that includes multiple counterparties with attachment functionlity. For single counter party flow check branch named - SingleCounterParty.
+This is demo application of Blockchain that uses Corda Plateform. For single counter party flow check branch named - SingleCounterParty.
 
 #Prerequisites
 1. Java 1.8.x for later must be installed on system.
@@ -11,9 +11,7 @@ This is demo application of Blockchain that uses Corda Plateform. This is V2 tha
 1. Download the application from github.
 2. Start command prompt and navigate extracted folder where runnodes.bat file is placed.
 3. run - > 
-
-		runnodes.bat.
-			
+		runnodes.bat.		
 4. If Java version are correctly installed and environment variables are set correctly the below message would be displayed.
 			
 			<<location>>>runnodes.bat
@@ -29,17 +27,11 @@ This is demo application of Blockchain that uses Corda Plateform. This is V2 tha
 			Finished starting nodes	
 
 5.  It will open up 9 windows -
-
-	a) Windows for webserver, one for each node (total 4 windows).
-		
+	a) Windows for webserver, one for each node (total 4 windows).		
 	b) Windows for command line intraction with Corda. (Total 4 windows - 1 for each party and 1 for Controller (notary)).
 		
 6.  Urls for templates -
-
 		JPMorganChase - http://localhost:10007/web/template/		
 		BankofAmerica - http://localhost:10010/web/template/
-		Genpact - http://localhost:10013/web/template/	
-		
-		
-		
+		Genpact - http://localhost:10013/web/template/
 
