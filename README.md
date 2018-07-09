@@ -11,7 +11,9 @@ This is demo application of Blockchain that uses Corda Plateform. For single cou
 1. Download the application from github.
 2. Start command prompt and navigate extracted folder where runnodes.bat file is placed.
 3. run - > 
-		runnodes.bat.		
+
+			runnodes.bat.	
+			
 4. If Java version are correctly installed and environment variables are set correctly the below message would be displayed.
 			
 			<<location>>>runnodes.bat
@@ -27,14 +29,15 @@ This is demo application of Blockchain that uses Corda Plateform. For single cou
 			Finished starting nodes	
 
 5.  It will open up 9 windows -
-	a) Windows for webserver, one for each node (total 4 windows).		
-	b) Windows for command line intraction with Corda. (Total 4 windows - 1 for each party and 1 for Controller (notary)).
+
+			a) Windows for webserver, one for each node (total 4 windows).		
+			b) Windows for command line intraction with Corda. (Total 4 windows - 1 for each party and 1 for Controller (notary)).
 		
 6.  Urls for templates -
 
-	JPMorganChase - http://localhost:10007/web/template/
+		JPMorganChase - http://localhost:10007/web/template/
 
-	BankofAmerica - http://localhost:10010/web/template/
+		BankofAmerica - http://localhost:10010/web/template/
 
-	Genpact - http://localhost:10013/web/template/
+		Genpact - http://localhost:10013/web/template/
 	
