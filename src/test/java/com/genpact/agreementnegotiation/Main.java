@@ -1,19 +1,17 @@
 package com.genpact.agreementnegotiation;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import net.corda.core.concurrent.CordaFuture;
 import net.corda.core.identity.CordaX500Name;
-import net.corda.node.services.transactions.ValidatingNotaryService;
-import net.corda.nodeapi.User;
-import net.corda.nodeapi.internal.ServiceInfo;
 import net.corda.testing.driver.DriverParameters;
 import net.corda.testing.driver.NodeHandle;
 import net.corda.testing.driver.NodeParameters;
+import net.corda.testing.node.User;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.util.Collections.singleton;
 import static net.corda.testing.driver.Driver.driver;
 
 /**
@@ -37,36 +35,36 @@ public class Main {
         permissions.add("StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow$Initiator");
         permissions.add("StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow$Initiator");
         permissions.add("StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationAcceptFlow$Initiator");
-        final User user = new User("user1", "test", permissions );
-        driver(new DriverParameters().setIsDebug(true), dsl -> {
-                    dsl.startNode(new NodeParameters()
-                            .setProvidedName(new CordaX500Name("Controller", "London", "GB"))
-                            .setAdvertisedServices(singleton(new ServiceInfo(ValidatingNotaryService.Companion.getType(), null))));
+        final User user = new User("user1", "test", ImmutableSet.of("ALL") );
+        driver(new DriverParameters().withIsDebug(true).withWaitForAllNodesToFinish(true), dsl -> {
+            dsl.startNode(new NodeParameters()
+                            .withProvidedName(new CordaX500Name("Notary Service", "London", "GB"))
+                            .withRpcUsers(ImmutableList.of(user)));
 
                     CordaFuture<NodeHandle> nodeAFuture = dsl.startNode(new NodeParameters()
-                            .setProvidedName(new CordaX500Name("JPMorgan Chase", "London", "GB"))
-                            .setRpcUsers(ImmutableList.of(user)));
+                            .withProvidedName(new CordaX500Name("JPMorgan Chase", "London", "GB"))
+                            .withRpcUsers(ImmutableList.of(user)));
                     CordaFuture<NodeHandle> nodeB = dsl.startNode(new NodeParameters()
-                            .setProvidedName(new CordaX500Name("Bank of America", "New York", "US"))
-                            .setRpcUsers(ImmutableList.of(user)));
-            CordaFuture<NodeHandle> nodeC = dsl.startNode(new NodeParameters()
+                            .withProvidedName(new CordaX500Name("Bank of America", "New York", "US"))
+                            .withRpcUsers(ImmutableList.of(user)));
+         /*   CordaFuture<NodeHandle> nodeC = dsl.startNode(new NodeParameters()
                     .setProvidedName(new CordaX500Name("Genpact", "New Delhi", "IN"))
                     .setRpcUsers(ImmutableList.of(user)));
             CordaFuture<NodeHandle> nodeD = dsl.startNode(new NodeParameters()
                     .setProvidedName(new CordaX500Name("Macquarie", "Sydney", "AU"))
                     .setRpcUsers(ImmutableList.of(user)));
-
+*/
                     try {
                         dsl.startWebserver(nodeAFuture.get());
                         dsl.startWebserver(nodeB.get());
-                        dsl.startWebserver(nodeC.get());
-                        dsl.startWebserver(nodeD.get());
+              //          dsl.startWebserver(nodeC.get());
+             //           dsl.startWebserver(nodeD.get());
                     } catch (Throwable e) {
                         System.err.println("Encountered exception in node startup: " + e.getMessage());
                         e.printStackTrace();
                     }
 
-                    dsl.waitForAllNodesToFinish();
+
 
                     return null;
                 }

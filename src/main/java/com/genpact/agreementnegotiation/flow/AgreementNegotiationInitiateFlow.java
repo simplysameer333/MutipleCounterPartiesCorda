@@ -70,6 +70,7 @@ public class AgreementNegotiationInitiateFlow {
                 return FinalityFlow.tracker();
             }
         };
+        private static final ProgressTracker.Step COMPLETION = new ProgressTracker.Step("Transaction completed.");
         private final ProgressTracker progressTracker = new ProgressTracker(
                 ID_OTHER_NODES,
                 SENDING_AND_RECEIVING_DATA,
@@ -79,7 +80,8 @@ public class AgreementNegotiationInitiateFlow {
                 TX_SIGNING,
                 TX_VERIFICATION,
                 SIGS_GATHERING,
-                FINALISATION);
+                FINALISATION,
+                COMPLETION);
 
 
         @Override
@@ -139,6 +141,7 @@ public class AgreementNegotiationInitiateFlow {
             txBuilder.verify(getServiceHub());
 
             // Signing the transaction.
+            progressTracker.setCurrentStep(TX_SIGNING);
             final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
 
             /// Creating a session with the other party.
@@ -149,11 +152,18 @@ public class AgreementNegotiationInitiateFlow {
             }
 
             // Obtaining the counterparty's signature.
+            progressTracker.setCurrentStep(SIGS_GATHERING);
             SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(
                     signedTx, Collections.unmodifiableList(otherPartySessionList), CollectSignaturesFlow.tracker()));
 
             // Finalising the transaction.
-            return subFlow(new FinalityFlow(fullySignedTx));
+            progressTracker.setCurrentStep(FINALISATION);
+            SignedTransaction returnSignedTransaction = subFlow(new FinalityFlow(fullySignedTx));
+
+            progressTracker.setCurrentStep(COMPLETION);
+
+            return returnSignedTransaction;
+
 
         }
     }

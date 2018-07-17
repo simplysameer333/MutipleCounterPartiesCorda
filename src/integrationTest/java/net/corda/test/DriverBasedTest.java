@@ -1,89 +1,85 @@
 package net.corda.test;
 
-import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 import net.corda.core.concurrent.CordaFuture;
-import net.corda.core.identity.Party;
-import net.corda.core.messaging.FlowProgressHandle;
-import net.corda.core.transactions.SignedTransaction;
-import net.corda.node.services.transactions.ValidatingNotaryService;
-import net.corda.nodeapi.internal.ServiceInfo;
+import net.corda.core.identity.CordaX500Name;
+import net.corda.core.utilities.NetworkHostAndPort;
+import net.corda.testing.core.TestIdentity;
 import net.corda.testing.driver.DriverParameters;
 import net.corda.testing.driver.NodeHandle;
 import net.corda.testing.driver.NodeParameters;
-import org.junit.Assert;
+import net.corda.testing.driver.WebserverHandle;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
-import static net.corda.testing.TestConstants.*;
 import static net.corda.testing.driver.Driver.driver;
+import static org.junit.Assert.assertEquals;
 
 public class DriverBasedTest {
-    static final Logger logger = LoggerFactory.getLogger(DriverBasedTest.class);
+    TestIdentity bankA = new TestIdentity(new CordaX500Name("BankA", "", "GB"));
+    TestIdentity bankB = new TestIdentity(new CordaX500Name("BankB", "", "US"));
+
     @Test
-    public void runDriverTest() {
-        Party notary = getDUMMY_NOTARY();
-        Party bankA = getDUMMY_BANK_A();
-        Party bankB = getDUMMY_BANK_B();
-
-
-
-        //DriverParameters dp = new DriverParameters();
-        //dp.setExtraCordappPackagesToScan(Arrays.asList("com.genpact.agreementnegotiation.contract"));
-        //dp.setIsDebug(true);
-        driver(new DriverParameters().setExtraCordappPackagesToScan(Arrays.asList("com.genpact.agreementnegotiation")).setIsDebug(true
-        ), dsl -> {
-            HashSet<ServiceInfo> notaryServices = Sets.newHashSet(new ServiceInfo(ValidatingNotaryService.Companion.getType(), null));
+    public void nodeTest() {
+        driver(new DriverParameters().withIsDebug(true).withStartNodesInProcess(true), dsl -> {
 
             // This starts three nodes simultaneously with startNode, which returns a future that completes when the node
             // has completed startup. Then these are all resolved with getOrThrow which returns the NodeHandle list.
-            List<CordaFuture<NodeHandle>> handles = ImmutableList.of(
-                    dsl.startNode(new NodeParameters().setProvidedName(notary.getName()).setAdvertisedServices(notaryServices)),
-                    dsl.startNode(new NodeParameters().setProvidedName(bankA.getName())),
-                    dsl.startNode(new NodeParameters().setProvidedName(bankB.getName()))
+            List<CordaFuture<NodeHandle>> handleFutures = ImmutableList.of(
+                    dsl.startNode(new NodeParameters().withProvidedName(bankA.getName())),
+                    dsl.startNode(new NodeParameters().withProvidedName(bankB.getName()))
             );
 
             try {
-                NodeHandle notaryHandle = handles.get(0).get();
-                NodeHandle nodeAHandle = handles.get(1).get();
-                NodeHandle nodeBHandle = handles.get(2).get();
-
+                NodeHandle partyAHandle = handleFutures.get(0).get();
+                NodeHandle partyBHandle = handleFutures.get(1).get();
 
                 // This test will call via the RPC proxy to find a party of another node to verify that the nodes have
                 // started and can communicate. This is a very basic test, in practice tests would be starting flows,
                 // and verifying the states in the vault and other important metrics to ensure that your CorDapp is working
                 // as intended.
-                Assert.assertEquals(notaryHandle.getRpc().wellKnownPartyFromX500Name(bankA.getName()).getName(), bankA.getName());
-                Assert.assertEquals(nodeAHandle.getRpc().wellKnownPartyFromX500Name(bankB.getName()).getName(), bankB.getName());
-                Assert.assertEquals(nodeBHandle.getRpc().wellKnownPartyFromX500Name(notary.getName()).getName(), notary.getName());
-
-
-
-                //nodeAHandle.getRpc().startFlowDynamic()
-
-                FlowProgressHandle<SignedTransaction> flowHandle = nodeAHandle.getRpc().startTrackedFlowDynamic(AgreementNegotiationInitiateFlow.Initiator.class, "TestAgmt", new Date(),1101.11,"bond",bankB);
-
-                flowHandle.getProgress().subscribe(evt -> logger.info("Transactiomn Event >> %s\n", evt));
-
-
-                // The line below blocks and waits for the flow to return.
-                //final SignedTransaction result = flowHandle.getReturnValue().get();
-
-
-                //final String msg = String.format("Transaction id %s committed to ledger.\n", result.getId());
-                //logger.info("message"+msg);
-
+                assertEquals(partyAHandle.getRpc().wellKnownPartyFromX500Name(bankB.getName()).getName(), bankB.getName());
+                assertEquals(partyBHandle.getRpc().wellKnownPartyFromX500Name(bankA.getName()).getName(), bankA.getName());
+            } catch (Exception e) {
+                throw new RuntimeException("Caught exception during test", e);
             }
-            catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Caught exception during test:", e);
+
+            return null;
+        });
+    }
+
+    @Test
+    public void nodeWebserverTest() {
+        driver(new DriverParameters().withIsDebug(true).withStartNodesInProcess(true), dsl -> {
+
+            List<CordaFuture<NodeHandle>> handleFutures = ImmutableList.of(
+                    dsl.startNode(new NodeParameters().withProvidedName(bankA.getName())),
+                    dsl.startNode(new NodeParameters().withProvidedName(bankB.getName()))
+            );
+
+            try {
+                // This test starts each node's webserver and makes an HTTP call to retrieve the body of a GET endpoint on
+                // the node's webserver, to verify that the nodes' webservers have started and have loaded the API.
+                for (CordaFuture<NodeHandle> handleFuture : handleFutures) {
+                    NodeHandle nodeHandle = handleFuture.get();
+
+                    WebserverHandle webserverHandle = dsl.startWebserver(nodeHandle).get();
+
+                    NetworkHostAndPort nodeAddress = webserverHandle.getListenAddress();
+                    String url = String.format("http://%s/api/template/templateGetEndpoint", nodeAddress);
+
+                    Request request = new Request.Builder().url(url).build();
+                    OkHttpClient client = new OkHttpClient();
+                    Response response = client.newCall(request).execute();
+
+                    assertEquals("Template GET endpoint.", response.body().string());
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Caught exception during test", e);
             }
 
             return null;

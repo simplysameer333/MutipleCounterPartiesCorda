@@ -7,6 +7,7 @@ import net.corda.core.identity.Party;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
+import net.corda.core.serialization.ConstructorForDeserialization;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +40,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     private List<ThresholdState> thresholds;
     private List<String> attachmentHash;
 
+    @ConstructorForDeserialization
     public AgreementNegotiationState() {
         super();
     }

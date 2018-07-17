@@ -5,7 +5,6 @@ import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationSearchFlow;
 import com.genpact.agreementnegotiation.model.Agreement;
-import com.genpact.agreementnegotiation.model.ResponseException;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
@@ -45,7 +44,7 @@ public class AgreementNegotiationApi {
     private final Map<String, CordaX500Name> cordaX500NameMap;
     private final Map<String, CordaX500Name> cordaX500AllNodesMap;
 
-    private final List<String> serviceNames = ImmutableList.of("Controller", "Network Map Service");
+    private final List<String> serviceNames = ImmutableList.of("Notary Service", "Network Map Service");
 
     public AgreementNegotiationApi(CordaRPCOps services) {
         this.rpcOps = services;
@@ -498,9 +497,6 @@ public class AgreementNegotiationApi {
         }
         return cordaX500NameMap;
     }
-
-
-
 
     private List<Party> extractCounterParties(Agreement agreement) {
         List<Party> counterParties = new ArrayList<>();

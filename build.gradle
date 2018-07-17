@@ -1,8 +1,9 @@
 buildscript {
-    ext.corda_release_version = '1.0.0'
-    ext.corda_gradle_plugins_version = '1.0.0'
+    ext.corda_release_group = 'net.corda'
+    ext.corda_release_version = '3.1-corda'
+    ext.corda_gradle_plugins_version = '3.1.0'
     ext.junit_version = '4.12'
-    ext.quasar_version = '0.7.6'
+    ext.quasar_version = '0.7.9'
 
     repositories {
         mavenLocal()
@@ -11,6 +12,7 @@ buildscript {
     }
 
     dependencies {
+        classpath "net.corda.plugins:cordapp:$corda_gradle_plugins_version"
         classpath "net.corda.plugins:cordformation:$corda_gradle_plugins_version"
         classpath "net.corda.plugins:quasar-utils:$corda_gradle_plugins_version"
     }
@@ -20,15 +22,14 @@ repositories {
     mavenLocal()
     jcenter()
     mavenCentral()
-    maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-releases' }
-    maven { url 'https://dl.bintray.com/kotlin/exposed' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-releases' }
 }
 
 apply plugin: 'java'
+apply plugin: 'net.corda.plugins.cordapp'
 apply plugin: 'net.corda.plugins.cordformation'
 apply plugin: 'net.corda.plugins.quasar-utils'
-
 
 sourceSets {
     main {
@@ -59,46 +60,32 @@ dependencies {
     testCompile "junit:junit:$junit_version"
 
     // Corda integration dependencies
-    cordaCompile "net.corda:corda-core:$corda_release_version"
-    cordaCompile "net.corda:corda-finance:$corda_release_version"
-    cordaCompile "net.corda:corda-jackson:$corda_release_version"
-    cordaCompile "net.corda:corda-rpc:$corda_release_version"
-    cordaCompile "net.corda:corda-node-api:$corda_release_version"
-    cordaCompile "net.corda:corda-webserver-impl:$corda_release_version"
-    cordaRuntime "net.corda:corda:$corda_release_version"
-    cordaRuntime "net.corda:corda-webserver:$corda_release_version"
+    cordaCompile "$corda_release_group:corda-core:$corda_release_version"
+    cordaCompile "$corda_release_group:corda-finance:$corda_release_version"
+    cordaCompile "$corda_release_group:corda-jackson:$corda_release_version"
+    cordaCompile "$corda_release_group:corda-rpc:$corda_release_version"
+    cordaCompile "$corda_release_group:corda-node-api:$corda_release_version"
+    cordaCompile "$corda_release_group:corda-webserver-impl:$corda_release_version"
+    cordaRuntime "$corda_release_group:corda:$corda_release_version"
+    cordaRuntime "$corda_release_group:corda-webserver:$corda_release_version"
 
-    testCompile "net.corda:corda-node-driver:$corda_release_version"
+    testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
 
     // CorDapp dependencies
     // Specify your CorDapp's dependencies below, including dependent CorDapps.
     // We've defined Cash as a dependent CorDapp as an example.
-    cordapp "net.corda:corda-finance:$corda_release_version"
+    cordapp "$corda_release_group:corda-finance:$corda_release_version"
 
     compile "org.apache.commons:commons-lang3:3.6"
     compile "org.hibernate:hibernate-core:5.2.6.Final"
-
-    // https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-multipart
-    // compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.5'
-
-
-    // https://mvnrepository.com/artifact/com.sun.jersey.contribs/jersey-multipart
     compile group: 'com.sun.jersey.contribs', name: 'jersey-multipart', version: '1.19.4'
-   // compile.exclude group : "javax.ws.rs:jsr311-api:1.1.1"
-/*
-    compile 'org.springframework.boot:spring-boot-starter-web',
-            'org.springframework.boot:spring-boot-starter-jersey',
-            'org.glassfish.jersey.media:jersey-media-multipart:2.+',
-            'org.springframework.boot:spring-boot-starter-jdbc',
-            'org.springframework.boot:spring-boot-devtools'
 
-*/
 }
 
-//task integrationTest(type: Test, dependsOn: []) {
-  //  testClassesDir = sourceSets.integrationTest.output.
-    //classpath = sourceSets.integrationTest.runtimeClasspath
-//}
+task integrationTest(type: Test, dependsOn: []) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-parameters" // Required for passing named arguments to your flow via the shell.
@@ -106,58 +93,45 @@ tasks.withType(JavaCompile) {
 
 task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
     directory "./build/nodes"
-    networkMap "O=Controller,L=London,C=GB"
     node {
-        name "O=Controller,L=London,C=GB"
-        advertisedServices = ["corda.notary.validating"]
+        name "O=Notary,L=London,C=GB"
+        notary = [validating : true]
         p2pPort 10002
-        rpcPort 10003
-        cordapps = ["net.corda:corda-finance:$corda_release_version"]
+        cordapps = [
+                "$corda_release_group:corda-finance:$corda_release_version"
+        ]
     }
     node {
         name "O=JPMorgan Chase,L=London,C=GB"
-        advertisedServices = []
         p2pPort 10005
-        rpcPort 10006
+        rpcSettings {
+            address("localhost:10006")
+            adminAddress("localhost:10046")
+        }
         webPort 10007
-        cordapps = ["net.corda:corda-finance:$corda_release_version"]
-        rpcUsers = [[ user: "user1", "password": "test",
-                      "permissions":
-                              ["StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow\$Initiator",
-                               "StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow\$Initiator",
-                               "StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationAcceptFlow\$Initiator"]]]
+        cordapps = [
+                "$corda_release_group:corda-finance:$corda_release_version"
+        ]
+        rpcUsers = [[ user: "user1", "password": "test", "permissions": ["StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow\$Initiator"]]]
     }
     node {
         name "O=Bank of America,L=New York,C=US"
-        advertisedServices = []
         p2pPort 10008
-        rpcPort 10009
+        rpcSettings {
+            address("localhost:10009")
+            adminAddress("localhost:10049")
+        }
         webPort 10010
-        cordapps = ["net.corda:corda-finance:$corda_release_version"]
+        cordapps = [
+                "$corda_release_group:corda-finance:$corda_release_version"
+        ]
         rpcUsers = [[ user: "user1", "password": "test", "permissions": ["StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow\$Initiator"]]]
-    }
-    node {
-        name "O=Genpact,L=New Delhi,C=IN"
-        advertisedServices = []
-        p2pPort 10011
-        rpcPort 10012
-        webPort 10013
-        cordapps = ["net.corda:corda-finance:$corda_release_version"]
-        rpcUsers = [[ user: "user1", "password": "test", "permissions": ["StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow\$Initiator"]]]
-    }
-    node {
-        name "O=Macquarie,L=Sydney,C=AU"
-        advertisedServices = []
-        p2pPort 10014
-        rpcPort 10015
-        webPort 10016
-        cordapps = ["net.corda:corda-finance:$corda_release_version"]
-        rpcUsers = [[ user: "user1", "password": "test", "permissions": ["StartFlow.com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow\$Initiator"]]]
+
     }
 }
 
 task runTemplateClient(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'com.genpact.agreementnegotiation.client.AgreementNegotiationClient'
+    main = 'com.template.TemplateClient'
     args 'localhost:10006'
 }
