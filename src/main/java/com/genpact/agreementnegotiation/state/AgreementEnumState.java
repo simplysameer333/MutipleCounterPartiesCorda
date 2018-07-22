@@ -4,11 +4,11 @@ public enum AgreementEnumState {
     INITIAL("Initiated"),
     AMEND("Amended"),
     PARTIAL_ACCEPTED("Partially Agreed"),
-    REMOVED("Removed"),
+    //REMOVED("Removed"),
+    REMOVED("On Hold"),
     FULLY_ACCEPTED("Agreed");
 
     private final String name;
-
     AgreementEnumState(String s) {
         name = s;
     }

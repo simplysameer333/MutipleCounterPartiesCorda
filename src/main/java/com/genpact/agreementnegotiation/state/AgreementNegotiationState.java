@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Define your state object here.
@@ -38,44 +37,6 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     private List<EligibleCollateralState> eligibleCollateralStates;
     private List<ThresholdState> thresholds;
     private List<String> attachmentHash;
-
-    public AgreementNegotiationState() {
-        super();
-    }
-
-    public AgreementNegotiationState(String baseCurrency, List<String> eligibleCurrency,
-                                     int deliveryAmount, int returnAmount, int creditSupportAmount,
-                                     List<String> products, String valuationAgent, String valuationDate,
-                                     String valuationTime, Date notificationTime,
-                                     Date substitutionDateTo, Boolean consent, List<String> specifiedCondition,
-                                     String agrementName, Date agrementInitiationDate, Date substitutionDateFrom,
-                                     Date agrementAgreedDate, Party cptyInitiator, List<Party> cptyReciever, Party lastUpdatedBy,
-                                     Date agrementLastAmendDate, AgreementEnumState status, List<String> attachmentHash,
-                                     List<EligibleCollateralState> eligibleCollateralStates,
-                                     List<ThresholdState> thresholds, Map<String, String> allPartiesStatus) {
-
-        super(agrementName, agrementInitiationDate, agrementAgreedDate, cptyInitiator, cptyReciever, lastUpdatedBy,
-                agrementLastAmendDate, status, allPartiesStatus);
-
-        this.baseCurrency = baseCurrency;
-        this.eligibleCurrency = eligibleCurrency;
-        this.deliveryAmount = deliveryAmount;
-        this.returnAmount = returnAmount;
-        this.creditSupportAmount = creditSupportAmount;
-        this.products = products;
-        this.initialMargin = initialMargin;
-        this.valuationAgent = valuationAgent;
-        this.valuationDate = valuationDate;
-        this.valuationTime = valuationTime;
-        this.notificationTime = notificationTime;
-        this.substitutionDateTo = substitutionDateTo;
-        this.substitutionDateFrom = substitutionDateFrom;
-        this.specifiedCondition = specifiedCondition;
-        this.consent = consent;
-        this.eligibleCollateralStates = eligibleCollateralStates;
-        this.thresholds = thresholds;
-        this.attachmentHash = attachmentHash;
-    }
 
     public String getBaseCurrency() {
         return baseCurrency;

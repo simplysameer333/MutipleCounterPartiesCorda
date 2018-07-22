@@ -30,25 +30,6 @@ public class AgreementStateTemplate implements LinearState {
     //first value of version
     private int version;
 
-    public AgreementStateTemplate() {
-    }
-
-    public AgreementStateTemplate(String agrementName, Date agrementInitiationDate, Date agrementAgreedDate,
-                                  Party cptyInitiator, List<Party> cptyReciever, Party lastUpdatedBy,
-                                  Date agrementLastAmendDate, AgreementEnumState status,
-                                  Map<String, String> allPartiesStatus) {
-
-        this.agrementName = agrementName;
-        this.agrementInitiationDate = agrementInitiationDate;
-        this.agrementAgreedDate = agrementAgreedDate;
-        this.cptyInitiator = cptyInitiator;
-        this.cptyReciever = cptyReciever;
-        this.lastUpdatedBy = lastUpdatedBy;
-        this.agrementLastAmendDate = agrementLastAmendDate;
-        this.status = status;
-        this.allPartiesStatus = allPartiesStatus;
-    }
-
     public String getAgrementName() {
         return agrementName;
     }

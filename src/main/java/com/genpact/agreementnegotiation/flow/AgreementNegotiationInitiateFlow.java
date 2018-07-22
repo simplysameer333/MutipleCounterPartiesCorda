@@ -110,6 +110,11 @@ public class AgreementNegotiationInitiateFlow {
             agreementNegotiationState.setCptyReciever(otherParties);
             agreementNegotiationState.setVersion(1);
 
+            //Add initiator status
+            agreementNegotiationState.getAllPartiesStatus().
+                    put(agreementNegotiationState.getCptyInitiator().getName().getOrganisation(),
+                            AgreementEnumState.INITIAL.toString());
+
             StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, TEMPLATE_CONTRACT_ID);
             /*  List<PublicKey> requiredSigners = ImmutableList.of(agreementNegotiationState.getCptyInitiator().getOwningKey(),
                     agreementNegotiationState.getCptyReciever().getOwningKey());

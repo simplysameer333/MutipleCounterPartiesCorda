@@ -30,31 +30,28 @@
    function fileUpload(){
 	var fileContent = new FormData();
     fileContent.append("file",$('input[type=file]')[0].files[0]);
-	var extension =  $('input[type=file]')[0].files[0].name.split('.').pop();
-	if (extension != 'zip' && extension != 'jar') {
-		alert("Only Zip or Jar can be uploaded.");
-	} else {
-		var filename = $('input[type=file]').val().replace(/.*(\/|\\)/, '');
-		$.ajax({
-			 type: "POST",
-			  enctype:"multipart/form-data",
-			   url: "/upload/attachment",
-			   data: fileContent,
-			   processData: false,
-			   contentType: false,
-			success: function(response) {
-				fileAdded(filename, response);
-			},
-			error: function(xhr) {
-				  alert("error : "+JSON.stringify(xhr));				
-			}
-		});
-	 }
+	var filename = $('input[type=file]').val().replace(/.*(\/|\\)/, '');
+	 $.ajax({
+		 type: "POST",
+		  enctype:"multipart/form-data",
+		   url: "/upload/attachment",
+		   data: fileContent,
+		   processData: false,
+		   contentType: false,
+		success: function(response) {
+			fileAdded(filename, response);
+		},
+		error: function(xhr) {
+			  alert("error : "+JSON.stringify(xhr));
+			//Do Something to handle error
+		}
+
+	});
   }
     </script>
 
 </head>
-<body id = "demoAppId" ng-app="demoAppModule" ng-controller="AgreementController as demoApp">
+<body id="demoAppId" ng-app="demoAppModule" ng-controller="AgreementController as demoApp">
 
 <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -424,19 +421,21 @@
                             </div>
 
                             </BR> <!--Initiate -->
-                            <div >
+                            <div>
                                 <label class="control-label lbl-p">File Upload :</label>
                                 <div class="col-lg-12">
-                                    <form id="upload-form"  enctype="multipart/form-data">
+                                    <form id="upload-form" enctype="multipart/form-data">
                                         <div class="form-group">
                                             <input type="file" name="jar" class="form-control" accept=".zip,.jar">
                                         </div>
 
-                                        <button type="button" class="btn btn-primary" style="margin-bottom:20px" onclick ="fileUpload()">Upload </button>
+                                        <button type="button" class="btn btn-primary" style="margin-bottom:20px"
+                                                onclick="fileUpload()">Upload
+                                        </button>
                                     </form>
                                 </div>
-                                <div id="myDiv" style="margin-top:20px" ng-show ="fileArray.length > 0">
-                                    <table class="table table-bordered table-striped" id="myList" >
+                                <div id="myDiv" style="margin-top:20px" ng-show="fileArray.length > 0">
+                                    <table class="table table-bordered table-striped" id="myList">
                                         <thead style="font-weight: bold">
                                         <tr>
                                             <td>File Name</td>
@@ -445,9 +444,10 @@
                                         </thead>
                                         <tbody>
                                         <tr ng-repeat="x in fileArray">
-                                            <td>	<a href="{{x.filehashUrl}}">{{x.filename}}</a> </td>
+                                            <td><a href="{{x.filehashUrl}}">{{x.filename}}</a></td>
                                             <td>
-                                                <button ng-click="modalInstance.removefile(x.filename)" type="button" class="glyphicon glyphicon-remove" />
+                                                <button ng-click="modalInstance.removefile(x.filename)" type="button"
+                                                        class="glyphicon glyphicon-remove"/>
                                             </td>
                                         </tbody>
                                     </table>
@@ -805,7 +805,7 @@
                                     </td>
                                 </tr>
 
-                                <tr ng-show ="fileArray.length > 0">
+                                <tr ng-show="fileArray.length > 0">
                                     <td class="col-lg-3">Uploaded Files</td>
                                     <td ng-class="col-lg-9">
                                         <div ng-repeat="x in fileArray">
@@ -823,7 +823,8 @@
             </div>
             <div class="modal-footer">
                 <div class="btn-group gp-button-group">
-                    <button type="button" ng-show="showAmendAgree" ng-disabled="agreement.status == 'Agreed' || agreement.status == 'On Hold'"
+                    <button type="button" ng-show="showAmendAgree"
+                            ng-disabled="agreement.status == 'Agreed' || agreement.status == 'On Hold'"
                             class="btn btn-primary" ng-click="cancel(); amendAgreement(agreement)">Amend
                     </button>
                     <button type="button" ng-show="showAmendAgree"
@@ -1103,18 +1104,19 @@
                         </BR>
                         <label class="control-label lbl-p">File Upload :</label>
                         <div class="control-label lbl-p">
-                            <form id="upload-form"  enctype="multipart/form-data">
+                            <form id="upload-form" enctype="multipart/form-data">
                                 <div class="form-group">
                                     <input type="file" name="jar" class="form-control" accept=".zip,.jar">
                                 </div>
-                                <button type="button" class="btn btn-primary" onclick ="fileUpload()">Upload </button>
+                                <button type="button" class="btn btn-primary" onclick="fileUpload()">Upload</button>
                             </form>
                         </div>
                         </BR>
                         <div>
-                            <label ng-show = "fileArray.length > 0" >Uploaded Files</label>
+                            <label ng-show="fileArray.length > 0">Uploaded Files</label>
                             <div id="myDiv">
-                                <table class="table table-bordered table-striped" id="myList" ng-show ="fileArray.length > 0">
+                                <table class="table table-bordered table-striped" id="myList"
+                                       ng-show="fileArray.length > 0">
                                     <thead style="font-weight: bold">
                                     <tr>
                                         <td>File Name</td>
@@ -1123,9 +1125,10 @@
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="x in fileArray">
-                                        <td>	<a href="{{x.filehashUrl}}">{{x.filename}}</a> </td>
+                                        <td><a href="{{x.filehashUrl}}">{{x.filename}}</a></td>
                                         <td>
-                                            <button ng-click="removeFile(x.filename)" type="button" class="glyphicon glyphicon-remove" />
+                                            <button ng-click="removeFile(x.filename)" type="button"
+                                                    class="glyphicon glyphicon-remove"/>
                                         </td>
                                     </tbody>
                                 </table>

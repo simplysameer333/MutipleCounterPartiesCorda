@@ -349,12 +349,21 @@ public class AgreementUtil {
         List<Field> fields = getAllModelFields(clazz);
         HashMap<Object, Object> changedFields = new HashMap<>();
 
+        List<String> ignoreAttributeList = new ArrayList<>();
+        ignoreAttributeList.add("agrementLastAmendDate");
+        ignoreAttributeList.add("status");
+        ignoreAttributeList.add("changedFields");
+        ignoreAttributeList.add("version");
+        ignoreAttributeList.add("pendingParticipants");
+        ignoreAttributeList.add("lastUpdatedBy");
+
         try {
             if (fields != null) {
                 for (Field field : fields) {
                     field.setAccessible(true);
-                    if ("agrementLastAmendDate".equals(field.getName()) || "status".equals(field.getName())
-                            || "changedFields".equals(field.getName()) || "version".equals(field.getName())) {
+
+                    //Ignore List
+                    if (ignoreAttributeList.contains(field.getName())) {
                         continue;
                     }
                     if (field.get(newInstance) != null && field.get(oldInstance) != null) {
@@ -448,7 +457,7 @@ public class AgreementUtil {
         }
     }
 
-    public static void resetParticipantsStatus(AgreementNegotiationState agreementNegotiationState, AgreementEnumState status) {
+    public static void resetCounterPartiesStatus(AgreementNegotiationState agreementNegotiationState, AgreementEnumState status) {
         Map<String, String> allPartiesStatus = new HashMap<>();
         for (Party party : agreementNegotiationState.getCptyReciever()) {
             allPartiesStatus.put(party.getName().getOrganisation(), status.toString());

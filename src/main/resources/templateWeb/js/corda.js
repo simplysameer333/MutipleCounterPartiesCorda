@@ -527,8 +527,13 @@ app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $locat
 	}
 
     $scope.agreement = agreement;
-	$scope.agreement.substitutionDateFrom = $rootScope.convertToDt($scope.agreement.substitutionDateFrom);
-	$scope.agreement.substitutionDateTo = $rootScope.convertToDt($scope.agreement.substitutionDateTo);
+	if ($scope.agreement.substitutionDateFrom !== null) {
+		$scope.agreement.substitutionDateFrom = $rootScope.convertToDt($scope.agreement.substitutionDateFrom);
+	}
+	if ($scope.agreement.substitutionDateTo !== null) {
+		$scope.agreement.substitutionDateTo = $rootScope.convertToDt($scope.agreement.substitutionDateTo);
+	}
+
 	$scope.cond1 = $scope.agreement.specifiedConditions.indexOf('Illegality') > -1;;
 	$scope.cond2 = $scope.agreement.specifiedConditions.indexOf('Credit Event Upon Merger') > -1;;
 	$scope.cond3 = $scope.agreement.specifiedConditions.indexOf('Additional Termination Events') > -1;

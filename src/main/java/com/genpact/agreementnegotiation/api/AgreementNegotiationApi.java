@@ -5,7 +5,6 @@ import com.genpact.agreementnegotiation.flow.AgreementNegotiationAmendFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationInitiateFlow;
 import com.genpact.agreementnegotiation.flow.AgreementNegotiationSearchFlow;
 import com.genpact.agreementnegotiation.model.Agreement;
-import com.genpact.agreementnegotiation.model.ResponseException;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
@@ -78,9 +77,9 @@ public class AgreementNegotiationApi {
             AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
             agreementNegotiationState.setCptyInitiator(rpcOps.wellKnownPartyFromX500Name(myLegalName));
             agreementNegotiationState.setCptyReciever(extractCounterParties(agreement));
-
+            System.out.println("After  initFlow ==============================>" + agreementNegotiationState.toString());
             //Reset status of all participants
-            AgreementUtil.resetParticipantsStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
+            AgreementUtil.resetCounterPartiesStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
 
             //attach file if added and does not exists
             AgreementUtil.attachAttachmentHash(agreement, agreementNegotiationState);
@@ -132,7 +131,7 @@ public class AgreementNegotiationApi {
 
             //Initial status of all participants, this is required so that new participants get the status.
             //Later old partipants staus would be copied from previous state, check Amend flow
-            AgreementUtil.resetParticipantsStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
+            AgreementUtil.resetCounterPartiesStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
 
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
                     .startTrackedFlowDynamic(AgreementNegotiationAmendFlow.Initiator.class,
@@ -146,6 +145,7 @@ public class AgreementNegotiationApi {
             System.out.println("message " + msg);
 
             Agreement newAgreement = getAgreement(agreement.getAgrementName());
+            System.out.println("startAmendFlow ==============================>" + newAgreement.getChangedFields());
             Map<String, String> response = new HashMap<>();
             response.put("transactionId", result.getId().toString());
             if (newAgreement != null) {
@@ -202,6 +202,7 @@ public class AgreementNegotiationApi {
 
     /**
      * For future use for Open agreements only
+     *
      * @return
      */
     public List<Agreement> getOpenAgreements() {
@@ -373,7 +374,7 @@ public class AgreementNegotiationApi {
         Map<String, List<Agreement>> allAgreements = new HashMap();
         try {
             QueryCriteria criteriaOpen = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
-            QueryCriteria criteriaClosed= new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.CONSUMED);
+            QueryCriteria criteriaClosed = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.CONSUMED);
 
             Vault.Page<AgreementNegotiationState> results = rpcOps.vaultQueryByCriteria(criteriaClosed, AgreementNegotiationState.class);
             Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(criteriaOpen, AgreementNegotiationState.class);
@@ -421,8 +422,7 @@ public class AgreementNegotiationApi {
                 // If the latest  copy of agreement is NOT in Open List(UNCONSUMED) of agreement then it means
                 // this given node is removed from agreement negotiation. This logic needs to be changed if we
                 // decides to close (mark agreement as CONSUMED) after agreement is fully agreed.
-                if (!openAgreements.contains(latestlatestCopyOfAgreement.getAgrementName()))
-                {
+                if (!openAgreements.contains(latestlatestCopyOfAgreement.getAgrementName())) {
                     latestlatestCopyOfAgreement.setStatus(AgreementEnumState.REMOVED.toString());
                 }
                 agreementsList.add(latestlatestCopyOfAgreement);

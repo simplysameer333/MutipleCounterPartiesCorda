@@ -5,6 +5,7 @@ import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
+import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.flows.*;
@@ -110,6 +111,7 @@ public class AgreementNegotiationAmendFlow {
                 Page<AgreementNegotiationState> results = getServiceHub().getVaultService().
                         queryBy(AgreementNegotiationState.class, finalCriteria);
 
+
                 List<StateAndRef<AgreementNegotiationState>> previousStates = results.getStates();
                 if (previousStates.size() == 0)
                 {
@@ -133,11 +135,11 @@ public class AgreementNegotiationAmendFlow {
                 agreementNegotiationState.setStatus(AgreementEnumState.AMEND);
                 agreementNegotiationState.setAgrementLastAmendDate(new Date());
 
-                //Add initiator status
-                agreementNegotiationState.getAllPartiesStatus().
-                        put(agreementNegotiationState.getCptyInitiator().getName().getOrganisation(),
-                                AgreementEnumState.INITIAL.toString());
+                Party currentParty = getOurIdentity();
+                agreementNegotiationState.setLastUpdatedBy(currentParty);
 
+                //increment the version coming from UI
+                agreementNegotiationState.setVersion(agreementNegotiationState.getVersion() + 1);
 
                 //Copy old status in new map if they are still part of transaction
                 for (Map.Entry<String, String> partyStatus : previousState.getAllPartiesStatus().entrySet()) {
@@ -146,21 +148,35 @@ public class AgreementNegotiationAmendFlow {
                                 partyStatus.getValue());
                     }
                 }
+                //Add old status of Initiator
+                agreementNegotiationState.getAllPartiesStatus().
+                        put(agreementNegotiationState.getCptyInitiator().getName().getOrganisation(),
+                                previousState.getAllPartiesStatus().get(agreementNegotiationState.getCptyInitiator().getName().getOrganisation()));
 
-                //Update the status of current party
-                Party currentParty = getOurIdentity();
-                //agreementNegotiationState.getAllPartiesStatus().put(currentParty.getName().getOrganisation(),
-                //        AgreementEnumState.AMEND.toString());
-                agreementNegotiationState.getAllPartiesStatus().replaceAll((k, v) -> AgreementEnumState.AMEND.toString());
+                //Keep old status of only "counterparty" field is changed & at lest one party has Partial Accept status
+                // This is required because at least one party should be in "Agreed(FULLY_ACCEPTED)" state to mark the over status "Partially Accepted"
+                boolean isPartyAsAgreedStatus = false;
+                for (String status : agreementNegotiationState.getAllPartiesStatus().values()) {
+                    if (AgreementEnumState.FULLY_ACCEPTED.toString().equals(status)) {
+                        isPartyAsAgreedStatus = true;
+                    }
+                }
 
-                agreementNegotiationState.setLastUpdatedBy(currentParty);
+                HashMap<Object, Object> changedFields = AgreementUtil.compare(AgreementUtil.copyStateToVO(agreementNegotiationState),
+                        AgreementUtil.copyStateToVO(previousState));
 
-                //increment the version coming from UI
-                agreementNegotiationState.setVersion(agreementNegotiationState.getVersion() + 1);
+                System.out.println("New CHanged fields $$$$$$$$$$$$$$$$$$$$$$$$$$$$ " + changedFields);
+                if (isPartyAsAgreedStatus && changedFields.size() == 1 && changedFields.get("counterparty") != null) {
+                    agreementNegotiationState.setStatus(previousState.getStatus());
+                } else {
+                    //mark status to amend if any other field apart from counterparty is changed
+                    agreementNegotiationState.getAllPartiesStatus().replaceAll((k, v) -> AgreementEnumState.AMEND.toString());
+                    agreementNegotiationState.getAllPartiesStatus().
+                            put(agreementNegotiationState.getCptyInitiator().getName().getOrganisation(),
+                                    AgreementEnumState.AMEND.toString());
+                }
 
                 String outputContract = AgreementNegotiationContract.class.getName();
-                //List<PublicKey> requiredSigners = ImmutableList.of(previousState.getCptyReciever().get(0).getOwningKey(), previousState.getCptyInitiator().getOwningKey());
-                //Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Amend(), requiredSigners);
 
                 //Get public keys of all participants
                 List<PublicKey> requiredSigners = new ArrayList<>();
