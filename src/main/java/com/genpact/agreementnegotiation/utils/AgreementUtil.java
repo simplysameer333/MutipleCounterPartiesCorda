@@ -28,7 +28,10 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -44,15 +47,15 @@ import java.util.zip.ZipOutputStream;
 public class AgreementUtil {
     //Or whatever format fits best your needs.
     public static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    public static final String DIGITAL_SIGNATURE = "certificates/digitalSignature.jks";
+    public static final String DIGITAL_SIGNATURE = "digitalSignatures/";
     public static final char[] PASSWORD = "cordacapass".toCharArray();
     public static final String TEMPLATE_NAME = "agreementTemplate";
     public static final String TEMPLATE_FOLDER = "/agreementTemplates/";
 
     public static final int xStart = 40;
     public static final int xEnd = 150;
-    public static final int yStart = 700;
-    public static final int yEnd = 750;
+    public static final int yStart = 770;
+    public static final int yEnd = 820;
 
     public static <T> void copyAllFields(T to, T from) {
         Class<T> clazz = (Class<T>) from.getClass();
@@ -535,7 +538,11 @@ public class AgreementUtil {
         BouncyCastleProvider provider = new BouncyCastleProvider();
         Security.addProvider(provider);
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-        ks.load(new FileInputStream(DIGITAL_SIGNATURE), PASSWORD);
+        String partyNameWithoutSpaces = partyName.replaceAll("\\s+", "");
+        String digitalSignatureFileName = DIGITAL_SIGNATURE + partyNameWithoutSpaces + ".jks";
+
+        // String file = ;
+        ks.load(AgreementUtil.class.getClassLoader().getResourceAsStream(digitalSignatureFileName), PASSWORD);
         String alias = ks.aliases().nextElement();
         PrivateKey pk = (PrivateKey) ks.getKey(alias, PASSWORD);
         Certificate[] chain = ks.getCertificateChain(alias);
@@ -553,7 +560,7 @@ public class AgreementUtil {
         // Creating the appearance
         PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
         //This required to have space between digital signatures
-        int yDelta = 10 * (count * count);
+        int yDelta = 5 * (count * count);
         appearance.setVisibleSignature(new Rectangle(xStart, (yStart - yDelta), xEnd, (yEnd - yDelta)), reader.getNumberOfPages(), "signature of " + partyName);
         // Creating the signature
         ExternalDigest digest = new BouncyCastleDigest();
