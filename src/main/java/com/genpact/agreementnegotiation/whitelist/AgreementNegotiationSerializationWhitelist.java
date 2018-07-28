@@ -31,6 +31,7 @@ public class AgreementNegotiationSerializationWhitelist implements Serialization
         whiteList.add(java.io.File.class);
         whiteList.add(org.hibernate.MappingException.class);
         whiteList.add(org.hibernate.AnnotationException.class);
+
         return whiteList;
     }
 }

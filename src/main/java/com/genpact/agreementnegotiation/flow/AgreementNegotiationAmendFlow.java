@@ -112,6 +112,7 @@ public class AgreementNegotiationAmendFlow {
                         queryBy(AgreementNegotiationState.class, finalCriteria);
 
 
+
                 List<StateAndRef<AgreementNegotiationState>> previousStates = results.getStates();
                 if (previousStates.size() == 0)
                 {
@@ -127,13 +128,16 @@ public class AgreementNegotiationAmendFlow {
                 txBuilder.setNotary(notary);
 
                 progressTracker.setCurrentStep(OTHER_TX_COMPONENTS);
+
                 // We create the transaction components.
-                //AgreementUtil.copyAllFields(agreementNegotiationState, previousState);
                 agreementNegotiationState.setLinearId(previousState.getLinearId());
                 agreementNegotiationState.setAgrementInitiationDate(previousState.getAgrementInitiationDateAsDate());
                 agreementNegotiationState.setCptyInitiator(previousState.getCptyInitiator());
                 agreementNegotiationState.setStatus(AgreementEnumState.AMEND);
                 agreementNegotiationState.setAgrementLastAmendDate(new Date());
+
+                //make sure signedStream is reset to null
+                agreementNegotiationState.setSignedStream(null);
 
                 Party currentParty = getOurIdentity();
                 agreementNegotiationState.setLastUpdatedBy(currentParty);

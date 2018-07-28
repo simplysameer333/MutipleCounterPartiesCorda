@@ -6,7 +6,6 @@ import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -29,6 +28,7 @@ public class AgreementStateTemplate implements LinearState {
     private Map<String, String> allPartiesStatus = null;
     //first value of version
     private int version;
+    private Object signedStream;
 
     public String getAgrementName() {
         return agrementName;
@@ -177,8 +177,31 @@ public class AgreementStateTemplate implements LinearState {
         this.attachmentFileNames = attachmentFileNames;
     }
 
+    public Object getSignedStream() {
+        return signedStream;
+    }
+
+    public void setSignedStream(Object signedStream) {
+        this.signedStream = signedStream;
+    }
+
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return "AgreementStateTemplate{" +
+                "linearId=" + linearId +
+                ", agrementName='" + agrementName + '\'' +
+                ", agrementInitiationDate=" + agrementInitiationDate +
+                ", agrementAgreedDate=" + agrementAgreedDate +
+                ", cptyInitiator=" + cptyInitiator +
+                ", cptyReciever=" + cptyReciever +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", agrementLastAmendDate=" + agrementLastAmendDate +
+                ", status=" + status +
+                ", attachmentHash=" + attachmentHash +
+                ", attachmentHashCode=" + attachmentHashCode +
+                ", attachmentFileNames=" + attachmentFileNames +
+                ", allPartiesStatus=" + allPartiesStatus +
+                ", version=" + version +
+                '}';
     }
 }

@@ -172,6 +172,8 @@ public class AgreementNegotiationApi {
     public Response accept(Agreement agreement) {
         try {
             AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
+
+
             FlowProgressHandle<SignedTransaction> flowHandle = rpcOps
                     .startTrackedFlowDynamic(AgreementNegotiationAcceptFlow.Initiator.class,
                             agreementNegotiationState);
@@ -202,7 +204,6 @@ public class AgreementNegotiationApi {
 
     /**
      * For future use for Open agreements only
-     *
      * @return
      */
     public List<Agreement> getOpenAgreements() {

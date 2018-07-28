@@ -7,20 +7,52 @@ import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.genpact.agreementnegotiation.state.EligibleCollateralState;
 import com.genpact.agreementnegotiation.state.ThresholdState;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfSignatureAppearance;
+import com.itextpdf.text.pdf.PdfStamper;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.security.*;
+import com.itextpdf.tool.xml.XMLWorkerHelper;
 import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
+import net.corda.core.node.services.AttachmentStorage;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import java.io.*;
 import java.lang.reflect.Field;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.cert.Certificate;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class AgreementUtil {
-    public static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //Or whatever format fits best your needs.
+    //Or whatever format fits best your needs.
+    public static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static final String DIGITAL_SIGNATURE = "certificates/digitalSignature.jks";
+    public static final char[] PASSWORD = "cordacapass".toCharArray();
+    public static final String TEMPLATE_NAME = "agreementTemplate";
+    public static final String TEMPLATE_FOLDER = "/agreementTemplates/";
+
+    public static final int xStart = 40;
+    public static final int xEnd = 150;
+    public static final int yStart = 700;
+    public static final int yEnd = 750;
 
     public static <T> void copyAllFields(T to, T from) {
         Class<T> clazz = (Class<T>) from.getClass();
@@ -464,4 +496,112 @@ public class AgreementUtil {
         }
         agreementNegotiationState.setAllPartiesStatus(allPartiesStatus);
     }
+
+    public static ByteArrayOutputStream generatePDFofAgreement(AgreementNegotiationState agreementNegotiationState)
+            throws DocumentException, IOException, GeneralSecurityException {
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode("HTML");
+        templateResolver.setPrefix(TEMPLATE_FOLDER);
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+
+        Context context = new Context();
+
+        //define and and mention all placeholders here
+        context.setVariables(fillPlaceholders(agreementNegotiationState));
+
+        // Get the plain HTML with the resolved ${name} variable!
+        String html = templateEngine.process(TEMPLATE_NAME, context);
+
+        //creation of PDF
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Document document = new Document();
+        PdfWriter writer = PdfWriter.getInstance(document, out);
+        writer.setFullCompression();
+        document.open();
+        InputStream is = new ByteArrayInputStream(html.getBytes());
+        XMLWorkerHelper.getInstance().parseXHtml(writer, document, is);
+        document.close();
+        out.close();
+
+        return out;
+    }
+
+
+    public static ByteArrayOutputStream signPDF(ByteArrayOutputStream out, String partyName, int count)
+            throws GeneralSecurityException, IOException, DocumentException {
+
+        BouncyCastleProvider provider = new BouncyCastleProvider();
+        Security.addProvider(provider);
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        ks.load(new FileInputStream(DIGITAL_SIGNATURE), PASSWORD);
+        String alias = ks.aliases().nextElement();
+        PrivateKey pk = (PrivateKey) ks.getKey(alias, PASSWORD);
+        Certificate[] chain = ks.getCertificateChain(alias);
+
+        // Creating the reader and the stamper
+        PdfReader reader = new PdfReader(out.toByteArray());
+
+        PdfStamper stamper = PdfStamper.createSignature(reader, out, '\0');
+        //Adding blank page at the end for signature.
+        if (count == 1) {
+            stamper.insertPage(reader.getNumberOfPages() + 1,
+                    reader.getPageSizeWithRotation(1));
+        }
+
+        // Creating the appearance
+        PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
+        //This required to have space between digital signatures
+        int yDelta = 10 * (count * count);
+        appearance.setVisibleSignature(new Rectangle(xStart, (yStart - yDelta), xEnd, (yEnd - yDelta)), reader.getNumberOfPages(), "signature of " + partyName);
+        // Creating the signature
+        ExternalDigest digest = new BouncyCastleDigest();
+        ExternalSignature signature = new PrivateKeySignature(pk, DigestAlgorithms.SHA256, provider.getName());
+        MakeSignature.signDetached(appearance, digest, signature, chain, null, null, null,
+                0, MakeSignature.CryptoStandard.CMS);
+
+        return out;
+    }
+
+
+    public static byte[] zipBytes(String filename, byte[] input) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos);
+        ZipEntry entry = new ZipEntry(filename + ".pdf");
+        entry.setSize(input.length);
+        zos.putNextEntry(entry);
+        zos.write(input);
+        zos.closeEntry();
+        zos.close();
+        return baos.toByteArray();
+    }
+
+    public static void creationOfZIP(AgreementNegotiationState agreementNegotiationState, AttachmentStorage attachmentStorage,
+                                     ByteArrayOutputStream out, String fileSuffix) throws IOException {
+
+        String fileName = agreementNegotiationState.getAgrementName() + "_" + fileSuffix;
+        ByteArrayInputStream boi = new ByteArrayInputStream(AgreementUtil.zipBytes(fileName, out.toByteArray()));
+        SecureHash secureHash = attachmentStorage.importAttachment(boi);
+
+        //In case of accept, nothing is added from UI. Add final copy as nothing is taken from UI
+        Map<SecureHash, String> fileInfo = new HashMap<>();
+        fileInfo.put(secureHash, fileName);
+
+        //Either append final copy or add it with other attachments
+        if (MapUtils.isNotEmpty(agreementNegotiationState.getAttachmentHash())) {
+            agreementNegotiationState.getAttachmentHash().putAll(fileInfo);
+        } else {
+            agreementNegotiationState.setAttachmentHash(fileInfo);
+        }
+    }
+
+    public static Map<String, Object> fillPlaceholders(AgreementNegotiationState agreementNegotiationState) {
+
+        Map<String, Object> placeHolders = new HashMap<>();
+        placeHolders.put("name", agreementNegotiationState.getAgrementName());
+
+        return placeHolders;
+    }
+
 }
