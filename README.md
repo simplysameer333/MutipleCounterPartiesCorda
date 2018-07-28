@@ -26,7 +26,7 @@ This is demo application of Blockchain that uses Corda Plateform. For single cou
 			Starting corda.jar in <<location>>\JPMorganChase on debug port 5010
 			Starting corda-webserver.jar in <<location>>\JPMorganChase on debug port 5011
 			Starting corda.jar in <<location>>\Macquarie on debug port 5012
-            Starting corda-webserver.jar in <<location>>\Macquarie on debug port 5013
+			Starting corda-webserver.jar in <<location>>\Macquarie on debug port 5013
 			Started 9 processes
 			Finished starting nodes	
 
