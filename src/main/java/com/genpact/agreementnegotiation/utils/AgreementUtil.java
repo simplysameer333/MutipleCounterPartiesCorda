@@ -40,6 +40,7 @@ import java.security.Security;
 import java.security.cert.Certificate;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -47,6 +48,7 @@ import java.util.zip.ZipOutputStream;
 public class AgreementUtil {
     //Or whatever format fits best your needs.
     public static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static final SimpleDateFormat FORMAT_TIME = new SimpleDateFormat("H:mm");
     public static final String DIGITAL_SIGNATURE = "digitalSignatures/";
     public static final char[] PASSWORD = "cordacapass".toCharArray();
     public static final String TEMPLATE_NAME = "agreementTemplate";
@@ -516,6 +518,14 @@ public class AgreementUtil {
 
         // Get the plain HTML with the resolved ${name} variable!
         String html = templateEngine.process(TEMPLATE_NAME, context);
+        String eligibleCollateralStatesTable = createEligibleCollateralHTML(
+                agreementNegotiationState.getEligibleCollateralStates());
+        String thresholdsTable = createThresholdHTML(agreementNegotiationState.getThresholds());
+        String specifiedConditionTable = getSpecifiedConditionHTML(agreementNegotiationState);
+
+        html = html.replaceAll("thresholdsTable", thresholdsTable);
+        html = html.replaceAll("eligibleCollateralStatesTable", eligibleCollateralStatesTable);
+        html = html.replaceAll("specifiedConditionTable", specifiedConditionTable);
 
         //creation of PDF
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -605,10 +615,386 @@ public class AgreementUtil {
 
     public static Map<String, Object> fillPlaceholders(AgreementNegotiationState agreementNegotiationState) {
 
+        List<String> counterParties = new ArrayList<>();
+        for (Party party : agreementNegotiationState.getCptyReciever()) {
+            counterParties.add(party.getName().getOrganisation());
+        }
+        String counterPartyName = StringUtils.join(counterParties, ',');
+
+        //Start setting variables
         Map<String, Object> placeHolders = new HashMap<>();
+        String dateStr = AgreementUtil.FORMAT.format(new Date());
+        placeHolders.put("agreeDate", dateStr);
         placeHolders.put("name", agreementNegotiationState.getAgrementName());
+        placeHolders.put("cptyInitiator", agreementNegotiationState.getCptyInitiator().getName().getOrganisation());
+        placeHolders.put("cptyReciever", counterPartyName);
+        placeHolders.put("baseCurrency", agreementNegotiationState.getBaseCurrency() != null
+                ? StringUtils.join(agreementNegotiationState.getBaseCurrency(), ',') : "N.A");
+        placeHolders.put("eligibleCurrency", agreementNegotiationState.getEligibleCurrency() != null
+                ? StringUtils.join(agreementNegotiationState.getEligibleCurrency(), ',') : "N.A");
+        placeHolders.put("deliveryAmount", agreementNegotiationState.getDeliveryAmount() > 0
+                ? getDeiveryAndReturnAmount(agreementNegotiationState.getDeliveryAmount()) : "N.A");
+        placeHolders.put("returnAmount", agreementNegotiationState.getReturnAmount() > 0
+                ? getDeiveryAndReturnAmount(agreementNegotiationState.getReturnAmount()) : "N.A");
+        placeHolders.put("valuationAgent", StringUtils.isEmpty(agreementNegotiationState.getValuationAgent())
+                ? "N.A" : agreementNegotiationState.getValuationAgent());
+        placeHolders.put("valuationDate", StringUtils.isEmpty(agreementNegotiationState.getValuationDate())
+                ? "N.A" : agreementNegotiationState.getValuationDate());
+        placeHolders.put("valuationTime", StringUtils.isEmpty(agreementNegotiationState.getValuationTime())
+                ? "N.A" : agreementNegotiationState.getValuationTime());
+        placeHolders.put("notificationTime", StringUtils.isEmpty(agreementNegotiationState.getNotificationTime())
+                ? "N.A" : agreementNegotiationState.getNotificationTime());
+        placeHolders.put("consent", agreementNegotiationState.getConsent() ? "Yes" : "No");
+
+        String substituteDiff = "N.A";
+        Date substituteFrom = agreementNegotiationState.getSubstitutionDateFromAsDate();
+        Date substituteTo = agreementNegotiationState.getSubstitutionDateToAsDate();
+
+        if (substituteFrom != null && substituteTo != null && substituteTo.compareTo(substituteFrom) > 0) {
+            long diff = substituteTo.getTime() - substituteFrom.getTime();
+            substituteDiff = "" + TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+        }
+        placeHolders.put("substituteDiff", substituteDiff);
 
         return placeHolders;
     }
 
+
+    private static String getDeiveryAndReturnAmount(int index) {
+        index--; //this is because on UI index is from 1
+        List<String> returnValue = new ArrayList<>();
+        returnValue.add("Party A only pays");
+        returnValue.add("Party B only pays");
+        returnValue.add("Both Party A and Party B pay");
+
+        return returnValue.get(index);
+    }
+
+    private static String getSpecifiedConditionHTML(AgreementNegotiationState agreementNegotiationState) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<div class=\"center\" style=\"margin-left: 100px\">");
+        sb.append("<table>");
+        sb.append("<thead style=\"font-weight: bold\">");
+        sb.append("<tr>");
+        sb.append("<th>Item</th>");
+        sb.append("<th>Status</th>");
+        sb.append("</tr>");
+        sb.append("</thead>");
+        sb.append("<tbody>");
+
+        sb.append("<tr>");
+        sb.append("<td>");
+        sb.append("Illegality");
+        sb.append("</td>");
+        sb.append("<td>");
+        sb.append((agreementNegotiationState.getSpecifiedCondition().indexOf("Illegality") > -1) ? "Yes" : "No");
+        sb.append("</td>");
+        sb.append("</tr>");
+
+        sb.append("<tr>");
+        sb.append("<td>");
+        sb.append("Credit Event Upon Merger");
+        sb.append("</td>");
+        sb.append("<td>");
+        sb.append((agreementNegotiationState.getSpecifiedCondition().indexOf("Credit Event Upon Merger") > -1) ? "Yes" : "No");
+        sb.append("</td>");
+        sb.append("</tr>");
+
+        sb.append("<tr>");
+        sb.append("<td>");
+        sb.append("Additional Termination Events");
+        sb.append("</td>");
+        sb.append("<td>");
+        sb.append((agreementNegotiationState.getSpecifiedCondition().indexOf("Additional Termination Events") > -1) ? "Yes" : "No");
+        sb.append("</td>");
+        sb.append("</tr>");
+
+        sb.append("</tbody>");
+        sb.append("</table>");
+        sb.append("</div>");
+
+        return sb.toString();
+    }
+
+    private static String createThresholdHTML(List<ThresholdState> thresholds) {
+        StringBuilder sb = new StringBuilder();
+
+        if (CollectionUtils.isNotEmpty(thresholds)) {
+            sb.append("<div class=\"center\" style=\"margin-left: 30px\">");
+            sb.append("<table>");
+            sb.append("<thead style=\"font-weight: bold\">");
+            sb.append("<tr>");
+            sb.append("<th>Ratings</th>");
+            sb.append("<th>Currency</th>");
+            sb.append("<th>Threshold Amount</th>");
+            sb.append("<th>Party A</th>");
+            sb.append("<th>Party B</th>");
+            sb.append("</tr>");
+            sb.append("</thead>");
+            sb.append("<tbody>");
+
+            for (int i = 0; i < thresholds.size(); i++) {
+                ThresholdState thresholdState = thresholds.get(i);
+                sb.append("<tr>");
+                sb.append("<td>");
+
+                sb.append("<table>");
+                sb.append("<thead style=\"font-weight: bold\">");
+                sb.append("<tr>");
+                sb.append("<th>Type</th>");
+                sb.append("<th>Max</th>");
+                sb.append("<th>Min</th>");
+                sb.append("</tr>");
+                sb.append("</thead>");
+                sb.append("<tbody>");
+
+                if (StringUtils.isNotEmpty(thresholdState.getMoodysMax()) ||
+                        StringUtils.isNotEmpty(thresholdState.getMoodysMin())) {
+                    sb.append("<tr>");
+                    sb.append("<td>");
+                    sb.append("Moodys");
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(thresholdState.getMoodysMax());
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(thresholdState.getMoodysMin());
+                    sb.append("</td>");
+                    sb.append("</tr>");
+                }
+
+                if (StringUtils.isNotEmpty(thresholdState.getSpMax()) ||
+                        StringUtils.isNotEmpty(thresholdState.getSpMin())) {
+                    sb.append("<tr>");
+                    sb.append("<td>");
+                    sb.append("S & P");
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(thresholdState.getSpMax());
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(thresholdState.getSpMin());
+                    sb.append("</td>");
+                    sb.append("</tr>");
+                }
+
+                if (StringUtils.isNotEmpty(thresholdState.getFitchMax()) ||
+                        StringUtils.isNotEmpty(thresholdState.getFitchMin())) {
+                    sb.append("<tr>");
+                    sb.append("<td>");
+                    sb.append("Fitch");
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(thresholdState.getFitchMax());
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(thresholdState.getFitchMin());
+                    sb.append("</td>");
+                    sb.append("</tr>");
+                }
+
+                sb.append("</tbody>");
+                sb.append("</table>");
+                sb.append("</td>");
+
+                sb.append("<td>");
+                sb.append(thresholdState.getCurrencies());
+                sb.append("</td>");
+
+                sb.append("<td>");
+                sb.append(thresholdState.getAmount());
+                sb.append("</td>");
+
+                sb.append("<td>");
+                sb.append(thresholdState.getInitiatorAccepted() ? "Yes" : "No");
+                sb.append("</td>");
+                sb.append("<td>");
+                sb.append(thresholdState.getResponderAccecpted() ? "Yes" : "No");
+                sb.append("</td>");
+
+                sb.append("</tr>");
+            }
+
+            sb.append("</tbody>");
+            sb.append("</table>");
+            sb.append("</div>");
+
+        } else {
+            sb.append("N.A");
+        }
+
+        System.out.println("createThresholdHTML =====" + sb.toString());
+
+        return sb.toString();
+    }
+
+    private static String createEligibleCollateralHTML(List<EligibleCollateralState> eligibleCollateralStates) {
+        StringBuilder sb = new StringBuilder();
+
+        if (CollectionUtils.isNotEmpty(eligibleCollateralStates)) {
+            sb.append("<div class=\"center\" style=\"margin-left: 30px\">");
+            sb.append("<table>");
+            sb.append("<thead style=\"font-weight: bold\">");
+            sb.append("<tr>");
+            sb.append("<th>Country</th>");
+            sb.append("<th>Category</th>");
+            sb.append("<th>Qualifier / Currencies</th>");
+            sb.append("<th>Ratings</th>");
+            sb.append("<th>Maturity</th>");
+            sb.append("<th>Ranges</th>");
+            sb.append("<th>Party A</th>");
+            sb.append("<th>Party B</th>");
+            sb.append("</tr>");
+            sb.append("</thead>");
+            sb.append("<tbody>");
+
+            for (int i = 0; i < eligibleCollateralStates.size(); i++) {
+                EligibleCollateralState eligibleCollateralState = eligibleCollateralStates.get(i);
+
+                List<Range> rangeList = new ArrayList<>();
+                String rangesStateDate = eligibleCollateralState.getRanges();
+                String rangeArray[] = rangesStateDate.split("END");
+                for (String rangeValue : rangeArray) {
+                    String rangeValueArray[] = rangeValue.split(",");
+                    if (rangeValueArray.length == 3) {
+                        Range rangeVo = new Range();
+                        if (!"".equals(rangeValueArray[0])) {
+                            rangeVo.setRangeFrom(Integer.valueOf(rangeValueArray[0]));
+                        }
+                        if (!"".equals(rangeValueArray[1])) {
+                            rangeVo.setRangeTo(Integer.valueOf(rangeValueArray[1]));
+                        }
+                        if (!"".equals(rangeValueArray[2])) {
+                            rangeVo.setValuation(Integer.valueOf(rangeValueArray[2]));
+                        }
+                        rangeList.add(rangeVo);
+                    }
+                }
+
+                sb.append("<tr>");
+                sb.append("<td>");
+                sb.append(eligibleCollateralState.getRegion());
+                sb.append("</td>");
+                sb.append("<td>");
+                sb.append(eligibleCollateralState.getCategory());
+                sb.append("</td>");
+                sb.append("<td>");
+                if ("Cash".equals(eligibleCollateralState.getCategory()))
+                    sb.append(eligibleCollateralState.getCurrencies());
+                else
+                    sb.append(eligibleCollateralState.getQualifier());
+                sb.append("</td>");
+                //MOODY
+                sb.append("<td>");
+                sb.append("<table>");
+                sb.append("<thead style=\"font-weight: bold\">");
+                sb.append("<tr>");
+                sb.append("<th>Type</th>");
+                sb.append("<th>Max</th>");
+                sb.append("<th>Min</th>");
+                sb.append("</tr>");
+                sb.append("</thead>");
+                sb.append("<tbody>");
+
+                if (StringUtils.isNotEmpty(eligibleCollateralState.getMoodysMax()) ||
+                        StringUtils.isNotEmpty(eligibleCollateralState.getMoodysMin())) {
+                    sb.append("<tr>");
+                    sb.append("<td>");
+                    sb.append("Moodys");
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(eligibleCollateralState.getMoodysMax());
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(eligibleCollateralState.getMoodysMin());
+                    sb.append("</td>");
+                    sb.append("</tr>");
+                }
+
+                if (StringUtils.isNotEmpty(eligibleCollateralState.getSpMax()) ||
+                        StringUtils.isNotEmpty(eligibleCollateralState.getSpMin())) {
+                    sb.append("<tr>");
+                    sb.append("<td>");
+                    sb.append("S & P");
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(eligibleCollateralState.getSpMax());
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(eligibleCollateralState.getSpMin());
+                    sb.append("</td>");
+                    sb.append("</tr>");
+                }
+
+                if (StringUtils.isNotEmpty(eligibleCollateralState.getFitchMax()) ||
+                        StringUtils.isNotEmpty(eligibleCollateralState.getFitchMin())) {
+                    sb.append("<tr>");
+                    sb.append("<td>");
+                    sb.append("Fitch");
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(eligibleCollateralState.getFitchMax());
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(eligibleCollateralState.getFitchMin());
+                    sb.append("</td>");
+                    sb.append("</tr>");
+                }
+
+                sb.append("</tbody>");
+                sb.append("</table>");
+
+                sb.append("</td>");
+                sb.append("<td>");
+                sb.append(eligibleCollateralState.getRemMaturity());
+                sb.append("</td>");
+
+                sb.append("<td>");
+                sb.append("<table>");
+                sb.append("<thead style=\"font-weight: bold\">");
+                sb.append("<tr>");
+                sb.append("<th>From(Yrs)</th>");
+                sb.append("<th>To(Yrs)</th>");
+                sb.append("<th>Valuation%</th>");
+                sb.append("</tr>");
+                sb.append("</thead>");
+                sb.append("<tbody>");
+                for (int j = 0; j < rangeList.size(); j++) {
+                    Range rangeNew = rangeList.get(j);
+                    sb.append("<tr>");
+                    sb.append("<td>");
+                    sb.append(rangeNew.getRangeFrom() != 0 ? rangeNew.getRangeFrom() : "");
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(rangeNew.getRangeTo() != 0 ? rangeNew.getRangeTo() : "");
+                    sb.append("</td>");
+                    sb.append("<td>");
+                    sb.append(rangeNew.getValuation() != 0 ? rangeNew.getValuation() : "");
+                    sb.append("</td>");
+                    sb.append("</tr>");
+                }
+                sb.append("</tbody>");
+                sb.append("</table>");
+                sb.append("</td>");
+
+                sb.append("<td>");
+                sb.append(eligibleCollateralState.getInitiatorAccepted() ? "Yes" : "No");
+                sb.append("</td>");
+                sb.append("<td>");
+                sb.append(eligibleCollateralState.getResponderAccecpted() ? "Yes" : "No");
+                sb.append("</td>");
+
+                sb.append("</tr>");
+            }
+            sb.append("</tbody>");
+            sb.append("</table>");
+            sb.append("</div>");
+        } else {
+            sb.append("N.A");
+        }
+
+        System.out.println("createEligibleCollateralHTML =====" + sb.toString());
+        return sb.toString();
+    }
 }

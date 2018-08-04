@@ -7,7 +7,6 @@ import net.corda.core.identity.Party;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -120,7 +119,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
     public String getNotificationTime() {
         if (notificationTime != null) {
-            String dateStr = AgreementUtil.FORMAT.format(notificationTime);
+            String dateStr = AgreementUtil.FORMAT_TIME.format(notificationTime);
             return dateStr;
         }
         return "";
@@ -249,6 +248,25 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return "AgreementNegotiationState{" +
+                "baseCurrency='" + baseCurrency + '\'' +
+                ", eligibleCurrency=" + eligibleCurrency +
+                ", deliveryAmount=" + deliveryAmount +
+                ", returnAmount=" + returnAmount +
+                ", creditSupportAmount=" + creditSupportAmount +
+                ", products=" + products +
+                ", initialMargin=" + initialMargin +
+                ", valuationAgent='" + valuationAgent + '\'' +
+                ", valuationDate='" + valuationDate + '\'' +
+                ", valuationTime='" + valuationTime + '\'' +
+                ", notificationTime=" + notificationTime +
+                ", specifiedCondition=" + specifiedCondition +
+                ", substitutionDateFrom=" + substitutionDateFrom +
+                ", substitutionDateTo=" + substitutionDateTo +
+                ", consent=" + consent +
+                ", eligibleCollateralStates=" + eligibleCollateralStates +
+                ", thresholds=" + thresholds +
+                ", attachmentHash=" + attachmentHash +
+                '}';
     }
 }

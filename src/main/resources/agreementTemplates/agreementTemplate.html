@@ -1,5 +1,1737 @@
-<html>
-<body>
-<h1>Hi! My name is [[${name}]]!</h1>
+<html
+        xmlns:o="urn:schemas-microsoft-com:office:office"
+        xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+    <style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;
+	mso-font-charset:0;
+	mso-generic-font-family:swiss;
+	mso-font-pitch:variable;
+	mso-font-signature:-536870145 1073786111 1 0 415 0;}
+@font-face
+	{font-family:Tahoma;
+	panose-1:2 11 6 4 3 5 4 4 2 4;
+	mso-font-charset:0;
+	mso-generic-font-family:swiss;
+	mso-font-pitch:variable;
+	mso-font-signature:-520081665 -1073717157 41 0 66047 0;}
+@font-face
+	{font-family:"Bookman Old Style";
+	panose-1:2 5 6 4 5 5 5 2 2 4;
+	mso-font-charset:0;
+	mso-generic-font-family:roman;
+	mso-font-pitch:variable;
+	mso-font-signature:647 0 0 0 159 0;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-unhide:no;
+	mso-style-qformat:yes;
+	mso-style-parent:"";
+	mso-margin-top-alt:auto;
+	margin-right:0cm;
+	mso-margin-bottom-alt:auto;
+	margin-left:0cm;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;
+	mso-believe-normal-left:yes;}
+h2
+	{mso-style-priority:9;
+	mso-style-unhide:no;
+	mso-style-qformat:yes;
+	mso-style-link:"Heading 2 Char";
+	mso-margin-top-alt:auto;
+	margin-right:0cm;
+	mso-margin-bottom-alt:auto;
+	margin-left:0cm;
+	mso-pagination:widow-orphan;
+	mso-outline-level:2;
+	font-size:18.0pt;
+	font-family:"Times New Roman","serif";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;
+	font-weight:bold;}
+p.MsoHeader, li.MsoHeader, div.MsoHeader
+	{mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-style-link:"Header Char";
+	mso-margin-top-alt:auto;
+	margin-right:0cm;
+	mso-margin-bottom-alt:auto;
+	margin-left:0cm;
+	mso-pagination:widow-orphan;
+	tab-stops:center 225.65pt right 451.3pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;}
+p.MsoFooter, li.MsoFooter, div.MsoFooter
+	{mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-style-link:"Footer Char";
+	mso-margin-top-alt:auto;
+	margin-right:0cm;
+	mso-margin-bottom-alt:auto;
+	margin-left:0cm;
+	mso-pagination:widow-orphan;
+	tab-stops:center 225.65pt right 451.3pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;}
+p
+	{mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-margin-top-alt:auto;
+	margin-right:0cm;
+	mso-margin-bottom-alt:auto;
+	margin-left:0cm;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;}
+code
+	{mso-style-noshow:yes;
+	mso-style-priority:99;
+	font-family:"Courier New";
+	mso-ascii-font-family:"Courier New";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;
+	mso-hansi-font-family:"Courier New";
+	mso-bidi-font-family:"Courier New";}
+p.MsoAcetate, li.MsoAcetate, div.MsoAcetate
+	{mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-style-link:"Balloon Text Char";
+	mso-margin-top-alt:auto;
+	margin-right:0cm;
+	mso-margin-bottom-alt:auto;
+	margin-left:0cm;
+	mso-pagination:widow-orphan;
+	font-size:8.0pt;
+	font-family:"Tahoma","sans-serif";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;}
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
+	{mso-style-priority:34;
+	mso-style-unhide:no;
+	mso-style-qformat:yes;
+	margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:8.0pt;
+	margin-left:36.0pt;
+	line-height:105%;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;
+	mso-bidi-font-family:"Times New Roman";}
+span.Heading2Char
+	{mso-style-name:"Heading 2 Char";
+	mso-style-noshow:yes;
+	mso-style-priority:9;
+	mso-style-unhide:no;
+	mso-style-locked:yes;
+	mso-style-link:"Heading 2";
+	mso-ansi-font-size:13.0pt;
+	mso-bidi-font-size:13.0pt;
+	font-family:"Cambria","serif";
+	mso-ascii-font-family:Cambria;
+	mso-ascii-theme-font:major-latin;
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:major-fareast;
+	mso-hansi-font-family:Cambria;
+	mso-hansi-theme-font:major-latin;
+	mso-bidi-font-family:"Times New Roman";
+	mso-bidi-theme-font:major-bidi;
+	color:#4F81BD;
+	mso-themecolor:accent1;
+	font-weight:bold;}
+span.HeaderChar
+	{mso-style-name:"Header Char";
+	mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-style-unhide:no;
+	mso-style-locked:yes;
+	mso-style-link:Header;
+	mso-ansi-font-size:12.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman","serif";
+	mso-ascii-font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;
+	mso-hansi-font-family:"Times New Roman";
+	mso-bidi-font-family:"Times New Roman";}
+span.FooterChar
+	{mso-style-name:"Footer Char";
+	mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-style-unhide:no;
+	mso-style-locked:yes;
+	mso-style-link:Footer;
+	mso-ansi-font-size:12.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:"Times New Roman","serif";
+	mso-ascii-font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;
+	mso-hansi-font-family:"Times New Roman";
+	mso-bidi-font-family:"Times New Roman";}
+span.BalloonTextChar
+	{mso-style-name:"Balloon Text Char";
+	mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-style-unhide:no;
+	mso-style-locked:yes;
+	mso-style-link:"Balloon Text";
+	mso-ansi-font-size:8.0pt;
+	mso-bidi-font-size:8.0pt;
+	font-family:"Tahoma","sans-serif";
+	mso-ascii-font-family:Tahoma;
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;
+	mso-hansi-font-family:Tahoma;
+	mso-bidi-font-family:Tahoma;}
+p.Default, li.Default, div.Default
+	{mso-style-name:Default;
+	mso-style-priority:99;
+	mso-style-unhide:no;
+	margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";
+	mso-fareast-font-family:"Times New Roman";
+	mso-fareast-theme-font:minor-fareast;
+	color:black;}
+span.SpellE
+	{mso-style-name:"";
+	mso-spl-e:yes;}
+span.GramE
+	{mso-style-name:"";
+	mso-gram-e:yes;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	mso-default-props:yes;
+	font-size:10.0pt;
+	mso-ansi-font-size:10.0pt;
+	mso-bidi-font-size:10.0pt;}
+ /* Page Definitions */
+ @page
+	{mso-footnote-separator:url("agreementTemplateF_files/header.html") fs;
+	mso-footnote-continuation-separator:url("agreementTemplateF_files/header.html") fcs;
+	mso-endnote-separator:url("agreementTemplateF_files/header.html") es;
+	mso-endnote-continuation-separator:url("agreementTemplateF_files/header.html") ecs;}
+@page WordSection1
+	{size:595.3pt 841.9pt;
+	margin:72.0pt 72.0pt 72.0pt 72.0pt;
+	mso-header-margin:35.4pt;
+	mso-footer-margin:35.4pt;
+	mso-paper-source:0;}
+div.WordSection1
+	{page:WordSection1;}
+ /* List Definitions */
+ @list l0
+	{mso-list-id:684332555;
+	mso-list-template-ids:-1122049476;}
+@list l0:level1
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:36.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l0:level2
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:72.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l0:level3
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:108.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l0:level4
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:144.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l0:level5
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:180.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l0:level6
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:216.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l0:level7
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:252.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l0:level8
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:288.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l0:level9
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:324.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l1
+	{mso-list-id:995842224;
+	mso-list-type:hybrid;
+	mso-list-template-ids:1360329456 964469254 134807577 134807579 134807567 134807577 134807579 134807567 134807577 134807579;}
+@list l1:level1
+	{mso-level-number-format:alpha-upper;
+	mso-level-text:"\(%1\)";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:111.75pt;
+	text-indent:-39.75pt;
+	mso-bidi-font-family:"Courier New";
+	color:black;}
+@list l1:level2
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:126.0pt;
+	text-indent:-18.0pt;}
+@list l1:level3
+	{mso-level-number-format:roman-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:right;
+	margin-left:162.0pt;
+	text-indent:-9.0pt;}
+@list l1:level4
+	{mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:198.0pt;
+	text-indent:-18.0pt;}
+@list l1:level5
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:234.0pt;
+	text-indent:-18.0pt;}
+@list l1:level6
+	{mso-level-number-format:roman-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:right;
+	margin-left:270.0pt;
+	text-indent:-9.0pt;}
+@list l1:level7
+	{mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:306.0pt;
+	text-indent:-18.0pt;}
+@list l1:level8
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:342.0pt;
+	text-indent:-18.0pt;}
+@list l1:level9
+	{mso-level-number-format:roman-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:right;
+	margin-left:378.0pt;
+	text-indent:-9.0pt;}
+@list l2
+	{mso-list-id:1035890243;
+	mso-list-template-ids:-1586356912;}
+@list l2:level1
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:36.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level2
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:72.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level3
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:108.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level4
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:144.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level5
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:180.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level6
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:216.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level7
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:252.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level8
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:288.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level9
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:324.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+-->
+
+    </style>
+
+    <style>
+p.MsoNormal
+	{margin-left:75.0pt;}
+
+	
+table {
+    border-collapse: collapse;
+	font-size:	10px;
+}
+
+table, td, th {
+    border: 1px solid black;
+	font-size:	10px;
+}
+
+table.center {
+    margin-left: auto;
+    margin-right: auto;
+}
+	
+
+    </style>
+
+</head>
+
+<body lang=EN-GB style='tab-interval:36.0pt;margin-left:75.0pt;margin-right:75.0pt'>
+
+<div>
+
+
+    <p><strong><span style='font-size:10.0pt;color:black'><span style="float: left;">(Bilateral Form)</span>
+		<span style="display:block; float: right !important;">	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		(ISDA Agreements Subject to New York Law Only) </span></span></strong>
+    </p>
+
+
+    <p><strong>
+	<span style='font-size:21.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family: "Courier New";color:black'>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2018 CREDIT SUPPORT ANNEX (VM) 
+	</span>
+    </strong>
+    </p>
+
+
+    <p>
+        <code><span style='font-size:9.5pt;font-family:"Bookman Old Style","serif"; color:black;'>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	to the Schedule to the </span></code></p>
+
+    <p>
+        <code><span style='font-size:9.5pt;font-family:"Bookman Old Style","serif"; color:black;'>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+			ISDA Master Agreement</span></code></p>
+    <p>
+        <code><span style='font-size:9.5pt;font-family:"Bookman Old Style","serif"; color:black;'>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	dates as of </span></code>
+        <code><span
+                style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black;
+background:yellow'>[[${agreeDate}]]</span></code></p>
+
+    <p>
+        <code><span style='font-size:9.5pt;font-family:"Bookman Old Style","serif"; color:black;'>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	between</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:center'><code>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black;
+background:yellow'>
+[[${cptyInitiator}]]</span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span style='background:yellow'>[[${cptyReciever}]]</span></span></code></p>
+
+    <p align=center style='margin:0cm;margin-bottom:.0001pt;text-align:center'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			(Party A)
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+			(Party B)</span></code></p>
+
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code>
+    </p>
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><span
+    ><strong><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New";color:black; background:yellow'>Agreement Name : [[${name}]]</span></strong>
+</span>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>This
+Annex supplements, forms part of, and is subject to, the above-referenced Agreement, is part of its Schedule and is a Credit Support Document under this
+Agreement with respect to each party.</span></code></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>Accordingly, the parties agree as follows<span>:<span
+            style='mso-spacerun:yes'>
+</span></span> </span></code></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><span
+    ><strong><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New";color:black'>Paragraph 1.</span></strong></span><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'> Interpretation </span></strong></p>
+
+    <ol start=1 type=a>
+        <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo3;
+     tab-stops:list 36.0pt'><em><b><span style='font-size:10.0pt;font-family:
+     "Bookman Old Style","serif";mso-bidi-font-family:"Courier New"'>Definitions
+     and Inconsistency</span></b></em><strong><span style='font-size:10.0pt;
+     font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New"'>.
+     </span></strong><code><span style='font-size:10.0pt;font-family:"Times New Roman","serif"'>Capitalized
+     terms not otherwise defined herein or elsewhere in this Agreement have the
+     meanings specified pursuant to Paragraph 12, and all references in this
+     Annex to Paragraphs are to Paragraphs of this Annex. In the event of any
+     inconsistency between this Annex and the other provisions of this
+     Schedule, this Annex will prevail, and in the event of any inconsistency
+     between Paragraph 13 and the other provisions of this Annex, Paragraph 13
+     will prevail.</span></code><span style='mso-fareast-font-family:"Times New Roman"'>
+     <o:p></o:p></span></li>
+        <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo3;
+     tab-stops:list 36.0pt'><em><b><span style='font-size:10.0pt;font-family:
+     "Bookman Old Style","serif";mso-bidi-font-family:"Courier New"'>Secured
+     Party and <span>Pledgor</span></span></b></em><strong><span
+                style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+     mso-bidi-font-family:"Courier New"'>. </span></strong><code><span
+                style='font-size:10.0pt;font-family:"Times New Roman","serif"'>All
+     references in this Annex to the Secured Party will be to either party when
+     acting in that capacity and all corresponding references to the<span
+                    style='mso-spacerun:yes'>  </span><span>Pledgor</span> will
+     be to the other party when acting in that capacity; </span></code><em><span
+                style='font-size:10.0pt'>provided</span></em><code><span style='font-size:
+     10.0pt;font-family:"Times New Roman","serif"'>, </span></code><em><span
+                style='font-size:10.0pt'>however</span></em><code><span style='font-size:
+     10.0pt;font-family:"Times New Roman","serif"'>, that if Other Posted
+     Support (VM) is held by a party to this Annex, all references herein to
+     that party as the Secured Party with respect to that Other Posted Support
+     (VM) will be to that party as the beneficiary thereof and will not subject
+     that support or that party as the beneficiary thereof to provisions of law
+     generally relating to security interests and secured parties.</span></code><span
+                style='mso-fareast-font-family:"Times New Roman"'> <o:p></o:p></span></li>
+
+        <li class=MsoNormal style='text-align:justify;mso-list:l0 level1 lfo3;
+     tab-stops:list 36.0pt'><em><b><span style='font-size:10.0pt;font-family:
+     "Bookman Old Style","serif";mso-bidi-font-family:"Courier New"'>Scope of this Annex and the Other CSA
+	 </span></b></em><strong><span style='font-size:10.0pt;
+     font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New"'>.
+     </span></strong><code><span style='font-size:10.0pt;font-family:"Times New Roman","serif"'>The only Transactions which
+	will be relevant for the purposes of determining Exposure under this Annex will
+	be the Covered Transactions specified in Paragraph 13. Each Other CSA, if any,
+	is hereby amended such that the Transactions that will be relevant for purposes
+	of determining Exposure thereunder, if any, will exclude the Covered
+	Transactions. Except as provided in Paragraphs 8(a), 8(b) and 11(j), nothing in
+	this Annex will affect the rights and obligations, if any, of either party with
+	respect to independent amounts or initial margin under each Other
+	CSA, if any, with respect to Transactions that are Covered Transactions.
+	</span></code><span style='mso-fareast-font-family:"Times New Roman"'>
+     <o:p></o:p></span></li>
+
+
+    </ol>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><span><strong><span
+            style='font-size:10.0pt;color:black'>Paragraph 2.</span></strong></span><strong><span
+            style='font-size:10.0pt;color:black'> Security Interest </span></strong><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>Each party, as the <span
+    >Pledgor</span>, hereby pledges to the other party, as the Secured
+Party, as security for its Obligations, and grants to the Secured Party a first
+priority continuing security interest in, lien on and right of Set-off against
+all Posted Collateral (VM) Transferred to or received by the Secured Party
+hereunder. Upon the Transfer by the Secured Party to the <span>Pledgor</span>
+of Posted Collateral (VM), the security interest and lien granted hereunder on
+that Posted Collateral (VM) will be released immediately and, to the extent
+possible, without any further action by either party.</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><span><strong><span
+            style='font-size:10.0pt;color:black'>Paragraph 3.</span></strong></span><strong><span
+            style='font-size:10.0pt;color:black'> Credit Support Obligations </span></strong><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(a) </span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Delivery Amount (VM)</span></b></em><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>. </span></strong><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>Subject to Paragraphs 4
+and 5, upon a demand made by the Secured Party on or promptly following a
+Valuation Date, if the Delivery Amount (VM) for that Valuation Date equals or
+exceeds the <span>Pledgor</span> Minimum Transfer Amount, then
+the <span>Pledgor</span> will Transfer to the Secured Party
+Eligible Credit Support (VM) having a Value as of the date of Transfer at least
+equal to the applicable Delivery Amount (VM) (rounded pursuant to Paragraph
+13). Unless otherwise specified in Paragraph 13, the </span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Delivery Amount (VM<span>)<code><span
+            style='font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Bookman Old Style";
+font-weight:normal;font-style:normal'></span></code></span></span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>
+applicable to the <span>Pledgor</span> for any Valuation Date will
+equal the amount by which: </span></code><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(<span>i</span>)
+<span>the</span> Secured Party Exposure exceeds </span></code><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(ii) <span>the</span>
+Value as of that Valuation Date of all Posted Credit Support (VM) held by the
+Secured Party. </span></code><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(b) </span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Return Amount (VM)</span></b></em><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>. </span></strong><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>Subject to Paragraphs 4
+and 5, upon a demand made by the <span>Pledgor</span> on or
+promptly following a Valuation Date, if the Return Amount (VM) for that
+Valuation Date equals or exceeds the Secured <span>Party</span>
+Minimum Transfer Amount, then the Secured Party will Transfer to the <span
+        >Pledgor</span> Posted Credit Support (VM) specified by the <span
+        >Pledgor</span> in that demand having a Value as of the date of
+Transfer as close as practicable to the applicable Return Amount (VM) (rounded
+pursuant to Paragraph 13). Unless otherwise specified in Paragraph 13, the </span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Return Amount</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> applicable to the
+Secured Party for any Valuation Date will equal the amount by which: </span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(<span>i</span>)
+<span>the</span> Value as of that Valuation Date of all Posted
+Credit Support (VM) held by the Secured Party exceeds </span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(ii) <span>the</span>
+Secured <span>Party€ž¢s</span> Exposure. </span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><strong><span style='font-size:10.0pt;
+color:black'>&nbsp;</span></strong><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><strong><span style='font-size:10.0pt;
+color:black'>&nbsp;</span></strong><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><span><strong><span
+            style='font-size:10.0pt;color:black'>Paragraph 4.</span></strong></span><strong><span
+            style='font-size:10.0pt;color:black'> Conditions Precedent, Transfer Timing,
+Calculations and Substitutions </span></strong><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(a) </span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Conditions Precedent</span></b></em><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>. </span></strong><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>Unless otherwise specified
+in Paragraph 13, each Transfer obligation of the <span>Pledgor</span>
+under Paragraphs 3, 5 and 6(d) and of the Secured Party under Paragraphs 3,
+4(d)(ii), 5, 6(d) and 11(h) is subject to the conditions precedent that: </span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(<span>i</span>)
+no Event of Default, Potential Event of Default or Specified Condition has
+occurred and is continuing with respect to the other party; and </span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(ii) no Early Termination
+Date for which any unsatisfied payment obligations exist has occurred or been
+designated as the result of an Event of Default or Specified Condition with
+respect to the other party. </span></code><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(b) </span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Transfer Timing</span></b></em><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>. </span></strong><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>Subject to Paragraphs 4(a)
+and 5 and unless otherwise specified in Paragraph 13, if a demand for the
+Transfer of Eligible Credit Support (VM) or Posted Credit Support (VM) is made
+by the Notification Time, then the relevant Transfer will be made not later
+than the close of business on the Regular Settlement Day; if a demand is made
+after the Notification Time, then the relevant Transfer will be made not later
+than the close of business on the next Local Business Day following the Regular
+Settlement Day.</span></code><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(c) </span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Calculations</span></b></em><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>. </span></strong><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>All calculations of Value
+and Exposure for purposes of Paragraphs 3 and 6(d) will be made by the
+Valuation Agent as of the Valuation Time; </span></code><em><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>provided </span></em><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'>that the Valuation
+Agent may use, in the case of any calculation of </span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(<span>i</span>)
+Value, Values most recently reasonably available for close of business in the
+relevant market for the relevant Eligible Credit Support (VM) as of the
+Valuation Time and </span></code><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(ii) Exposure, relevant
+information or data most recently reasonably available for close of business in
+the relevant market(s) as of the Valuation Time. </span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>The Valuation Agent will
+notify each party (or the other party, if the Valuation Agent is a party) of
+its calculations not later than the Notification Time on the Local Business Day
+following the applicable Valuation Date (or in the case of Paragraph 6(d),
+following the date of calculation).</span></code><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(d) </span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Substitutions</span></b></em><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>. </span></strong><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(<span>i</span>)
+Unless otherwise specified in Paragraph 13, upon notice to the Secured Party
+specifying the items of Posted Credit Support (VM) to be exchanged, the <span
+        >Pledgor</span> may, on any Local Business Day, Transfer to the
+Secured Party substitute Eligible Credit Support (VM) (the </span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Substitute Credit Support (VM)</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'>); and </span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>(ii) subject to Paragraph
+4(a), the Secured Party will Transfer to the <span>Pledgor</span>
+the items of Posted Credit Support (VM) specified by the <span>Pledgor</span>
+in its notice not later than the Local Business Day following the date on which
+the Secured Party receives the Substitute Credit Support (VM), unless otherwise
+specified in Paragraph 13 (the </span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Substitution Date</span></b></em><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Bookman Old Style";
+color:black'></span></code><code><span style='font-size:10.0pt;font-family:
+"Bookman Old Style","serif";color:black'>); </span></code><em><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>provided </span></em><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'>that the Secured
+Party will only be obligated to Transfer Posted Credit Support (VM) with a
+Value as of the date of Transfer of that Posted Credit Support (VM) equal to the
+Value as of that date of the Substitute Credit Support (VM).</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><span><strong><span
+            style='font-size:10.0pt;color:black'>Paragraph 5.</span></strong></span><strong><span
+            style='font-size:10.0pt;color:black'> Dispute Resolution</span></strong><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'><span
+            style='mso-spacerun:yes'>   </span><b style='mso-bidi-font-weight:normal'>NA</b></span></code><strong><span
+            style='font-size:10.0pt;color:black'>&nbsp;</span></strong><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><strong><span style='font-size:10.0pt;
+color:black'>&nbsp;</span></strong><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><span><strong><span
+            style='font-size:10.0pt;color:black'>Paragraph 6.</span></strong></span><strong><span
+            style='font-size:10.0pt;color:black'> Holding and Using Posted Collateral (VM)</span></strong><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'><span
+            style='mso-spacerun:yes'>   </span><b style='mso-bidi-font-weight:normal'>NA</b></span></code><strong><span
+            style='font-size:10.0pt;color:black'>&nbsp;</span></strong><span
+            style='color:black'> </span><strong><span style='font-size:10.0pt;color:black'>&nbsp;</span></strong><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><strong><span style='font-size:10.0pt;
+color:black'>&nbsp;</span></strong><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><span><strong><span
+            style='font-size:10.0pt;color:black'>Paragraph 7.</span></strong></span><strong><span
+            style='font-size:10.0pt;color:black'> Events of Default</span></strong><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'><span
+            style='mso-spacerun:yes'>   </span><b style='mso-bidi-font-weight:normal'>NA</b></span></code><strong><span
+            style='font-size:10.0pt;color:black'>&nbsp;</span></strong><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><strong><span style='font-size:10.0pt;
+color:black'>&nbsp;</span></strong><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><span><strong><span
+            style='font-size:10.0pt;color:black'>Paragraph 8.</span></strong></span><strong><span
+            style='font-size:10.0pt;color:black'>Certain Rights and Remedies</span></strong><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'><span
+            style='mso-spacerun:yes'>   </span><b style='mso-bidi-font-weight:normal'>NA</b></span></code><b
+            style='mso-bidi-font-weight:normal'><span style='color:black'><o:p></o:p></span></b></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-left:33.0pt'><b><span lang=EN-US
+                                           style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'><span style='mso-spacerun:yes'> </span><span>Paragraph 9.</span>
+Representations <o:p></o:p></span></b></p>
+
+    <p style='margin-left:33.0pt'><b><span lang=EN-US
+                                           style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'>&nbsp;<span style='mso-spacerun:yes'>  </span>NA<o:p></o:p></span></b></p>
+
+
+    <p style='margin-left:33.0pt'><b><span lang=EN-US
+                                           style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'>&nbsp;<o:p></o:p></span></b></p>
+
+    <p style='margin-left:33.0pt'><b><span lang=EN-US
+                                           style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'><span style='mso-spacerun:yes'> </span><span>Paragraph 10.</span>
+Representations <o:p></o:p></span></b></p>
+
+    <p style='margin-left:33.0pt'><b><span lang=EN-US
+                                           style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'>&nbsp;<span style='mso-spacerun:yes'>  </span>NA<o:p></o:p></span></b></p>
+
+    <p style='margin-top:0cm;margin-right:75.0pt;margin-bottom:0cm;
+margin-left:108.0pt;margin-bottom:.0001pt'><b><span lang=EN-US
+                                                    style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'>&nbsp;<o:p></o:p></span></b></p>
+
+    <p style='margin-left:33.0pt'><b><span lang=EN-US
+                                           style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'><span style='mso-spacerun:yes'> </span><span>Paragraph 11.</span>
+Representations <o:p></o:p></span></b></p>
+
+    <p style='margin-left:33.0pt'><b><span lang=EN-US
+                                           style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'>&nbsp;<span style='mso-spacerun:yes'>  </span>NA<o:p></o:p></span></b></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><span style='color:black'><o:p>&nbsp;</o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><span style='color:black'><o:p>&nbsp;</o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><span><strong><span
+            style='font-size:10.0pt;color:black'>Paragraph 12.</span></strong></span><strong><span
+            style='font-size:10.0pt;color:black'> Definitions</span></strong><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><strong><span style='font-size:10.0pt;
+color:black'>&nbsp;</span></strong><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>As used in this Annex: </span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><em><b><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Base Currency</span></b></em><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Bookman Old Style";
+color:black'></span></code><code><span style='font-size:10.0pt;font-family:
+"Bookman Old Style","serif";color:black'> means the currency specified as such
+in Paragraph 13.</span></code><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Delivery Amount (VM<span>)<code><span
+            style='font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Bookman Old Style";
+font-weight:normal;font-style:normal'></span></code></span></span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>
+has the meaning specified in Paragraph 3(a).</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Eligible Collateral (VM)</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> has the meaning
+specified in Paragraph 13. </span></code><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Eligible Currency</span></b></em><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> means each
+currency specified as such in Paragraph 13, if such currency is freely
+available.</span></code><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Minimum Transfer Amount</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> means, with
+respect to a party, the amount specified as such for that party in Paragraph
+13; if no amount is specified, zero. </span></code><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Notification Time</span></b></em><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> has the meaning
+specified in Paragraph 13.</span></code><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Return Amount (VM)</span></b></em><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> has the meaning
+specified in Paragraph 3(b).</span></code><span style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Specified Condition</span></b></em><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> means, with
+respect to a party, any event specified as such for that party in Paragraph 13.</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><em><b><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'><span style='mso-spacerun:yes'> </span>Substitution Date</span></b></em><code>
+        <span style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'> has the meaning specified in Paragraph 4(d<span>)(</span>ii).</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Valuation Agent</span></b></em><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> has the meaning
+specified in Paragraph 13. </span></code><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Valuation Date</span></b></em><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> means, unless
+otherwise specified in Paragraph 13, each day from, and including, the date of
+this Annex, that is a day on which commercial banks are open for business
+(including dealings in foreign exchange and foreign currency deposits) in at
+least one Valuation Date Location for Party A and at least one Valuation Date
+Location for Party B. </span></code><span style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Valuation Time</span></b></em><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> means, unless
+otherwise specified in Paragraph 13, the time as of which the Valuation Agent
+computes its end of day valuations of derivatives transactions in the ordinary
+course of its business (or such other commercially reasonable convenient time
+on the relevant day as the Valuation Agent may determine).</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify;page-break-before:always'><span
+    ><strong><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New"'>Paragraph 13.</span></strong></span><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New"'> Elections and Variables </span></strong><span style='color:
+black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif"'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif"'>(a) </span></code><em><b><span
+            style='font-size:10.0pt'>Base Currency and Eligible Currency. </span></b></em><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif"'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif"'>(<span>i</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='mso-spacerun:yes'> 
+</span></span></code><em><b><span style='font-size:10.0pt'>Base Currency</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif"'> means United States
+Dollars, unless otherwise specified here:<span style='mso-spacerun:yes'> 
+</span></span></code><code><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+background:yellow'>[[${baseCurrency}]]</span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif"'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif"'>(ii)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='mso-spacerun:yes'>  </span></span></code><em><b><span
+            style='font-size:10.0pt'>Eligible Currency</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif"'> means the
+Base Currency and each other currency specified here:<span
+                style='mso-spacerun:yes'>  </span></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";background:yellow'>[[${eligibleCurrency}]]</span></code><span
+            style='color:black'><o:p></o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code><span
+            style='color:black'> <o:p></o:p></span></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(c)
+</span></code><em><b><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New";color:black'>Credit Support Obligations</span></b></em><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>. </span></strong></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(<span
+    >i</span>) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Delivery Amount (VM) and Return Amount (VM)</span></b></em><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>. </span></strong></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:108.0pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:-36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>(A)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='mso-spacerun:yes'>  </span></span></code><em><b><span
+            style='font-size:10.0pt;color:black'>Delivery Amount (VM)</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'> has the meaning specified in Paragraph 3(a), unless otherwise specified here: </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";background:
+yellow'>[[${deliveryAmount}]]</span></code></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:108.0pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:-36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>(B)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='mso-spacerun:yes'>  </span></span></code><em><b><span
+            style='font-size:10.0pt;color:black'>Return Amount (VM)</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'> has the meaning specified in Paragraph 3(b), unless otherwise specified here: <span
+            style='background:yellow'>[[${returnAmount}]]</span></span></code></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:72.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:72.0pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:-36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>ii)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></code><em><b><span
+            style='font-size:10.0pt;color:black'>Eligible Collateral (VM)</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>.
+Subject to Paragraph 11(g), if applicable, and each Credit Support Eligibility
+Condition (VM) applicable to it specified in Paragraph 13, if any, the
+following items will qualify as<span style='mso-spacerun:yes'>  </span></span></code><em><b><span
+            style='font-size:10.0pt;color:black'>Eligible Collateral (VM)</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'> for the party specified (as the <span>Pledgor</span>):</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'><span
+            style='mso-tab-count:1'>               </span>&nbsp;</span></code></p>
+
+    <div style='margin-left:72.0pt;'>
+        eligibleCollateralStatesTable
+    </div>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'>
+        <o:p>&nbsp;</o:p>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(iii)
+</span></code><em><b><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New";color:black'>Thresholds</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif"'> </span></code></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:111.75pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:-39.75pt;mso-list:l1 level1 lfo5'><span
+            lang=EN-US style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-fareast-font-family:"Bookman Old Style";mso-bidi-font-family:"Bookman Old Style";
+color:black;mso-ansi-language:EN-US'><span style='mso-list:Ignore'>(A)<span
+            style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><span lang=EN-US style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";mso-ansi-language:EN-US'><b><i>Minimum
+Transfer Amount</i></b></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:111.75pt;
+margin-bottom:.0001pt;text-align:justify'><span lang=EN-US style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:EN-US'><o:p>&nbsp;</o:p></span></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:75.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+    <div style='margin-left:72.0pt;'>
+        thresholdsTable
+    </div>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:75.0pt;
+margin-bottom:.0001pt;text-align:justify'>
+        <o:p>&nbsp;</o:p>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>(d) </span></code><em><b><span
+            style='font-size:10.0pt;color:black'>Valuation and Timing. </span></b></em></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:72.0pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:-36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(<span
+    >i</span>) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Valuation Agent</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> means, for
+purposes of Paragraphs 3 and 5, the party making the demand under Paragraph 3,
+and, for purposes of Paragraph 6(d), the Secured Party, as applicable, unless
+otherwise specified here: <span style='background:yellow'>[[${valuationAgent}]]</span></span></code></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:72.0pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:-36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>(<span
+    >ii</span>) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+            style='mso-spacerun:yes'>  </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Valuation Date</span></b></em><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'> has the meaning specified
+in Paragraph 12, unless otherwise specified here: <span
+                style='background:yellow'>[[${valuationDate}]]</span></span></code></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:72.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>For purposes of
+determining the Valuation Date and clause (iii) of the definition <span
+        >of<span style='mso-spacerun:yes'>  </span>Local</span> Business Day
+</span></code><code><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Bookman Old Style";color:black'></span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>
+in Paragraph 12,<span style='mso-spacerun:yes'>  </span></span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Valuation Date Location</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> means, with
+respect to each party, each city, region, or country specified below: </span></code><b
+            style='mso-bidi-font-weight:normal'><span lang=EN-US style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";mso-ansi-language:EN-US'>London</span>
+        <o:p></o:p>
+    </b></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'>
+        <o:p>&nbsp;</o:p>
+    </p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:72.0pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:-36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(<span
+    >iii</span>) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></code><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Valuation Time</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'> </span></code><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Bookman Old Style";color:black'></span></code><code><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";color:black'> has the meaning
+specified in Paragraph 12, unless otherwise specified here: <span
+                style='background:yellow'>[[${valuationTime}]]</span></span></code></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:72.0pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:-36.0pt'><span
+    ><code><span style='font-size:10.0pt;font-family:"Times New Roman","serif";
+color:black'>(iv) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+            style='mso-spacerun:yes'>  </span></span></code><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Notification</span></b></em></span><em><b><span style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'> Time</span></b></em><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'> means 10:00 a.m., New
+York time, on a Local Business Day, unless otherwise specified here: <span
+                style='background:yellow'>[[${notificationTime}]]</span></span></code></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(e)
+</span></code><em><b><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New";color:black'>Conditions Precedent and
+Secured Party Rights and Remedies. </span></b></em></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(<span
+    >i</span>) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The provisions
+of Paragraph 4(a) will apply, unless otherwise specified here: <b
+                style='mso-bidi-font-weight:normal'>N/A</b></span></code></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:72.0pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:-36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>(ii)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If the provisions of Paragraph 4(a) are
+applicable, the following Termination Event(s) will be a Specified</span></code><em><b><span
+            style='font-size:10.0pt;color:black'> Condition</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'> for
+the party specified (that party being the Affected Party if the Termination
+Event occurs with respect to that party):</span></code></p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:72.0pt;
+margin-bottom:.0001pt;text-align:justify;text-indent:-36.0pt'>
+        <o:p>&nbsp;</o:p>
+    </p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:75.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code></p>
+
+    <div style='margin-left:72.0pt;'>
+        specifiedConditionTable
+    </div>
+
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><em><b>&nbsp;</b></em><em><b><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'> <o:p></o:p></span></b></em></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><em><b><span
+            style='font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New"'>(f)
+</span></b></em><em><b><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New";color:black'>Substitution</span></b></em><em><span
+            style='font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New"'>.
+</span></em><em><b><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New";color:black'><o:p></o:p></span></b></em></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'>
+        <o:p>&nbsp;</o:p>
+    </p>
+
+    <p style='margin-left:72.0pt;text-indent:-36.0pt'><span
+            lang=EN-US style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-ansi-language:EN-US'>(<span>i</span>)</span><span lang=EN-US
+                                                      style='font-size:7.0pt;mso-ansi-language:EN-US'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span lang=EN-US style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-ansi-language:EN-US'><b><i>Substitution Date</i></b> has the meaning
+specified in Paragraph 4(d<span>)(</span>ii), unless otherwise
+specified here:&nbsp;&nbsp;&nbsp; <span
+                style='background:yellow'>[[${substituteDiff}]]</span> Business Day&nbsp;</span></p>
+
+    <p class=MsoListParagraph style='margin-top:0cm;margin-right:0cm;margin-bottom:
+0cm;margin-left:72.0pt;margin-bottom:.0001pt;text-indent:-36.0pt;line-height:
+normal;text-autospace:none'><span lang=EN-US style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";mso-ansi-language:EN-US'>(ii)</span><span
+            lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman","serif";
+mso-ansi-language:EN-US'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><b><i><span lang=EN-US style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-ansi-language:EN-US'>Consent</span></i></b><span lang=EN-US
+                                                     style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'>. If specified here as applicable, then the <span>Pledgor</span>
+must obtain the Secured Party, consent for any substitution pursuant to
+Paragraph 4(d): <span
+                style='background:yellow'>[[${consent}]]</span></span></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(g)
+</span></code><em><b><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New";color:black'>Distributions and Interest
+Payment (VM). </span></b></em></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Times New Roman","serif";color:black'>NA&nbsp;</span></code><span
+            style='mso-spacerun:yes'>  </span></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(h)
+</span></code><em><b><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New";color:black'>Demands and Notices. </span></b></em></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:36.0pt;
+margin-bottom:.0001pt;text-align:justify'><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>All demands,
+specifications and notices under this Annex will be made pursuant to the
+Notices Section of this Agreement, unless otherwise specified here: </span></code></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify;text-indent:36.0pt'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='text-indent:36.0pt'><span lang=EN-US style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:EN-US'>Party A:
+745, 7th Ave, New York, NY 10019, USA&nbsp;</span></p>
+
+    <p class=MsoNormal style='text-indent:36.0pt;text-autospace:none'><span
+            lang=EN-US style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-ansi-language:EN-US'>Party B: 1 King Arms Yard, Third Floor, London, EC2R 7AF, United Kingdom</span></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(<span
+    >i</span>) </span></code><em><b><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";mso-bidi-font-family:"Courier New";
+color:black'>Addresses for Transfers</span></b></em><strong><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>. </span></strong></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='text-indent:36.0pt'><span lang=EN-US style='font-size:
+10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:EN-US'>Party
+A: The Collateral Management <span>Team ,</span> Central Phone
+Number: +44 020 111 111</span></p>
+
+    <p class=MsoNormal style='text-autospace:none'><span lang=EN-US
+                                                         style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'>&nbsp;<span style='mso-tab-count:1'>          </span>Party B: Not Available</span><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>(j) </span></code><em><b><span
+            style='font-size:10.0pt;color:black'>Other CSA</span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>. </span></code><em><b><span
+            style='font-size:10.0pt;color:black'>&quot;Other CSA&quot; </span></b></em><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>has
+the meaning specified in Paragraph 10, unless otherwise specified here: </span></code></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Times New Roman","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'><span
+            style='mso-spacerun:yes'> </span><b style='mso-bidi-font-weight:normal'><span
+            style='mso-tab-count:1'>          </span></b></span></code><span lang=EN-US
+                                                                             style='font-size:10.0pt;font-family:"Bookman Old Style","serif";mso-ansi-language:
+EN-US'>Not Available</span><code><span style='font-size:10.0pt;font-family:
+"Bookman Old Style","serif";color:black'>&nbsp;</span></code><b
+            style='mso-bidi-font-weight:normal'>
+        <o:p></o:p>
+    </b></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'>
+        <o:p>&nbsp;</o:p>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>(k)
+</span></code><em><b><span style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-bidi-font-family:"Courier New";color:black'>Other Provisions. </span></b></em><span
+            lang=EN-US style='font-size:10.0pt;font-family:"Bookman Old Style","serif";
+mso-ansi-language:EN-US'>Not Available</span><code><span style='font-size:10.0pt;
+font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code></p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:10.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:16.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:16.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:16.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><code><span
+            style='font-size:16.0pt;font-family:"Bookman Old Style","serif";color:black'>&nbsp;</span></code>
+    </p>
+
+    <p style='margin:0cm;margin-bottom:.0001pt;text-align:justify'><strong><u><span
+            style='font-size:16.0pt;font-family:"Bookman Old Style","serif";mso-bidi-font-family:
+"Courier New";color:black'>Signed by:</span></u></strong></p>
+
+</div>
+
 </body>
+
 </html>
