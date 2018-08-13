@@ -9,6 +9,7 @@ import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndContract;
 import net.corda.core.contracts.StateAndRef;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.node.services.Vault;
@@ -196,6 +197,17 @@ public class AgreementNegotiationAcceptFlow {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
                         baos.write(bytes, 0, bytes.length);
 
+                       /* Map<String, InputStream> attachedFiles = new HashMap<>();
+                        if (agreementNegotiationState.getAttachmentHash() != null &&
+                                !agreementNegotiationState.getAttachmentHash().isEmpty()) {
+                            for (SecureHash secureHasId : agreementNegotiationState.getAttachmentHash().keySet()) {
+                                Attachment attachedFile = getServiceHub().getAttachments().openAttachment(secureHasId);
+                                 InputStream ins = attachedFile.open();
+                                 attachedFiles.put(agreementNegotiationState.getAttachmentHash().get(secureHasId),
+                                         ins );
+                            }
+                        }*/
+
                         baos = AgreementUtil.signPDF(baos, currentParty.getName().getOrganisation(), count);
                         AgreementUtil.creationOfZIP(agreementNegotiationState, getServiceHub().getAttachments(),
                                 baos, FINAL_SUFFIX);
@@ -206,7 +218,8 @@ public class AgreementNegotiationAcceptFlow {
                         ByteArrayOutputStream baosBtwFIrstAndLast = new ByteArrayOutputStream(bytes.length);
                         baosBtwFIrstAndLast.write(bytes, 0, bytes.length);
 
-                        baosBtwFIrstAndLast = AgreementUtil.signPDF(baosBtwFIrstAndLast, currentParty.getName().getOrganisation(), count);
+                        baosBtwFIrstAndLast = AgreementUtil.signPDF(baosBtwFIrstAndLast,
+                                currentParty.getName().getOrganisation(), count);
                         agreementNegotiationState.setSignedStream(baosBtwFIrstAndLast.toByteArray());
                     }
                 }
@@ -227,6 +240,23 @@ public class AgreementNegotiationAcceptFlow {
 
                 StateAndContract outputSateAndContract = new StateAndContract(agreementNegotiationState, TEMPLATE_CONTRACT_ID);
                 txBuilder.withItems(previousStatesAndRef, outputSateAndContract, cmd);
+                //Adding attachment so that counterparties can also access it
+                if (agreementNegotiationState.getAttachmentHash() != null &&
+                        !agreementNegotiationState.getAttachmentHash().isEmpty()) {
+                    for (SecureHash secureHasId : agreementNegotiationState.getAttachmentHash().keySet()) {
+                        txBuilder.addAttachment(secureHasId);
+                        System.out.println("Add atatchments =======> " + secureHasId);
+                    }
+                }
+
+                //FOr final copy
+                if (agreementNegotiationState.getFinalCOpy() != null &&
+                        !agreementNegotiationState.getFinalCOpy().isEmpty()) {
+                    for (SecureHash secureHasId : agreementNegotiationState.getFinalCOpy().keySet()) {
+                        txBuilder.addAttachment(secureHasId);
+                        System.out.println("Add atatchments =======> " + secureHasId);
+                    }
+                }
 
                 // Signing the transaction.
                 progressTracker.setCurrentStep(TX_SIGNING);

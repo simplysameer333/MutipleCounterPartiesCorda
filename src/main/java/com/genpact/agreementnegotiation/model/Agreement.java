@@ -29,6 +29,7 @@ public class Agreement {
     private Date substitutionDateTo = null;
     private int consent = 0;//boolean 0 or 1
     private List<String> attachmentHash;
+    private String finalCopy;
     private List<String> attachmentFileNames;
     private String pendingParticipants;
 
@@ -293,6 +294,14 @@ public class Agreement {
 
     public void setAttachmentFileNames(List<String> attachmentFileNames) {
         this.attachmentFileNames = attachmentFileNames;
+    }
+
+    public String getFinalCopy() {
+        return finalCopy;
+    }
+
+    public void setFinalCopy(String finalCopy) {
+        this.finalCopy = finalCopy;
     }
 
     @Override

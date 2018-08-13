@@ -103,14 +103,15 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
 		});
     };
 
-	demoApp.getAgreements = () => $http.get($rootScope.apiBaseURL + "getAgreements")
+	$rootScope.getAgreements = () => $http.get($rootScope.apiBaseURL + "getAgreements")
         .then(function(response) {
+
 			demoApp.agreements = response.data;
 		});
 	//demoApp.agreements = [{id:1}]; //SanjayTest
 
 
-    demoApp.getAgreements();
+    $rootScope.getAgreements();
 	$scope.getDateValue = (dt) => {
 		var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 		if (dt != null && dt != undefined && dt != '') {
@@ -155,10 +156,13 @@ app.controller('AgreementController', function($http, $scope, $location, $uibMod
 		fileInfo.filehashUrl = $rootScope.apiBaseAtatchmentURL + fileInfo.filehash;
 		$rootScope.fileArray.push(fileInfo);
     };
+
+
 });
 
 app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $location, $window,
     $uibModalInstance, $uibModal, peers) {
+
     const modalInstance = this;
 
 	$scope.moodys = $rootScope.moodys;
@@ -306,8 +310,9 @@ app.controller('ModalInstanceCtrl', function ($scope, $rootScope, $http, $locati
 
 		// Create PO and handle success / fail responses.
 		$http.post(createIOUEndpoint, angular.toJson(agreement)).then(
-			(result) =>  modalInstance.displayMessage(result, agreement),
-			(result) =>  modalInstance.displayErrorMessage(result, agreement),
+
+			(result) =>  { $rootScope.getAgreements(); modalInstance.displayMessage(result, agreement)},
+			(result) =>  modalInstance.displayErrorMessage(result, agreement)
 		);
 
     };
@@ -450,7 +455,7 @@ app.controller('ViewAgreementCtrl', function ($scope, $rootScope, $http, $locati
 		const createIOUEndpoint = $rootScope.apiBaseURL + "acceptFlow";
 		// Create PO and handle success / fail responses.
 		$http.put(createIOUEndpoint, angular.toJson(updAgreement)).then(
-			(result) => $scope.displayMessage(result, agreement),
+			(result) =>  {$rootScope.getAgreements(); $scope.displayMessage(result, agreement)},
 			(result) => $scope.displayMessage(result, agreement)
 		);
 		//$scope.cancel();
@@ -562,7 +567,7 @@ app.controller('AmendAgreementCtrl', function ($scope, $rootScope, $http, $locat
 		const createIOUEndpoint = $rootScope.apiBaseURL + "amendFlow";
 		// Create PO and handle success / fail responses.
 		$http.put(createIOUEndpoint, angular.toJson(agreement)).then(
-			(result) => $scope.displayMessage(result, agreement),
+			(result) =>  { $rootScope.getAgreements(); $scope.displayMessage(result, agreement)},
 			(result) => $scope.displayErrorMessage(result, agreement)
 		);
 		//$scope.cancel();

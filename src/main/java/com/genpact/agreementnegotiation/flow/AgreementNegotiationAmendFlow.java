@@ -8,6 +8,7 @@ import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndRef;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.node.services.Vault;
@@ -169,7 +170,7 @@ public class AgreementNegotiationAmendFlow {
                 HashMap<Object, Object> changedFields = AgreementUtil.compare(AgreementUtil.copyStateToVO(agreementNegotiationState),
                         AgreementUtil.copyStateToVO(previousState));
 
-                System.out.println("New CHanged fields $$$$$$$$$$$$$$$$$$$$$$$$$$$$ " + changedFields);
+                System.out.println("New Changed fields $$$$$$$$$$$$$$$$$$$$$$$$$$$$ " + changedFields);
                 if (isPartyAsAgreedStatus && changedFields.size() == 1 && changedFields.get("counterparty") != null) {
                     agreementNegotiationState.setStatus(previousState.getStatus());
                 } else {
@@ -196,6 +197,14 @@ public class AgreementNegotiationAmendFlow {
                 txBuilder.addOutputState(agreementNegotiationState, outputContract);
                 txBuilder.addInputState(previousStatesAndRef);
                 txBuilder.addCommand(cmd);
+                //Adding attachment so that counterparties can also access it
+                if (agreementNegotiationState.getAttachmentHash() != null &&
+                        !agreementNegotiationState.getAttachmentHash().isEmpty()) {
+                    for (SecureHash secureHasId : agreementNegotiationState.getAttachmentHash().keySet()) {
+                        txBuilder.addAttachment(secureHasId);
+                        System.out.println("Add atatchments =======> " + secureHasId);
+                    }
+                }
 
                 progressTracker.setCurrentStep(TX_VERIFICATION);
 

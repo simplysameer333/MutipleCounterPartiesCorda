@@ -120,6 +120,11 @@
                         <!--button type="button" class="btn btn-primary" ng-click="demoApp.amendAgreement(x)">Amend</button-->
                         <button type="button" ng-click="demoApp.viewAudit(x)" class="btn btn-primary">Audit History
                         </button>
+
+                        <a href="{{apiBaseAtatchmentURL}}{{x.finalCopy}}" class="btn btn-primary"
+                           ng-show="x.status == 'Agreed'"
+                        > Signed Copy</a>
+
                     </td>
                 </tr>
                 </tbody>

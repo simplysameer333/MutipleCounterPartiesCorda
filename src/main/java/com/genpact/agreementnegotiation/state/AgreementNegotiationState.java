@@ -37,6 +37,7 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
     private List<ThresholdState> thresholds;
     private List<String> attachmentHash;
 
+
     public String getBaseCurrency() {
         return baseCurrency;
     }

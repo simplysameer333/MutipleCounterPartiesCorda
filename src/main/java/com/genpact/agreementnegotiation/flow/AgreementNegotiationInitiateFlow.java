@@ -132,6 +132,8 @@ public class AgreementNegotiationInitiateFlow {
 
             // We add the items to the builder.
             txBuilder.withItems(outputContractAndState, cmd);
+
+            //Adding attachment so that counterparties can also access it
             if (agreementNegotiationState.getAttachmentHash() != null &&
                     !agreementNegotiationState.getAttachmentHash().isEmpty()) {
                 for (SecureHash secureHasId : agreementNegotiationState.getAttachmentHash().keySet()) {

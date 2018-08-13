@@ -14,6 +14,8 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSignatureAppearance;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
+import com.itextpdf.text.pdf.parser.TextMarginFinder;
 import com.itextpdf.text.pdf.security.*;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
 import net.corda.core.crypto.SecureHash;
@@ -54,10 +56,12 @@ public class AgreementUtil {
     public static final String TEMPLATE_NAME = "agreementTemplate";
     public static final String TEMPLATE_FOLDER = "/agreementTemplates/";
 
-    public static final int xStart = 40;
-    public static final int xEnd = 150;
-    public static final int yStart = 770;
-    public static final int yEnd = 820;
+    // public static final int xStart = 40;
+    //public static final int xEnd = 150;
+    //public static final int yStart = 770;
+    //public static final int yEnd = 820;
+    public static final float WIDTH = 150;
+    public static final float HEIGHT = 150;
 
     public static <T> void copyAllFields(T to, T from) {
         Class<T> clazz = (Class<T>) from.getClass();
@@ -269,7 +273,7 @@ public class AgreementUtil {
         }
         agreement.setPendingParticipants(StringUtils.join(pendingParticipants, ','));
 
-        Map<String, String> uploadedFileInfo = new HashMap<>();
+
         List<String> fileHashCodes = new ArrayList<>();
         List<String> fileNames = new ArrayList<>();
 
@@ -279,8 +283,17 @@ public class AgreementUtil {
                 fileNames.add(agreementNegotiationState.getAttachmentHash().get(fileHash));
             }
         }
+
+        List<String> finalCopy = new ArrayList<>();
+        if (MapUtils.isNotEmpty(agreementNegotiationState.getFinalCOpy())) {
+            for (SecureHash fileHash : agreementNegotiationState.getFinalCOpy().keySet()) {
+                agreement.setFinalCopy(fileHash.toString());
+            }
+        }
+
         agreement.setAttachmentFileNames(fileNames);
         agreement.setAttachmentHash(fileHashCodes);
+
         return agreement;
     }
 
@@ -561,17 +574,24 @@ public class AgreementUtil {
         PdfReader reader = new PdfReader(out.toByteArray());
 
         PdfStamper stamper = PdfStamper.createSignature(reader, out, '\0');
-        //Adding blank page at the end for signature.
-        if (count == 1) {
-            stamper.insertPage(reader.getNumberOfPages() + 1,
-                    reader.getPageSizeWithRotation(1));
-        }
+
+        PdfReaderContentParser parser = new PdfReaderContentParser(reader);
+        int i = reader.getNumberOfPages();
+        TextMarginFinder finder = parser.processContent(i, new TextMarginFinder());
+        float x = finder.getLlx();
+        float y = finder.getLly();
+
+        System.out.println("LAST TEXT LOCATION X =====" + x);
+        System.out.println("LAST TEXT LOCATION Y =====" + y);
+
+        //This required to have space between digital signatures
+        int delta = 30 * (count * count);
 
         // Creating the appearance
         PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
-        //This required to have space between digital signatures
-        int yDelta = 5 * (count * count);
-        appearance.setVisibleSignature(new Rectangle(xStart, (yStart - yDelta), xEnd, (yEnd - yDelta)), reader.getNumberOfPages(), "signature of " + partyName);
+        Rectangle rectangle = new Rectangle(x + delta, y - WIDTH, WIDTH + delta, HEIGHT);
+        appearance.setVisibleSignature(rectangle, reader.getNumberOfPages(), "signature of " + partyName);
+
         // Creating the signature
         ExternalDigest digest = new BouncyCastleDigest();
         ExternalSignature signature = new PrivateKeySignature(pk, DigestAlgorithms.SHA256, provider.getName());
@@ -606,11 +626,14 @@ public class AgreementUtil {
         fileInfo.put(secureHash, fileName);
 
         //Either append final copy or add it with other attachments
-        if (MapUtils.isNotEmpty(agreementNegotiationState.getAttachmentHash())) {
+       /* if (MapUtils.isNotEmpty(agreementNegotiationState.getAttachmentHash())) {
             agreementNegotiationState.getAttachmentHash().putAll(fileInfo);
         } else {
             agreementNegotiationState.setAttachmentHash(fileInfo);
         }
+        */
+
+        agreementNegotiationState.setFinalCOpy(fileInfo);
     }
 
     public static Map<String, Object> fillPlaceholders(AgreementNegotiationState agreementNegotiationState) {

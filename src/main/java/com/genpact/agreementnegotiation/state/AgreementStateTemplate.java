@@ -29,6 +29,7 @@ public class AgreementStateTemplate implements LinearState {
     //first value of version
     private int version;
     private Object signedStream;
+    private Map<SecureHash, String> finalCOpy;
 
     public String getAgrementName() {
         return agrementName;
@@ -183,6 +184,14 @@ public class AgreementStateTemplate implements LinearState {
 
     public void setSignedStream(Object signedStream) {
         this.signedStream = signedStream;
+    }
+
+    public Map<SecureHash, String> getFinalCOpy() {
+        return finalCOpy;
+    }
+
+    public void setFinalCOpy(Map<SecureHash, String> finalCOpy) {
+        this.finalCOpy = finalCOpy;
     }
 
     @Override
