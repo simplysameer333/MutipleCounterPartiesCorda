@@ -12,6 +12,7 @@ import com.genpact.agreementnegotiation.utils.AgreementUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.corda.core.contracts.StateAndRef;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
@@ -27,11 +28,15 @@ import org.json.simple.JSONObject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarInputStream;
+import java.util.zip.ZipEntry;
 
 import static java.util.stream.Collectors.toList;
 
@@ -443,7 +448,6 @@ public class AgreementNegotiationApi {
     public List<Agreement> getStatesUsingLinerIds(@QueryParam("listSearch") String listSearch) {
         List<Agreement> agreementsList = new ArrayList<>();
         try {
-            final Party otherParty = rpcOps.nodeInfo().getLegalIdentities().get(0);
 
             FlowProgressHandle<List<String>> flowHandle = rpcOps
                     .startTrackedFlowDynamic(AgreementNegotiationSearchFlow.Initiator.class, listSearch);
@@ -478,6 +482,42 @@ public class AgreementNegotiationApi {
         return agreementsList;
     }
 
+    @GET
+    @Path("downloadSignedCopy/{hashId}")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response downloadSignedCopy(@PathParam("hashId") String hashStringId) {
+
+        try {
+            // downloading the attachment
+            SecureHash hashId = SecureHash.parse(hashStringId);
+            InputStream attachmentDownloadInputStream = rpcOps.openAttachment(hashId);
+            JarInputStream attachmentJar = new JarInputStream(attachmentDownloadInputStream);
+
+            //Reading the contents
+            ZipEntry zipFile = attachmentJar.getNextEntry();
+            String fileName = zipFile.getName();
+
+            byte[] buffer = new byte[8192];
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            int len;
+            while ((len = attachmentJar.read(buffer)) != -1) {
+                baos.write(buffer, 0, len);
+            }
+            baos.close();
+            System.out.println("Send file name ================= > " + fileName);
+            return Response.ok(baos.toByteArray(), MediaType.APPLICATION_OCTET_STREAM_TYPE)
+                    .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                    .build();
+
+        } catch (Exception ex) {
+            System.out.println("Exception" + ex.toString());
+            ex.printStackTrace();
+
+        }
+        return null;
+    }
+
 
     /**
      * This is to create parties Map at startup.
@@ -499,8 +539,6 @@ public class AgreementNegotiationApi {
         }
         return cordaX500NameMap;
     }
-
-
 
 
     private List<Party> extractCounterParties(Agreement agreement) {

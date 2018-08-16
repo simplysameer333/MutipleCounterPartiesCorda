@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>BlockChain POC</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.0-rc.1/angular.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.2.0/ui-bootstrap-tpls.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+
+    <script src="js/jquery.min-3.1.1.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/ui-bootstrap-tpls.min.js"></script>
     <script src="js/corda.js"></script>
     <link rel="stylesheet" href="css/style.css">
 
@@ -61,7 +58,7 @@
         <div class="btngroup" style="width: 50%;display: inline;">
             <button ng-click="demoApp.openModal()" type="button" class="btn btn-primary navbar-btn">Initiate Agreement
             </button>
-            <button ng-click="demoApp.getAgreements()" title="See all Agreements" type="button"
+            <button ng-click="getAgreements()" title="See all Agreements" type="button"
                     class="btn btn-default navbar-btn">
                 See all Agreements
             </button>
@@ -121,10 +118,14 @@
                         <button type="button" ng-click="demoApp.viewAudit(x)" class="btn btn-primary">Audit History
                         </button>
 
-                        <a href="{{apiBaseAtatchmentURL}}{{x.finalCopy}}" class="btn btn-primary"
-                           ng-show="x.status == 'Agreed'"
-                        > Signed Copy</a>
+                        <!--  <a href="{{apiBaseAtatchmentURL}}{{x.finalCopy}}" class="btn btn-primary"  ng-show="x.status == 'Agreed'"
+                          > Signed Copy</a>
+                      -->
 
+                        <a href="{{apiBaseURL}}downloadSignedCopy/{{x.finalCopy}}" ng-show="x.status == 'Agreed'">
+                            <img src="image/pdf.png" alt="Signed Copy" title="Download Signed Copy" width="50"
+                                 height="45" border="0">
+                        </a>
                     </td>
                 </tr>
                 </tbody>
@@ -181,7 +182,7 @@
 
                         <div class="form-group">
                             <label for="value" class="control-label lbl-p">Counterparty:</label>
-                            <select ng-model="agreement.counterparty" multiple class="form-control" id="counterparty"
+                            <select ng-model="agreement.counterparty" class="form-control" id="counterparty"
                                     ng-options="peer as peer for peer in modalInstance.peers">
                             </select>
 
@@ -853,9 +854,13 @@
                 <div class="col-lg-12">
                     <div class="form-group">
                         <label for="value" class="control-label lbl-p">Counterparty:</label>
-                        <select multiple ng-model="agreement.counterparty" class="form-control" id="counterparty"
-                                ng-options="party for party in allCounterParties">
-                        </select>
+                        <!-- This si required for muti-select
+                        <select ng-model="agreement.counterparty" class="form-control" id="counterparty"
+                                  ng-options="party for party in allCounterParties">
+                          </select>
+                      -->
+                        <select disabled ng-model="agreement.counterparty.join(', ')" class="form-control"
+                                ng-options="party for party in allCounterParties"></select>
                         <label for="value" class="control-label lbl-p">Agreement Name:</label>
                         <input disabled type="text" ng-model="agreement.agrementName" class="form-control" id="address">
                         <label for="value" class="control-label lbl-p">Base Currency:</label>
