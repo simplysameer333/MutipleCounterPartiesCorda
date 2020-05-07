@@ -1,7 +1,6 @@
 # Eclipse, ctags, Mac metadata, log files
 .classpath
 .project
-.settings
 tags
 .DS_Store
 *.log
@@ -56,6 +55,9 @@ lib/dokka.jar
 
 # IntelliJ
 /out/
+/workflows/out/
+/contracts/out/
+clients/out/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -70,3 +72,6 @@ crashlytics-build.properties
 
 # docs related
 docs/virtualenv/
+
+# if you use the installQuasar task
+lib
