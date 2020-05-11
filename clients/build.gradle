@@ -23,10 +23,13 @@ dependencies {
     compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
     compile "org.apache.logging.log4j:log4j-web:${log4j_version}"
     compile "org.slf4j:jul-to-slf4j:$slf4j_version"
+    compile "org.thymeleaf:thymeleaf:3.0.1.RELEASE"
+    compile "org.thymeleaf:thymeleaf-spring5:3.0.11.RELEASE"
+    compile "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.0.3"
 }
 
 springBoot {
-    mainClassName = "com.template.webserver.Server"
+    mainClassName = "com.genpact.agreementnegotiation.webserver.Server"
 }
 /*
 task runTemplateClient(type: JavaExec, dependsOn: assemble) {
@@ -43,13 +46,13 @@ task runTemplateServer(type: JavaExec, dependsOn: assemble) {
 
 task runPartyAServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'com.template.webserver.Starter'
+    main = 'com.genpact.agreementnegotiation.webserver.Starter'
     args '--server.port=50005', '--config.rpc.host=localhost', '--config.rpc.port=10006', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
 task runPartyBServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'com.template.webserver.Starter'
+    main = 'com.genpact.agreementnegotiation.webserver.Starter'
     args '--server.port=50006', '--config.rpc.host=localhost', '--config.rpc.port=10009', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 

@@ -1,6 +1,7 @@
 apply plugin: 'net.corda.plugins.cordapp'
 apply plugin: 'net.corda.plugins.cordformation'
 
+
 cordapp {
     targetPlatformVersion corda_platform_version
     minimumPlatformVersion corda_platform_version
@@ -32,4 +33,14 @@ dependencies {
     cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
     cordaRuntime "$corda_release_group:corda:$corda_release_version"
     testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
+
+    compile "com.google.guava:guava:16+"
+    compile group: 'com.itextpdf.tool', name: 'xmlworker', version: '5.4.1'
+    compile group: 'com.sun.jersey.contribs', name: 'jersey-multipart', version: '1.19.4'
+    // https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf
+    compile group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.11.RELEASE'
+    compile group: 'org.xhtmlrenderer', name: 'flying-saucer-core', version: '9.1.6'
+    compile group: 'org.xhtmlrenderer', name: 'flying-saucer-pdf-itext5', version: '9.1.6'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 }

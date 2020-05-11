@@ -11,6 +11,7 @@ tags
 
 # General build files
 **/build/*
+**/bin/*
 !docs/build/*
 
 lib/dokka.jar
@@ -75,3 +76,8 @@ docs/virtualenv/
 
 # if you use the installQuasar task
 lib
+.idea/$PRODUCT_WORKSPACE_FILE$
+.settings/org.eclipse.buildship.core.prefs
+clients/.settings/org.eclipse.buildship.core.prefs
+contracts/.settings/org.eclipse.buildship.core.prefs
+workflows/.settings/org.eclipse.buildship.core.prefs
