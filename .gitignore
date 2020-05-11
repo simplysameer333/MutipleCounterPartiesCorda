@@ -81,3 +81,4 @@ lib
 clients/.settings/org.eclipse.buildship.core.prefs
 contracts/.settings/org.eclipse.buildship.core.prefs
 workflows/.settings/org.eclipse.buildship.core.prefs
+.vscode/settings.json

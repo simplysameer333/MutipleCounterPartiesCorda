@@ -1,10 +1,1956 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Example front-end.</title>
+    <title>BlockChain POC</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+
+    <script src="js/jquery.min-3.1.1.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/ui-bootstrap-tpls.min.js"></script>
+    <script src="js/corda.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+
+    <script>
+
+	function fileAdded(filename, filehash) {
+		alert(filename +" uploaded successfully.");
+		var fileInfo = {filename: filename, filehash : filehash};
+		var scope = angular.element(document.getElementById('demoAppId')).scope();
+		scope.updateFileNameSection(fileInfo);
+		scope.$apply();
+	}
+
+   function fileUpload(){
+	var fileContent = new FormData();
+    fileContent.append("file",$('input[type=file]')[0].files[0]);
+	var filename = $('input[type=file]').val().replace(/.*(\/|\\)/, '');
+	 $.ajax({
+		 type: "POST",
+		  enctype:"multipart/form-data",
+		   url: "/upload/attachment",
+		   data: fileContent,
+		   processData: false,
+		   contentType: false,
+		success: function(response) {
+			fileAdded(filename, response);
+		},
+		error: function(xhr) {
+			  alert("error : "+JSON.stringify(xhr));
+			//Do Something to handle error
+		}
+
+	});
+  }
+    </script>
+
 </head>
-<body>
-    <div>Define your front-end her2.</div>
+<body id="demoAppId" ng-app="demoAppModule" ng-controller="AgreementController as demoApp">
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand ng-binding" href="#">{{thisNode}}</a>
+        </div>
+        <div class="btngroup" style="width: 50%;display: inline;">
+            <button ng-click="demoApp.openModal()" type="button" class="btn btn-primary navbar-btn">Initiate Agreement
+            </button>
+            <button ng-click="getAgreements()" title="See all Agreements" type="button"
+                    class="btn btn-default navbar-btn">
+                See all Agreements
+            </button>
+        </div>
+        <div class="gp-genpact-logo" style="float: right;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="172" height="63" viewBox="0 0 172 63"><title>
+                GP_HTL_RGB</title>
+                <g fill="none" fill-rule="evenodd">
+                    <path fill="#FF555F"
+                          d="M45 15.954l-11.35 8.034-11.148-7.906L11.338 24 0 15.959 22.502 0 45 15.954"></path>
+                    <path fill="#25A5BD"
+                          d="M11.589 39.44V23.894L0 16v31.333L23 63V47.212L11.589 39.44M23 48h11V32H23z"></path>
+                    <path fill="#1E2C4C" d="M23 63l23-15.5V32L23 47.38V63"></path>
+                    <path fill="#FF555F" d="M34.448 40L23 31.977 34.394 24 46 31.988 34.448 40"></path>
+                    <path d="M69.1 36.604c2.388 0 4.37-2.042 4.37-4.601 0-2.56-1.982-4.601-4.37-4.601-2.352 0-4.335 2.041-4.335 4.6 0 2.56 1.983 4.602 4.336 4.602zm-3.83 3.661c.705 1.36 2.117 2.3 3.73 2.3 2.353 0 4.235-1.976 4.235-4.406v-.162l-.067-.032c-1.31 1.263-2.992 2.041-4.874 2.041-4.033 0-7.294-3.596-7.294-8.003C61 27.564 64.261 24 68.294 24c1.882 0 3.563.778 4.874 2.074l.067-.033v-1.62H77v13.738C77 42.501 73.672 46 69.168 46c-3.025 0-5.647-1.555-7.058-3.92l3.16-1.815zm24.705-10.37l.033-.065c-.832-1.49-2.295-2.494-3.991-2.494-1.763 0-3.127.94-4.025 2.494l.033.065h7.95zm-.433 5.214l2.595 2.494C90.64 39.093 88.545 40 86.249 40 81.66 40 78 36.437 78 32c0-4.437 3.56-8 8.017-8A7.97 7.97 0 0 1 94 32c0 .713-.067.907-.067.907H81.726c0 1.684 2.029 3.66 4.357 3.66 1.364 0 2.561-.583 3.46-1.458zm10.102-2.893V40H96V24.432h3.644v1.896l.066.034c1.236-1.563 2.896-2.362 4.62-2.362 6.507 0 6.67 6.054 6.67 7.917V40h-3.644v-7.784c0-1.863-.033-4.724-3.807-4.724-2.147 0-3.905 2.096-3.905 4.724m21.272-4.748c-2.415 0-4.36 2.082-4.36 4.658 0 2.61 1.945 4.69 4.36 4.69 2.348 0 4.327-2.08 4.327-4.69 0-2.576-1.979-4.658-4.327-4.658zm.805 12.85c-1.912 0-3.555-.76-4.897-2.114l-.068.033V46H113V24.43h3.756v1.618l.068.033c1.342-1.288 2.985-2.081 4.897-2.081 4.025 0 7.279 3.634 7.279 8.16 0 4.525-3.254 8.159-7.279 8.159zm16.379-3.752c2.388 0 4.337-2.008 4.337-4.566 0-2.559-1.95-4.6-4.336-4.6-2.353 0-4.336 2.041-4.336 4.6 0 2.558 1.983 4.566 4.336 4.566zM137.295 24c1.882 0 3.563.778 4.874 2.073l.067-.033v-1.62H146v15.16h-3.765v-1.555l-.067-.065c-1.31 1.263-2.992 2.041-4.874 2.041-4.033 0-7.294-3.563-7.294-8 0-4.437 3.26-8 7.294-8zM162 37.603A8.202 8.202 0 0 1 156.17 40c-4.546 0-8.17-3.563-8.17-8 0-4.437 3.624-8 8.17-8 2.272 0 4.348.907 5.83 2.397l-2.602 2.396a4.364 4.364 0 0 0-3.228-1.392c-2.504 0-4.48 2.072-4.48 4.599 0 2.526 1.976 4.566 4.48 4.566a4.54 4.54 0 0 0 3.294-1.425L162 37.603m7.386-10.284V39h-3.772V27.319H163v-3.505h2.614V17h3.772v6.814H172v3.505h-2.614"
+                          fill="#25A5BD"></path>
+                </g>
+            </svg>
+        </div>
+    </div>
+</nav>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div ng-show="!demoApp.agreements.length" class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">There are no recorded Agreements</h3>
+            </div>
+            <div class="panel-body">Use the "Initiate Agreement" button to create an Agreement with a Party.</div>
+        </div>
+        <!--div ng-show="demoApp.ious.length" class="panel panel-primary"-->
+        <div ng-show="demoApp.agreements.length" class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Agreements</h3>
+            </div>
+            <table class="table table-striped">
+                <thead style="font-weight: bold">
+                <tr>
+                    <th>Agreement Name</th>
+                    <th>Initiator</th>
+                    <th>Counter Party Names(s)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="x in demoApp.agreements">
+
+                    <td>{{x.agrementName}}</td>
+                    <td>{{x.cptyInitiator}}</td>
+                    <td>{{x.counterparty.join(', ')}}</td>
+                    <td>{{x.status}}</td>
+                    <td>
+                        <button type="button" ng-click="demoApp.viewAgreement(x, true)" class="btn btn-primary">View
+                        </button>
+                        <!--button type="button" class="btn btn-primary" ng-click="demoApp.amendAgreement(x)">Amend</button-->
+                        <button type="button" ng-click="demoApp.viewAudit(x)" class="btn btn-primary">Audit History
+                        </button>
+
+                        <!--  <a href="{{apiBaseAtatchmentURL}}{{x.finalCopy}}" class="btn btn-primary"  ng-show="x.status == 'Agreed'"
+                          > Signed Copy</a>
+                      -->
+
+                        <a href="{{apiBaseURL}}downloadSignedCopy/{{x.finalCopy}}" ng-show="x.status == 'Agreed'">
+                            <img src="image/pdf.png" alt="Signed Copy" title="Download Signed Copy" width="50"
+                                 height="45" border="0">
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-lg-12" ng-show="demoApp.agreementAudits.length > 0">
+            <h4 class="modal-title">Audit Trail for Agreement</h4>
+            <table class="table table-bordered table-striped">
+                <thead style="font-weight: bold">
+                <tr>
+                    <td>Agreement Name</td>
+                    <td>Agreement Initiation Date</td>
+                    <td>Initiator</td>
+                    <td>Counter Party Name(s)</td>
+                    <td>Status</td>
+                    <td>Last Updated By</td>
+                    <td>Last Updated On</td>
+                    <td></td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="x in demoApp.agreementAudits">
+                    <td>{{x.agrementName}}</td>
+                    <td>{{getDateValue(x.agrementInitiationDate)}}</td>
+                    <td>{{x.cptyInitiator}}</td>
+                    <td>{{x.counterparty.join(', ')}}</td>
+                    <td>{{x.status}}</td>
+                    <td>{{x.lastUpdatedBy}}</td>
+                    <td>{{getDateValue(x.agrementLastAmendDate)}}</td>
+                    <td>
+                        <button type="button" ng-click="demoApp.viewAgreement(x, false)" class="btn btn-primary">View
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+
+
+<script type="text/ng-template" id="initiateAgreementModal.html">
+    <div class="modal-header">
+        <h4 class="modal-title">New Agreement</h4>
+    </div>
+    <form class="gp-firm-side-ui">
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="col-lg-6">
+
+
+                        <div class="form-group">
+                            <label for="value" class="control-label lbl-p">Counterparty:</label>
+                            <select ng-model="agreement.counterparty" class="form-control" id="counterparty"
+                                    ng-options="peer as peer for peer in modalInstance.peers">
+                            </select>
+
+                            <label for="value" class="control-label lbl-p">Agreement Name:</label>
+                            <input ng-required="required" type="text" ng-model="agreement.agrementName"
+                                   class="form-control" id="agrementName"/>
+
+                            <label for="value" class="control-label lbl-p">Base Currency:</label>
+                            <select ng-model="agreement.baseCurrency" class="form-control"
+                                    ng-options="item for item in modalInstance.currencies"></select>
+
+                            <label for="value" class="control-label lbl-p">Eligible Currency:</label>
+                            <select multiple ng-model="agreement.eligibleCurrency" class="form-control"
+                                    ng-options="item for item in modalInstance.currencies"></select>
+
+                            <label for="value" class="control-label lbl-p">Product(s):</label>
+                            <select multiple ng-model="agreement.products" class="form-control"
+                                    ng-options="item for item in modalInstance.products"></select>
+
+                            <label for="value" class="control-label lbl-p">Delivery Amount:</label>
+                            <select ng-model="agreement.deliveryAmount" class="form-control"
+                                    ng-options="item.id as item.name for item in modalInstance.deliveryAmount track by item.id"></select>
+
+                            <label for="value" class="control-label lbl-p">Return Amount:</label>
+                            <select ng-model="agreement.returnAmount" class="form-control"
+                                    ng-options="item.id as item.name for item in modalInstance.deliveryAmount track by item.id"></select>
+
+                            <label for="value" class="control-label lbl-p">Credit Support Amount:</label>
+                            <select ng-model="agreement.creditSupportAmount" class="form-control"
+                                    ng-options="item.id as item.name for item in modalInstance.deliveryAmount track by item.id"></select>
+
+                            <!--label for="value" class="control-label lbl-p">Eligible Collateral Criteria:</label>
+                            <select ng-change="changedValue()" class="form-control" ng-options="item as item.name for item in modalInstance.collateral track by item.id" ng-model="agreement.eligibleCollateral">
+                            </select-->
+                            <div class="control-label thr">
+                                <button ng-click="changedValue()" type="button" class="btn btn-primary">Add Eligible
+                                    Collateral
+                                </button>
+                            </div>
+
+                            <div class="col-lg-12" ng-show="agreement.eligibleCollaterals.length > 0">
+                                <div class="gp-table-div">
+                                    <table class="table table-bordered table-striped">
+                                        <thead style="font-weight: bold">
+                                        <tr>
+                                            <td>Country</td>
+                                            <td>Category</td>
+                                            <td>Qualifier / Currencies</td>
+                                            <td>Ratings</td>
+                                            <td>Maturity</td>
+                                            <td>Ranges</td>
+                                            <td>Party A</td>
+                                            <td>Party B</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="x in agreement.eligibleCollaterals">
+                                            <td>{{x.region}}</td>
+                                            <td>{{x.category}}</td>
+                                            <td ng-if="x.category != 'Cash'">{{x.qualifier}}</td>
+                                            <
+                                            <td ng-if="x.category == 'Cash'">{{getCurrencies(x.currencies)}}</td>
+                                            <td>
+                                                <div class="gp-table-div">
+                                                    <table class="table table-bordered table-striped gp-table">
+                                                        <thead style="font-weight: bold">
+                                                        <tr>
+                                                            <td>Type</td>
+                                                            <td>Max</td>
+                                                            <td>Min</td>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr ng-if="x.moodysMax != null && x.moodysMin != null">
+                                                            <td>Moodys</td>
+                                                            <td>{{x.moodysMax}}</td>
+                                                            <td>{{x.moodysMin}}</td>
+                                                        </tr>
+                                                        <tr ng-if="x.spMax != null && x.spMin != null">
+                                                            <td>S & P</td>
+                                                            <td>{{x.spMax}}</td>
+                                                            <td>{{x.spMin}}</td>
+                                                        </tr>
+                                                        <tr ng-if="x.fitchMax != null && x.fitchMin != null">
+                                                            <td>Fitch</td>
+                                                            <td>{{x.fitchMax}}</td>
+                                                            <td>{{x.fitchMin}}</td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                            <td>{{x.remMaturity}}</td>
+                                            <td>
+                                                <div class="gp-table-div">
+                                                    <table class="table table-bordered table-striped gp-table">
+                                                        <thead style="font-weight: bold">
+                                                        <tr>
+                                                            <td>From(Yrs)</td>
+                                                            <td>To(Yrs)</td>
+                                                            <td>Valuation%</td>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr ng-repeat="a in x.ranges"> <!-- New base page -->
+                                                            <td>{{a.rangeFrom != '0' ? a.rangeFrom : ""}}</td>
+                                                            <td>{{a.rangeTo != '0' ? a.rangeTo : ""}}</td>
+                                                            <td>{{a.valuation != '0' ? a.valuation : ""}}</td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                            <td>{{x.partyA ? "Yes":"No"}}</td>
+                                            <td>{{x.partyB ? "Yes":"No"}}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                            <div class="control-label thr">
+                                <button ng-click="addThresholds()" type="button" class="btn btn-primary">Add
+                                    Thresholds
+                                </button>
+                            </div>
+                            <div class="col-lg-12" ng-show="agreement.thresholds.length > 0">
+                                <div class="gp-table-div">
+                                    <table class="table table-bordered table-striped">
+                                        <thead style="font-weight: bold">
+                                        <tr>
+                                            <td>Ratings</td>
+                                            <td>Currency</td>
+                                            <td>Threshold Amount</td>
+                                            <td>Party A</td>
+                                            <td>Party B</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="x in agreement.thresholds">
+                                            <td>
+                                                <div class="gp-table-div">
+                                                    <table class="table table-bordered table-striped gp-table">
+                                                        <thead style="font-weight: bold">
+                                                        <tr>
+                                                            <td>Type</td>
+                                                            <td>Max</td>
+                                                            <td>Min</td>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr ng-if="x.moodysMax != null && x.moodysMin != null">
+                                                            <td>Moodys</td>
+                                                            <td>{{x.moodysMax}}</td>
+                                                            <td>{{x.moodysMin}}</td>
+                                                        </tr>
+                                                        <tr ng-if="x.spMax != null && x.spMin != null">
+                                                            <td>S & P</td>
+                                                            <td>{{x.spMax}}</td>
+                                                            <td>{{x.spMin}}</td>
+                                                        </tr>
+                                                        <tr ng-if="x.fitchMax != null && x.fitchMin != null">
+                                                            <td>Fitch</td>
+                                                            <td>{{x.fitchMax}}</td>
+                                                            <td>{{x.fitchMin}}</td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                            <td>{{x.currencies}}</td>
+                                            <td>
+                                                {{x.amount}}
+                                            </td>
+                                            <td>{{x.partyA ? "Yes":"No"}}</td>
+                                            <td>{{x.partyB ? "Yes":"No"}}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                            <label for="value" class="control-label lbl-p">Initial Margin:</label>
+                            <select ng-model="agreement.initialMargin" class="form-control"
+                                    ng-options="item.id as item.name for item in modalInstance.yesNo track by item.id">
+                            </select>
+
+                            <label for="value" class="control-label lbl-p">Valuation Agent:</label>
+                            <select ng-model="agreement.valuationAgent" class="form-control" id="valuationAgent"
+                                    ng-options="peer as peer for peer in modalInstance.peers">
+                            </select>
+
+                            <label for="value" class="control-label lbl-p">Valuation Date:</label>
+                            <select ng-model="agreement.valuationDate" class="form-control">
+                                <option>LON - Business Days</option>
+                                <option>NYC - Business Days</option>
+                            </select>
+
+                            <label for="value" class="control-label lbl-p">Valuation Time:</label>
+                            <select ng-model="agreement.valuationTime" class="form-control">
+                                <option>Close of Business</option>
+                            </select>
+
+                            <label for="value" class="control-label lbl-p">Notification Time:</label>
+                            <input type="time" ng-model="agreement.notificationTime" class="form-control" id="address">
+
+                            <label for="value" class="control-label lbl-p">Specified Condition:</label>
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-click="addConditions(1)" type="checkbox" ng-model="cond1"> Illegality
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-click="addConditions(2)" type="checkbox" ng-model="cond2"> Credit Event
+                                    Upon Merger
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-click="addConditions(3)" type="checkbox" ng-model="cond3"> Additional
+                                    Termination Events
+                                </label>
+                            </div>
+
+
+                            <div class="range">
+                                <label for="value">Substitution Date:</label>
+                                <input type="date" placeholder="From" ng-model="agreement.substitutionDateFrom"
+                                       id="address">
+                                <input type="date" placeholder="To" ng-model="agreement.substitutionDateTo"
+                                       id="address">
+                            </div>
+
+                            <div>
+                                <label for="value" class="control-label lbl-p">Consent:</label>
+                                <select ng-model="agreement.consent" class="form-control"
+                                        ng-options="item.id as item.name for item in modalInstance.yesNo track by item.id">
+                                </select>
+                            </div>
+
+                            </BR> <!--Initiate -->
+                            <div>
+                                <label class="control-label lbl-p">File Upload :</label>
+                                <div class="col-lg-12">
+                                    <form id="upload-form" enctype="multipart/form-data">
+                                        <div class="form-group">
+                                            <input type="file" name="jar" class="form-control" accept=".zip,.jar">
+                                        </div>
+
+                                        <button type="button" class="btn btn-primary" style="margin-bottom:20px"
+                                                onclick="fileUpload()">Upload
+                                        </button>
+                                    </form>
+                                </div>
+                                <div id="myDiv" style="margin-top:20px" ng-show="fileArray.length > 0">
+                                    <table class="table table-bordered table-striped" id="myList">
+                                        <thead style="font-weight: bold">
+                                        <tr>
+                                            <td>File Name</td>
+                                            <td>Action</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="x in fileArray">
+                                            <td><a href="{{x.filehashUrl}}">{{x.filename}}</a></td>
+                                            <td>
+                                                <button ng-click="modalInstance.removefile(x.filename)" type="button"
+                                                        class="glyphicon glyphicon-remove"/>
+                                            </td>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="modalInstance.formError" class="form-group">
+                <div class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Error:</span>
+                    Enter valid Contract parameters
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button ng-click="modalInstance.create()" type="button" class="btn btn-primary">Submit</button>
+            <button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
+        </div>
+    </form>
+    <!--
+        <div class="modal-body">
+            <form >
+                <div class="form-group">
+                    <input type="file" name="myFile" accept=".zip" class="form-control">
+                </div>
+                <br>
+                <button type="submit" ng-click="modalInstance.fileUpload()" class="btn btn-default">Upload</button>
+            </form>
+        </div>
+    -->
+
+
+
+
+</script>
+
+<script type="text/ng-template" id="messageContent.html">
+    <div class="modal-body" id="modal-body">
+        {{ modalInstanceTwo.message? modalInstanceTwo.message:"Success" }}
+    </div>
+</script>
+<script type="text/ng-template" id="messageContentInit.html">
+    <div class="modal-body" id="modal-body">
+        {{ modalInstanceInit.message}}
+    </div>
+</script>
+<script type="text/ng-template" id="messageContentAmend.html">
+    <div class="modal-body" id="modal-body">
+        {{ modalInstanceAmend.message}}
+    </div>
+</script>
+<script type="text/ng-template" id="messageContentError.html">
+    <div class="modal-body" id="modal-body">
+        {{ modalInstanceError.message}}
+    </div>
+</script>
+
+<script type="text/ng-template" id="viewAgreementModal.html">
+    <div>
+        <div class="modal-header">
+            <h4 class="modal-title">View Agreement</h4>
+        </div>
+        <form class="gp-firm-side-ui">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="gp-table-div">
+                            <table class="table table-bordered table-striped gp-table">
+                                <tbody>
+                                <tr>
+                                    <td class="col-lg-3">Agrement Name</td>
+                                    <td class="col-lg-9">{{agreement.agrementName}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Counterparty Name</td>
+                                    <td class="col-lg-9">{{agreement.counterparty.join(', ')}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Base Currency</td>
+                                    <td class="col-lg-9">{{agreement.baseCurrency}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Eligible Currency</td>
+                                    <td ng-class="hasValueChanged('eligibleCurrency', 1) ? 'col-lg-9 highlight':'col-lg-9'">
+                                        {{getCurrencies(agreement.eligibleCurrency)}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Products</td>
+                                    <td class="col-lg-9">
+                                        <div class="col-lg-12" ng-show="agreement.products.length > 0">
+                                            <div class="gp-table-div">
+                                                <table class="table table-bordered table-striped gp-table">
+                                                    <tbody>
+                                                    <tr ng-repeat="a in agreement.products">
+                                                        <td ng-class="hasValueChanged('products', 2, a) ? 'highlight':''">
+                                                            {{a}}
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Delivery Amount</td>
+                                    <td ng-class="hasValueChanged('deliveryAmount', 0) ? 'col-lg-9 highlight':'col-lg-9'">
+                                        {{getAmtValue(agreement.deliveryAmount)}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Return Amount</td>
+                                    <td ng-class="hasValueChanged('returnAmount', 0) ? 'col-lg-9 highlight':'col-lg-9'">
+                                        {{getAmtValue(agreement.returnAmount)}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Credit Support Amount</td>
+                                    <td ng-class="hasValueChanged('creditSupportAmount', 0) ? 'col-lg-9 highlight':'col-lg-9'">
+                                        {{getAmtValue(agreement.creditSupportAmount)}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Eligible Collateral</td>
+                                    <td class="col-lg-9">
+                                        <div class="col-lg-12" ng-show="agreement.eligibleCollaterals.length > 0">
+                                            <div class="gp-table-div">
+                                                <table class="table table-bordered table-striped">
+                                                    <thead style="font-weight: bold">
+                                                    <tr>
+                                                        <td>Country</td>
+                                                        <td>Category</td>
+                                                        <td>Qualifier / Currencies</td>
+                                                        <td>Ratings</td>
+                                                        <td>Maturity</td>
+                                                        <td>Ranges</td>
+                                                        <td>Party A</td>
+                                                        <td>Party B</td>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr ng-repeat="x in agreement.eligibleCollaterals">
+                                                        <td>{{x.region}}</td>
+                                                        <td>{{x.category}}</td>
+                                                        <td ng-if="x.category != 'Cash'">{{x.qualifier}}</td>
+                                                        <td ng-if="x.category == 'Cash'">
+                                                            {{getCurrencies(x.currencies)}}
+                                                        </td>
+                                                        <td>
+                                                            <div class="gp-table-div">
+                                                                <table class="table table-bordered table-striped gp-table">
+                                                                    <thead style="font-weight: bold">
+                                                                    <tr>
+                                                                        <td>Type</td>
+                                                                        <td>Max</td>
+                                                                        <td>Min</td>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    <tr ng-if="x.moodysMax != null && x.moodysMin != null">
+                                                                        <td>Moodys</td>
+                                                                        <td>{{x.moodysMax}}</td>
+                                                                        <td>{{x.moodysMin}}</td>
+                                                                    </tr>
+                                                                    <tr ng-if="x.spMax != null && x.spMin != null">
+                                                                        <td>S & P</td>
+                                                                        <td>{{x.spMax}}</td>
+                                                                        <td>{{x.spMin}}</td>
+                                                                    </tr>
+                                                                    <tr ng-if="x.fitchMax != null && x.fitchMin != null">
+                                                                        <td>Fitch</td>
+                                                                        <td>{{x.fitchMax}}</td>
+                                                                        <td>{{x.fitchMin}}</td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                        <td>{{x.remMaturity}}</td>
+                                                        <td>
+                                                            <div class="gp-table-div">
+                                                                <table class="table table-bordered table-striped gp-table">
+                                                                    <thead style="font-weight: bold">
+                                                                    <tr>
+                                                                        <td>From(Yrs)</td>
+                                                                        <td>To(Yrs)</td>
+                                                                        <td>Valuation%</td>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    <tr ng-repeat="a in x.ranges">
+                                                                        <!-- View base page -->
+                                                                        <td>{{a.rangeFrom != '0' ? a.rangeFrom : ""}}
+                                                                        </td>
+                                                                        <td>{{a.rangeTo != '0' ? a.rangeTo : ""}}</td>
+                                                                        <td>{{a.valuation != '0' ? a.valuation : ""}}
+                                                                        </td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                        <td>{{x.partyA ? "Yes":"No"}}</td>
+                                                        <td>{{x.partyB ? "Yes":"No"}}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Thresholds</td>
+                                    <td class="col-lg-9">
+                                        <div class="col-lg-12" ng-show="agreement.thresholds.length > 0">
+                                            <div class="gp-table-div">
+                                                <table class="table table-bordered table-striped">
+                                                    <thead style="font-weight: bold">
+                                                    <tr>
+                                                        <td>Ratings</td>
+                                                        <td>Currency</td>
+                                                        <td>Threshold Amount</td>
+                                                        <td>Party A</td>
+                                                        <td>Party B</td>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr ng-repeat="x in agreement.thresholds">
+                                                        <td>
+                                                            <div class="gp-table-div">
+                                                                <table class="table table-bordered table-striped gp-table">
+                                                                    <thead style="font-weight: bold">
+                                                                    <tr>
+                                                                        <td>Type</td>
+                                                                        <td>Max</td>
+                                                                        <td>Min</td>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    <tr ng-if="x.moodysMax != null && x.moodysMin != null">
+                                                                        <td>Moodys</td>
+                                                                        <td>{{x.moodysMax}}</td>
+                                                                        <td>{{x.moodysMin}}</td>
+                                                                    </tr>
+                                                                    <tr ng-if="x.spMax != null && x.spMin != null">
+                                                                        <td>S & P</td>
+                                                                        <td>{{x.spMax}}</td>
+                                                                        <td>{{x.spMin}}</td>
+                                                                    </tr>
+                                                                    <tr ng-if="x.fitchMax != null && x.fitchMin != null">
+                                                                        <td>Fitch</td>
+                                                                        <td>{{x.fitchMax}}</td>
+                                                                        <td>{{x.fitchMin}}</td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                        <td>{{getCurrencies(x.currencies)}}</td>
+                                                        <td>
+                                                            {{x.amount}}
+                                                        </td>
+                                                        <td>{{x.partyA ? "Yes":"No"}}</td>
+                                                        <td>{{x.partyB ? "Yes":"No"}}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Initial Margin</td>
+                                    <td ng-class="hasValueChanged('initialMargin', 0) ? 'col-lg-9 highlight':'col-lg-9'">
+                                        {{agreement.initialMargin === 1?"Yes":"No"}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Valuation Agent</td>
+                                    <td ng-class="hasValueChanged('valuationAgent', 0) ? 'col-lg-9 highlight':'col-lg-9'">
+                                        {{agreement.valuationAgent}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Valuation Date</td>
+                                    <td ng-class="hasValueChanged('valuationDate', 0) ? 'col-lg-9 highlight':'col-lg-9'">
+                                        {{agreement.valuationDate}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Valuation Time</td>
+                                    <td ng-class="hasValueChanged('valuationTime', 0) ? 'col-lg-9 highlight':'col-lg-9'">
+                                        {{agreement.valuationTime}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Notification Time</td>
+                                    <td ng-class="hasValueChanged('notificationTime', 0) ? 'col-lg-9 highlight':'col-lg-9'">
+                                        {{getTimeValue(agreement.notificationTime)}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Specified Conditions</td>
+                                    <td class="col-lg-9">
+                                        <div class="gp-table-div">
+                                            <table class="table table-bordered table-striped gp-table">
+                                                <tbody>
+                                                <tr ng-repeat="a in agreement.specifiedConditions">
+                                                    <td ng-class="hasValueChanged('specifiedConditions', 2, a) ? 'highlight':''">
+                                                        {{a}}
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Substitution Date</td>
+                                    <td class="col-lg-9">
+                                        <div class="gp-table-div">
+                                            <table class="table table-bordered table-striped gp-table">
+                                                <thead style="font-weight: bold">
+                                                <tr>
+                                                    <td>From</td>
+                                                    <td>To</td>
+                                                </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                <tr>
+                                                    <td>{{getDateValue(agreement.substitutionDateFrom)}}</td>
+                                                    <td>{{getDateValue(agreement.substitutionDateTo)}}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-3">Consent</td>
+                                    <td ng-class="hasValueChanged('consent', 0) ? 'col-lg-9 highlight':'col-lg-9'">
+                                        {{agreement.consent == 1? "Yes":"No"}}
+                                    </td>
+                                </tr>
+
+                                <tr ng-show="agreement.status == 'Partially Agreed'">
+                                    <td class="col-lg-3">Pending Participants</td>
+                                    <td ng-class="col-lg-9">
+                                        {{agreement.pendingParticipants }}
+                                    </td>
+                                </tr>
+
+                                <tr ng-show="fileArray.length > 0">
+                                    <td class="col-lg-3">Uploaded Files</td>
+                                    <td ng-class="col-lg-9">
+                                        <div ng-repeat="x in fileArray">
+                                            <div>
+                                                <a href="{{x.filehashUrl}}">{{x.filename}}</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group gp-button-group">
+                    <button type="button" ng-show="showAmendAgree"
+                            ng-disabled="agreement.status == 'Agreed' || agreement.status == 'On Hold'"
+                            class="btn btn-primary" ng-click="cancel(); amendAgreement(agreement)">Amend
+                    </button>
+                    <button type="button" ng-show="showAmendAgree"
+                            ng-disabled="agreement.status == 'Agreed' || ( !isAgreeAllowed && agreement.status == 'Partially Agreed') || agreement.status == 'On Hold'"
+                            ng-click="agree(agreement)" class="btn btn-primary">Agree
+                    </button>
+                    <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="amendAgreementModal.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Amend Agreement</h4>
+    </div>
+    <form class="gp-firm-side-ui">
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label for="value" class="control-label lbl-p">Counterparty:</label>
+                        <!-- This si required for muti-select
+                        <select ng-model="agreement.counterparty" class="form-control" id="counterparty"
+                                  ng-options="party for party in allCounterParties">
+                          </select>
+                      -->
+                        <select disabled ng-model="agreement.counterparty.join(', ')" class="form-control"
+                                ng-options="party for party in allCounterParties"></select>
+                        <label for="value" class="control-label lbl-p">Agreement Name:</label>
+                        <input disabled type="text" ng-model="agreement.agrementName" class="form-control" id="address">
+                        <label for="value" class="control-label lbl-p">Base Currency:</label>
+                        <select disabled ng-model="agreement.baseCurrency" class="form-control"
+                                ng-options="item for item in currencies"></select>
+                        <label for="value" class="control-label lbl-p">Eligible Currency:</label>
+                        <select multiple ng-model="agreement.eligibleCurrency" class="form-control"
+                                ng-options="item for item in currencies"></select>
+
+                        <label for="value" class="control-label lbl-p">Products:</label>
+                        <select multiple ng-model="agreement.products" class="form-control"
+                                ng-options="item for item in products"></select>
+
+                        <label for="value" class="control-label lbl-p">Delivery Amount:</label>
+                        <select ng-model="agreement.deliveryAmount" class="form-control"
+                                ng-options="item.id as item.name for item in deliveryAmount">
+                        </select>
+
+                        <label for="value" class="control-label lbl-p">Return Amount:</label>
+                        <select ng-model="agreement.returnAmount" class="form-control"
+                                ng-options="item.id as item.name for item in deliveryAmount">
+                        </select>
+
+                        <label for="value" class="control-label lbl-p">Credit Support Amount:</label>
+                        <select ng-model="agreement.creditSupportAmount" class="form-control"
+                                ng-options="item.id as item.name for item in deliveryAmount">
+                        </select>
+
+                        <label for="value" class="control-label lbl-p">Eligible Collateral:</label>
+                        <div class="control-label thr">
+                            <button ng-click="changedValue()" type="button" class="btn btn-primary">Add Eligible
+                                Collateral
+                            </button>
+                        </div>
+                        <div class="gp-table-div" ng-show="agreement.eligibleCollaterals.length > 0">
+                            <table class="table table-bordered table-striped">
+                                <thead style="font-weight: bold">
+                                <tr>
+                                    <td>Country</td>
+                                    <td>Category</td>
+                                    <td>Qualifier</td>
+                                    <td>Ratings</td>
+                                    <td>Maturity</td>
+                                    <td>Ranges</td>
+                                    <td>Party A</td>
+                                    <td>Party B</td>
+                                    <td></td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="x in agreement.eligibleCollaterals">
+                                    <td>{{x.region}}</td>
+                                    <td>{{x.category}}</td>
+                                    <td>{{x.qualifier}}</td>
+                                    <td>
+                                        <div class="gp-table-div">
+                                            <table class="table table-bordered table-striped gp-table">
+                                                <thead style="font-weight: bold">
+                                                <tr>
+                                                    <td>Type</td>
+                                                    <td>Max</td>
+                                                    <td>Min</td>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr ng-if="x.moodysMax != null && x.moodysMin != null">
+                                                    <td>Moodys</td>
+                                                    <td>{{x.moodysMax}}</td>
+                                                    <td>{{x.moodysMin}}</td>
+                                                </tr>
+                                                <tr ng-if="x.spMax != null && x.spMin != null">
+                                                    <td>S & P</td>
+                                                    <td>{{x.spMax}}</td>
+                                                    <td>{{x.spMin}}</td>
+                                                </tr>
+                                                <tr ng-if="x.fitchMax != null && x.fitchMin != null">
+                                                    <td>Fitch</td>
+                                                    <td>{{x.fitchMax}}</td>
+                                                    <td>{{x.fitchMin}}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                    <td>{{x.remMaturity}}</td>
+                                    <td>
+                                        <div class="gp-table-div">
+                                            <table class="table table-bordered table-striped gp-table">
+                                                <thead style="font-weight: bold">
+                                                <tr>
+                                                    <td>From(Yrs)</td>
+                                                    <td>To(Yrs)</td>
+                                                    <td>Valuation%</td>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr ng-repeat="a in x.ranges"> <!-- Amend Base page -->
+                                                    <td>{{a.rangeFrom != '0' ? a.rangeFrom : ""}}</td>
+                                                    <td>{{a.rangeTo != '0' ? a.rangeTo : ""}}</td>
+                                                    <td>{{a.valuation != '0' ? a.valuation : ""}}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                    <td>{{x.partyA ? "Yes":"No"}}</td>
+                                    <td>{{x.partyB ? "Yes":"No"}}</td>
+                                    <td>
+                                        <button type="button" ng-click="deleteCollateral(x)" class="btn btn-primary">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!--select ng-change="changedValue()" ng-model="agreement.eligibleCollateral" class="form-control" ng-options="item as item.name for item in modalInstance.collateral track by item.id">
+                        </select-->
+
+                        <label for="value" class="control-label lbl-p">Thresholds:</label>
+                        <div class="control-label thr">
+                            <button ng-click="addThresholds()" type="button" class="btn btn-primary">Add Thresholds
+                            </button>
+                        </div>
+                        <div class="control-label thr">
+                            <div class="col-lg-12" ng-show="agreement.thresholds.length > 0">
+                                <div class="gp-table-div">
+                                    <table class="table table-bordered table-striped">
+                                        <thead style="font-weight: bold">
+                                        <tr>
+                                            <td>Ratings</td>
+                                            <td>Currency</td>
+                                            <td>Threshold Amount</td>
+                                            <td>Party A</td>
+                                            <td>Party B</td>
+                                            <td></td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="x in agreement.thresholds">
+                                            <td>
+                                                <div class="gp-table-div">
+                                                    <table class="table table-bordered table-striped gp-table">
+                                                        <thead style="font-weight: bold">
+                                                        <tr>
+                                                            <td>Type</td>
+                                                            <td>Max</td>
+                                                            <td>Min</td>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr ng-if="x.moodysMax != null && x.moodysMin != null">
+                                                            <td>Moodys</td>
+                                                            <td>{{x.moodysMax}}</td>
+                                                            <td>{{x.moodysMin}}</td>
+                                                        </tr>
+                                                        <tr ng-if="x.spMax != null && x.spMin != null">
+                                                            <td>S & P</td>
+                                                            <td>{{x.spMax}}</td>
+                                                            <td>{{x.spMin}}</td>
+                                                        </tr>
+                                                        <tr ng-if="x.fitchMax != null && x.fitchMin != null">
+                                                            <td>Fitch</td>
+                                                            <td>{{x.fitchMax}}</td>
+                                                            <td>{{x.fitchMin}}</td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                            <td>{{x.currencies}}</td>
+                                            <td>
+                                                {{x.amount}}
+                                            </td>
+                                            <td>{{x.partyA ? "Yes":"No"}}</td>
+                                            <td>{{x.partyB ? "Yes":"No"}}</td>
+                                            <td>
+                                                <button type="button" ng-click="deleteThreshold(x)"
+                                                        class="btn btn-primary">Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <label for="value" class="control-label lbl-p">Initial Margin:</label>
+                        <select ng-model="agreement.initialMargin" class="form-control"
+                                ng-options="item.id as item.name for item in yesNo">
+                        </select>
+
+                        <label for="value" class="control-label lbl-p">Valuation Agent:</label>
+                        <select ng-model="agreement.valuationAgent" class="form-control" id="valuationAgent"
+                                ng-options="peer as peer for peer in peers">
+                        </select>
+
+                        <label for="value" class="control-label lbl-p">Valuation Date:</label>
+                        <select ng-model="agreement.valuationDate" class="form-control">
+                            <option>LON - Business Days</option>
+                            <option>NYC - Business Days</option>
+                        </select>
+
+                        <label for="value" class="control-label lbl-p">Valuation Time:</label>
+                        <select ng-model="agreement.valuationTime" class="form-control">
+                            <option>Close of Business</option>
+                        </select>
+
+                        <label for="value" class="control-label lbl-p">Notification Time:</label>
+                        <input type="time" ng-model="agreement.notificationTime" class="form-control" id="address">
+
+                        <label for="value" class="control-label lbl-p">Specified Condition:</label>
+
+
+
+                        <div class="checkbox">
+                            <label>
+                                <input ng-click="addConditions(1)" ng-checked="cond1" ng-model="cond1" type="checkbox">
+                                Illegality
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input ng-click="addConditions(2)" ng-checked="cond2" ng-model="cond2" type="checkbox">
+                                Credit Event Upon Merger
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input ng-click="addConditions(3)" ng-checked="cond3" ng-model="cond3" type="checkbox">
+                                Additional Termination Events
+                            </label>
+                        </div>
+
+
+                        <div class="range">
+                            <label for="value">Substitution Date:</label>
+                            <input type="date" placeholder="From" ng-model="agreement.substitutionDateFrom"
+                                   id="address">
+                            <input type="date" placeholder="To" ng-model="agreement.substitutionDateTo" id="address">
+                        </div>
+
+
+                        <label for="value" class="control-label lbl-p">Consent:</label>
+                        <select ng-model="agreement.consent" class="form-control"
+                                ng-options="item.id as item.name for item in yesNo">
+                        </select>
+
+                        </BR>
+                        <label class="control-label lbl-p">File Upload :</label>
+                        <div class="control-label lbl-p">
+                            <form id="upload-form" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <input type="file" name="jar" class="form-control" accept=".zip,.jar">
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="fileUpload()">Upload</button>
+                            </form>
+                        </div>
+                        </BR>
+                        <div>
+                            <label ng-show="fileArray.length > 0">Uploaded Files</label>
+                            <div id="myDiv">
+                                <table class="table table-bordered table-striped" id="myList"
+                                       ng-show="fileArray.length > 0">
+                                    <thead style="font-weight: bold">
+                                    <tr>
+                                        <td>File Name</td>
+                                        <td>Action</td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="x in fileArray">
+                                        <td><a href="{{x.filehashUrl}}">{{x.filename}}</a></td>
+                                        <td>
+                                            <button ng-click="removeFile(x.filename)" type="button"
+                                                    class="glyphicon glyphicon-remove"/>
+                                        </td>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="btn-group gp-button-group">
+                <button type="button" ng-click="amendAgreement(agreement)" class="btn btn-primary">Amend</button>
+                <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="eligibleColCash.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Eligible Collateral</h4>
+    </div>
+    <div>
+        <form class="gp-firm-side-ui">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+
+                            <label for="value" class="control-label lbl-p">Currency:</label>
+                            <select ng-model="el.currency" class="form-control"
+                                    ng-options="item for item in currencies"></select>
+
+                            <label for="value" class="control-label lbl-p">Valuation %:</label>
+                            <input type="number" ng-model="el.valuation" class="form-control" id="address">
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-checked="el.partyA === true" ng-model="el.partyA" type="checkbox"> Party A
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-checked="el.partyB === true" ng-model="el.partyB" type="checkbox"> Party B
+                                </label>
+                            </div>
+
+                            <div ng-if="cash.length > 0">
+                                <table class="table table-bordered table-striped">
+                                    <thead style="font-weight: bold">
+                                    <tr>
+                                        <td>Currency</td>
+                                        <td>Valuation %</td>
+                                        <td>Party A</td>
+                                        <td>Party B</td>
+                                        <td></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="x in cash">
+                                        <td>{{x.currency}}</td>
+                                        <td>{{x.valuation}}</td>
+                                        <td>{{x.partyA ? "Yes":"No"}}</td>
+                                        <td>{{x.partyB ? "Yes":"No"}}</td>
+                                        <td>
+                                            <button ng-click="deleteCashColl(x)" type="button" class="btn btn-primary">
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group gp-button-group">
+                    <button type="button" ng-click="submit(el)" class="btn btn-primary">Submit</button>
+                    <button type="button" ng-click="add(el)" class="btn btn-secondary">Add</button>
+                    <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="eligibleColCashUpd.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Eligible Collateral</h4>
+    </div>
+    <div>
+        <form class="gp-firm-side-ui">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+
+                            <label for="value" class="control-label lbl-p">Currency:</label>
+                            <select ng-model="el.currency" class="form-control"
+                                    ng-options="item for item in currencies"></select>
+
+                            <label for="value" class="control-label lbl-p">Valuation %:</label>
+                            <input type="number" ng-model="el.valuation" class="form-control" id="address">
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-checked="el.partyA === true" ng-model="el.partyA" type="checkbox"> Party A
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-checked="el.partyB === true" ng-model="el.partyB" type="checkbox"> Party B
+                                </label>
+                            </div>
+
+                            <div ng-if="cash.length > 0">
+                                <table class="table table-bordered table-striped">
+                                    <thead style="font-weight: bold">
+                                    <tr>
+                                        <td>Currency</td>
+                                        <td>Valuation %</td>
+                                        <td>Party A</td>
+                                        <td>Party B</td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="x in cash">
+                                        <td>{{x.currency}}</td>
+                                        <td>{{x.valuation}}</td>
+                                        <td>{{x.partyA ? "Yes":"No"}}</td>
+                                        <td>{{x.partyB ? "Yes":"No"}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group gp-button-group">
+                    <button type="button" ng-click="submit()" class="btn btn-secondary">Submit</button>
+                    <button type="button" ng-click="addCash(el)" class="btn btn-secondary">Add</button>
+                    <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="eligibleColNew.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Eligible Collateral</h4>
+    </div>
+    <div>
+        <form class="gp-firm-side-ui">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <table class="table table-bordered table-striped">
+                            <thead style="font-weight: bold">
+                            <tr>
+                                <td style="width:10%">Country/Region</td>
+                                <td>Category</td>
+                                <td ng-if="el.category != 'Cash'">Qualifier</td>
+                                <td ng-if="el.category == 'Cash'">Currency</td>
+                                <td>Ratings</td>
+                                <td style="width:8%">Remaining or Original Maturity</td>
+                                <td style="width:25%">
+                                    <div>
+                                        <table class="table table-bordered table-striped">
+                                            <tbody>
+                                            <tr class="in-select">
+                                                <td>
+                                                    From:<input type="number" ng-model="range.rangeFrom"
+                                                                class="form-control" id="address">
+                                                </td>
+                                                <td>
+                                                    To:<input type="number" ng-model="range.rangeTo"
+                                                              class="form-control" id="address">
+                                                </td>
+                                                <td>
+                                                    Valuation%:<input type="number" ng-model="range.valuation"
+                                                                      class="form-control" id="address">
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <button type="button" ng-click="addRange(range, el)"
+                                            class="glyphicon glyphicon-plus"></button>
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <select ng-model="el.region" class="form-control"
+                                            ng-options="item as item for item in region">
+                                    </select>
+                                </td>
+                                <td>
+                                    <select ng-model="el.category" class="form-control"
+                                            ng-options="item as item for item in categories">
+                                    </select>
+                                </td>
+                                <td>
+                                    <div class="gp-qualifier-textbox" ng-if="el.category != 'Cash'">
+                                        <input type="text" ng-model="el.qualifier" class="form-control" id="address">
+                                    </div>
+                                    <div class="gp-cash-multiselect" ng-if="el.category == 'Cash'">
+                                        <select multiple ng-model="el.currencies" size="10" class="form-control"
+                                                ng-options="item for item in currencies"></select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <table class="table table-bordered table-striped">
+                                        <thead style="font-weight: bold">
+                                        <tr>
+                                            <td>Moody's</td>
+                                            <td>S&P</td>
+                                            <td>Fitch</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                                <div>Max:<select ng-model="el.moodysMax" class="form-control"
+                                                                 ng-options="item as item for item in moodysNew">
+                                                </select></div>
+                                                <div>Min:<select ng-model="el.moodysMin" class="form-control"
+                                                                 ng-options="item as item for item in moodysNew">
+                                                </select></div>
+                                            </td>
+                                            <td>
+                                                <div>Max:<select ng-model="el.spMax" class="form-control"
+                                                                 ng-options="item as item for item in spNew">
+                                                </select></div>
+                                                <div>Min:<select ng-model="el.spMin" class="form-control"
+                                                                 ng-options="item as item for item in spNew">
+                                                </select></div>
+                                            </td>
+                                            <td>
+                                                <div>Max:<select ng-model="el.fitchMax" class="form-control"
+                                                                 ng-options="item as item for item in fitchNew">
+                                                </select></div>
+                                                <div>Min:<select ng-model="el.fitchMin" class="form-control"
+                                                                 ng-options="item as item for item in fitchNew">
+                                                </select></div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </td>
+                                <td>
+                                    <select ng-model="el.remMaturity" class="form-control"
+                                            ng-options="item as item for item in maturities">
+                                    </select>
+                                </td>
+                                <td>
+                                    <div class="col-lg-12" ng-show="el.ranges.length > 0">
+                                        <div class="gp-table-div">
+                                            <table class="table table-bordered table-striped gp-table">
+                                                <thead style="font-weight: bold">
+                                                <tr>
+                                                    <td>From(Yrs)</td>
+                                                    <td>To(Yrs)</td>
+                                                    <td>Valuation%</td>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr ng-repeat="a in el.ranges">
+                                                    <td>{{a.rangeFrom != '0' ? a.rangeFrom : ""}}</td>
+                                                    <td>{{a.rangeTo != '0' ? a.rangeTo : ""}}</td>
+                                                    <td>{{a.valuation != '0' ? a.valuation : ""}}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="checkbox" style="padding-left:15px">
+                        <label>
+                            <input ng-checked="el.partyA === true" ng-model="el.partyA" type="checkbox"> Party A
+                        </label>
+                    </div>
+                    <div class="checkbox" style="padding-left:15px">
+                        <label>
+                            <input ng-checked="el.partyB === true" ng-model="el.partyB" type="checkbox"> Party B
+                        </label>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="btn-group gp-button-group">
+                            <button type="button" ng-click="submit(el)" class="btn btn-primary">Submit</button>
+                            <button type="button" ng-click="add(el)" class="btn btn-secondary">Add</button>
+                            <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div ng-if="sec.length > 0">
+                        <table class="table table-bordered table-striped">
+                            <thead style="font-weight: bold">
+                            <tr>
+                                <td>Country</td>
+                                <td>Category</td>
+                                <td>Qualifier/Currencies</td>
+                                <td>Ratings</td>
+                                <td>Maturity</td>
+                                <td>Ranges</td>
+                                <td>Party A</td>
+                                <td>Party B</td>
+                                <td></td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="x in sec">
+                                <td>{{x.region}}</td>
+                                <td>{{x.category}}</td>
+                                <td ng-if="x.category != 'Cash'">{{x.qualifier}}</td>
+                                <td ng-if="x.category == 'Cash'">{{getCurrencies(x.currencies)}}</td>
+                                <td>
+                                    <div class="gp-table-div">
+                                        <table class="table table-bordered table-striped gp-table">
+                                            <thead style="font-weight: bold">
+                                            <tr>
+                                                <td>Type</td>
+                                                <td>Max</td>
+                                                <td>Min</td>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-if="x.moodysMax != null && x.moodysMin != null">
+                                                <td>Moodys</td>
+                                                <td>{{x.moodysMax}}</td>
+                                                <td>{{x.moodysMin}}</td>
+                                            </tr>
+                                            <tr ng-if="x.spMax != null && x.spMin != null">
+                                                <td>S & P</td>
+                                                <td>{{x.spMax}}</td>
+                                                <td>{{x.spMin}}</td>
+                                            </tr>
+                                            <tr ng-if="x.fitchMax != null && x.fitchMin != null">
+                                                <td>Fitch</td>
+                                                <td>{{x.fitchMax}}</td>
+                                                <td>{{x.fitchMin}}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                                <td>{{x.remMaturity}}</td>
+                                <td>
+                                    <div class="gp-table-div">
+                                        <table class="table table-bordered table-striped gp-table">
+                                            <thead style="font-weight: bold">
+                                            <tr>
+                                                <td>From(Yrs)</td>
+                                                <td>To(Yrs)</td>
+                                                <td>Valuation%</td>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="a in x.ranges">
+                                                <td width="33%">{{a.rangeFrom}}</td>
+                                                <td width="33%">{{a.rangeTo}}</td>
+                                                <td><input type="number" ng-model="a.valuation" class="form-control">
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                                <td>{{x.partyA ? "Yes":"No"}}</td>
+                                <td>{{x.partyB ? "Yes":"No"}}</td>
+                                <td>
+                                    <button ng-click="deleteSecColl(x)" type="button" class="btn btn-primary">Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="eligibleColSec.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Eligible Collateral</h4>
+    </div>
+    <div>
+        <form class="gp-firm-side-ui">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+
+                            <label for="value" class="control-label lbl-p">Moody's Rating:</label>
+                            <select ng-model="el.moody" class="form-control"
+                                    ng-options="item as item.name for item in moodys"
+                                    ng-disabled="el.sp.id != null || el.fitch.id != null">
+                            </select>
+                            <label for="value" class="control-label lbl-p">S&P Rating:</label>
+                            <select ng-model="el.sp" class="form-control" ng-options="item as item.name for item in sps"
+                                    ng-disabled="el.moody.id != null || el.fitch.id != null">
+                            </select>
+                            <label for="value" class="control-label lbl-p">Fitch Rating:</label>
+                            <select ng-model="el.fitch" class="form-control"
+                                    ng-options="item as item.name for item in fitchs"
+                                    ng-disabled="el.sp.id != null || el.moody.id != null">
+                            </select>
+                            <!--div class="range">
+                                <label for="value">Range:</label>
+                                <input type="number" placeholder="From" ng-model="el.rfrom" id="address">
+                                <input type="number" placeholder="To" ng-model="el.rto" id="address">
+                            </div-->
+                            <label for="value" class="control-label lbl-p">Remaining Maturity:</label>
+                            <select ng-model="el.remMaturity" class="form-control"
+                                    ng-options="item.id as item.name for item in yesNo">
+                            </select>
+                            <div class="range" ng-if="el.remMaturity === 1">
+                                <label for="value">Maturity (in Years):</label>
+                                <input type="number" placeholder="From" ng-model="el.remMaturityFrom" id="address">
+                                <input type="number" placeholder="To" ng-model="el.remMaturityTo" id="address">
+                            </div>
+                            <label for="value" class="control-label lbl-p">Valuation %:</label>
+                            <input type="number" ng-model="el.valuation" class="form-control" id="address">
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-checked="el.partyA === true" ng-model="el.partyA" type="checkbox"> Party A
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-checked="el.partyB === true" ng-model="el.partyB" type="checkbox"> Party B
+                                </label>
+                            </div>
+
+                            <div ng-if="sec.length > 0">
+                                <table class="table table-bordered table-striped">
+                                    <thead style="font-weight: bold">
+                                    <tr>
+                                        <td>Rating</td>
+                                        <td>Rating Criteria</td>
+                                        <td>Remaining Maturity</td>
+                                        <td>Maturity From (in Years)</td>
+                                        <td>Maturity To (in Years)</td>
+                                        <td>Valuation %</td>
+                                        <td>Party A</td>
+                                        <td>Party B</td>
+                                        <td></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="x in sec">
+                                        <td>{{x.moody.name != null ? "Moody's" : (x.sp.name !=null?"S&P":"Fitch")}}</td>
+                                        <td>{{x.moody.name != null ? x.moody.name : (x.sp.name
+                                            !=null?x.sp.name:x.fitch.name)}}
+                                        </td>
+                                        <td>{{x.remMaturity === 1 ? "Yes":"No"}}</td>
+                                        <td>{{x.remMaturityFrom}}</td>
+                                        <td>{{x.remMaturityTo}}</td>
+                                        <td>{{x.valuation}}</td>
+                                        <td>{{x.partyA ? "Yes":"No"}}</td>
+                                        <td>{{x.partyB ? "Yes":"No"}}</td>
+                                        <td>
+                                            <button ng-click="deleteSecColl(x)" type="button" class="btn btn-primary">
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group gp-button-group">
+                    <button type="button" ng-click="submit(el)" class="btn btn-primary">Submit</button>
+                    <button type="button" ng-click="add(el)" class="btn btn-secondary">Add</button>
+                    <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="eligibleColSecUpd.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Eligible Collateral</h4>
+    </div>
+    <div>
+        <form class="gp-firm-side-ui">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+
+                            <label for="value" class="control-label lbl-p">Moody's Rating:</label>
+                            <select ng-model="el.moody" class="form-control"
+                                    ng-options="item as item.name for item in moodys"
+                                    ng-disabled="el.sp.id != null || el.fitch.id != null">
+                            </select>
+                            <label for="value" class="control-label lbl-p">S&P Rating:</label>
+                            <select ng-model="el.sp" class="form-control" ng-options="item as item.name for item in sps"
+                                    ng-disabled="el.moody.id != null || el.fitch.id != null">
+                            </select>
+                            <label for="value" class="control-label lbl-p">Fitch Rating:</label>
+                            <select ng-model="el.fitch" class="form-control"
+                                    ng-options="item as item.name for item in fitchs"
+                                    ng-disabled="el.sp.id != null || el.moody.id != null">
+                            </select>
+                            <label for="value" class="control-label lbl-p">Remaining Maturity:</label>
+                            <select ng-model="el.remMaturity" class="form-control"
+                                    ng-options="item.id as item.name for item in yesNo">
+                            </select>
+                            <div class="range" ng-if="el.remMaturity === 1">
+                                <label for="value">Maturity (in Years):</label>
+                                <input type="number" placeholder="From" ng-model="el.remMaturityFrom" id="address">
+                                <input type="number" placeholder="To" ng-model="el.remMaturityTo" id="address">
+                            </div>
+                            <label for="value" class="control-label lbl-p">Valuation %:</label>
+                            <input type="number" ng-model="el.valuation" class="form-control" id="address">
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-checked="el.partyA === true" ng-model="el.partyA" type="checkbox"> Party A
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-checked="el.partyB === true" ng-model="el.partyB" type="checkbox"> Party B
+                                </label>
+                            </div>
+
+                            <div ng-if="sec.length > 0">
+                                <table class="table table-bordered table-striped">
+                                    <thead style="font-weight: bold">
+                                    <tr>
+                                        <td>Rating</td>
+                                        <td>Rating Criteria</td>
+                                        <td>Remaining Maturity</td>
+                                        <td>Maturity From</td>
+                                        <td>Maturity To</td>
+                                        <td>Valuation</td>
+                                        <td>Party A</td>
+                                        <td>Party B</td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="x in sec">
+                                        <td>{{x.moody.name != null ? "Moody's" : (x.sp.name !=null?"S&P":"Fitch")}}</td>
+                                        <td>{{x.moody.name != null ? x.moody.name : (x.sp.name
+                                            !=null?x.sp.name:x.fitch.name)}}
+                                        </td>
+                                        <td>{{x.remMaturity}}</td>
+                                        <td>{{x.remMaturityFrom}}</td>
+                                        <td>{{x.remMaturityTo}}</td>
+                                        <td>{{x.valuation}}</td>
+                                        <td>{{x.partyA ? "Yes":"No"}}</td>
+                                        <td>{{x.partyB ? "Yes":"No"}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group gp-button-group">
+                    <button type="button" ng-click="submit()" class="btn btn-secondary">Submit</button>
+                    <button type="button" ng-click="addSec(el)" class="btn btn-secondary">Add</button>
+                    <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="addThresholds.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Thresholds</h4>
+    </div>
+    <div>
+        <form class="gp-firm-side-ui">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <table class="table table-bordered table-striped">
+                            <thead style="font-weight: bold">
+                            <tr>
+                                <td style="width:60%">Ratings</td>
+                                <td style="width:20%">Currency</td>
+                                <td>
+                                    Threshold Amount
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <table class="table table-bordered table-striped">
+                                        <thead style="font-weight: bold">
+                                        <tr>
+                                            <td>Moody's</td>
+                                            <td>S&P</td>
+                                            <td>Fitch</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                                <div>Max:<select ng-model="el.moodysMax" class="form-control"
+                                                                 ng-options="item as item for item in moodysNew">
+                                                </select></div>
+                                                <div>Min:<select ng-model="el.moodysMin" class="form-control"
+                                                                 ng-options="item as item for item in moodysNew">
+                                                </select></div>
+                                            </td>
+                                            <td>
+                                                <div>Max:<select ng-model="el.spMax" class="form-control"
+                                                                 ng-options="item as item for item in spNew">
+                                                </select></div>
+                                                <div>Min:<select ng-model="el.spMin" class="form-control"
+                                                                 ng-options="item as item for item in spNew">
+                                                </select></div>
+                                            </td>
+                                            <td>
+                                                <div>Max:<select ng-model="el.fitchMax" class="form-control"
+                                                                 ng-options="item as item for item in fitchNew">
+                                                </select></div>
+                                                <div>Min:<select ng-model="el.fitchMin" class="form-control"
+                                                                 ng-options="item as item for item in fitchNew">
+                                                </select></div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </td>
+                                <td>
+                                    <select ng-model="el.currencies" class="form-control"
+                                            ng-options="item for item in currencies"></select>
+                                </td>
+                                <td>
+                                    <input type="number" ng-model="el.amount" class="form-control" id="Tamount">
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="checkbox" style="padding-left:15px">
+                        <label>
+                            <input ng-checked="el.partyA === true" ng-model="el.partyA" type="checkbox"> Party A
+                        </label>
+                    </div>
+                    <div class="checkbox" style="padding-left:15px">
+                        <label>
+                            <input ng-checked="el.partyB === true" ng-model="el.partyB" type="checkbox"> Party B
+                        </label>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="btn-group gp-button-group">
+                            <button type="button" ng-click="submit(el)" class="btn btn-primary">Submit</button>
+                            <button type="button" ng-click="add(el)" class="btn btn-secondary">Add</button>
+                            <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div ng-if="sec.length > 0">
+                        <table class="table table-bordered table-striped">
+                            <thead style="font-weight: bold">
+                            <tr>
+                                <td style="width:60%">Ratings</td>
+                                <td style="width:10%">Currency</td>
+                                <td style="width:10%">Threshold Amount</td>
+                                <td>Party A</td>
+                                <td>Party B</td>
+                                <td></td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="x in sec">
+                                <td>
+                                    <div class="gp-table-div">
+                                        <table class="table table-bordered table-striped gp-table">
+                                            <thead style="font-weight: bold">
+                                            <tr>
+                                                <td>Type</td>
+                                                <td>Max</td>
+                                                <td>Min</td>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-if="x.moodysMax != null && x.moodysMin != null">
+                                                <td>Moodys</td>
+                                                <td>{{x.moodysMax}}</td>
+                                                <td>{{x.moodysMin}}</td>
+                                            </tr>
+                                            <tr ng-if="x.spMax != null && x.spMin != null">
+                                                <td>S & P</td>
+                                                <td>{{x.spMax}}</td>
+                                                <td>{{x.spMin}}</td>
+                                            </tr>
+                                            <tr ng-if="x.fitchMax != null && x.fitchMin != null">
+                                                <td>Fitch</td>
+                                                <td>{{x.fitchMax}}</td>
+                                                <td>{{x.fitchMin}}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                                <td>{{x.currencies}}</td>
+
+                                <td>
+                                    <input type="number" ng-model="x.amount" class="form-control"></td>
+                                </td>
+                                <td>{{x.partyA ? "Yes":"No"}}</td>
+                                <td>{{x.partyB ? "Yes":"No"}}</td>
+                                <td>
+                                    <button ng-click="deleteSecColl(x)" type="button" class="btn btn-primary">Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="addThresholdsUpd.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Add Thresholds</h4>
+    </div>
+    <div>
+        <form class="gp-firm-side-ui">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="value" class="control-label lbl-p">Moody's Rating:</label>
+                            <select ng-model="el.moody" class="form-control"
+                                    ng-options="item as item.name for item in moodys"
+                                    ng-disabled="el.sp.id != null || el.fitch.id != null">
+                            </select>
+                            <label for="value" class="control-label lbl-p">S&P Rating:</label>
+                            <select ng-model="el.sp" class="form-control" ng-options="item as item.name for item in sps"
+                                    ng-disabled="el.moody.id != null || el.fitch.id != null">
+                            </select>
+                            <label for="value" class="control-label lbl-p">Fitch Rating:</label>
+                            <select ng-model="el.fitch" class="form-control"
+                                    ng-options="item as item.name for item in fitchs"
+                                    ng-disabled="el.sp.id != null || el.moody.id != null">
+                            </select>
+                            <label for="value" class="control-label lbl-p">Threshold Amount:</label>
+                            <input type="number" ng-model="el.amount" class="form-control" id="address">
+
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-checked="el.partyA === true" ng-model="el.partyA" type="checkbox"> Party A
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-checked="el.partyB === true" ng-model="el.partyB" type="checkbox"> Party B
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group gp-button-group">
+                    <button type="button" ng-click="submit(el)" class="btn btn-primary">Submit</button>
+                    <button type="button" ng-click="add(el)" class="btn btn-secondary">Add</button>
+                    <button type="button" ng-click="cancel()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
 </body>
 </html>
