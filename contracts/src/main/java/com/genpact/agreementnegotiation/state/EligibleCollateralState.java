@@ -1,7 +1,9 @@
 package com.genpact.agreementnegotiation.state;
 
+import net.corda.core.serialization.CordaSerializable;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+@CordaSerializable
 public class EligibleCollateralState extends Rating {
     private String region;
     private String category;

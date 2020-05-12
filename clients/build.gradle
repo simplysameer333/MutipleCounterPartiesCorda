@@ -44,13 +44,13 @@ task runTemplateServer(type: JavaExec, dependsOn: assemble) {
     args '--server.port=10050', '--config.rpc.host=localhost', '--config.rpc.port=10006', '--config.rpc.username=user1', '--config.rpc.password=test'
 }*/
 
-task runPartyAServer(type: JavaExec) {
+task runGenpactServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.genpact.agreementnegotiation.webserver.Starter'
     args '--server.port=50005', '--config.rpc.host=localhost', '--config.rpc.port=10006', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runPartyBServer(type: JavaExec) {
+task runBOABServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.genpact.agreementnegotiation.webserver.Starter'
     args '--server.port=50006', '--config.rpc.host=localhost', '--config.rpc.port=10009', '--config.rpc.username=user1', '--config.rpc.password=test'

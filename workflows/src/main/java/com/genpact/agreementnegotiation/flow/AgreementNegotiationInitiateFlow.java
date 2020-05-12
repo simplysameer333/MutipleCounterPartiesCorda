@@ -16,10 +16,7 @@ import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
 
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.genpact.agreementnegotiation.contract.AgreementNegotiationContract.TEMPLATE_CONTRACT_ID;
 import static net.corda.core.contracts.ContractsDSL.requireThat;
@@ -110,16 +107,14 @@ public class AgreementNegotiationInitiateFlow {
             agreementNegotiationState.setCptyReciever(otherParties);
             agreementNegotiationState.setVersion(1);
 
-            //Add initiator status
-            agreementNegotiationState.getAllPartiesStatus().
-                    put(agreementNegotiationState.getCptyInitiator().getName().getOrganisation(),
-                            AgreementEnumState.INITIAL.toString());
 
+            System.out.println("set outputContractAndState");
             StateAndContract outputContractAndState = new StateAndContract(agreementNegotiationState, TEMPLATE_CONTRACT_ID);
             /*  List<PublicKey> requiredSigners = ImmutableList.of(agreementNegotiationState.getCptyInitiator().getOwningKey(),
                     agreementNegotiationState.getCptyReciever().getOwningKey());
             */
 
+            progressTracker.setCurrentStep(SIGS_GATHERING);
             //Get public keys of all participants
             List<PublicKey> requiredSigners = new ArrayList<>();
             requiredSigners.add(agreementNegotiationState.getCptyInitiator().getOwningKey());
@@ -127,9 +122,11 @@ public class AgreementNegotiationInitiateFlow {
                 requiredSigners.add(party.getOwningKey());
             }
             //sign command with all public keys
+            System.out.println("set requiredSigners");
             Command cmd = new Command<>(new AgreementNegotiationContract.Commands.Initiate(),
                     Collections.unmodifiableList(requiredSigners));
 
+            System.out.println("set withItems");
             // We add the items to the builder.
             txBuilder.withItems(outputContractAndState, cmd);
 

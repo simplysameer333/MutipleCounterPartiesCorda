@@ -132,7 +132,7 @@ public class AgreementNegotiationAmendFlow {
 
                 // We create the transaction components.
                 agreementNegotiationState.setLinearId(previousState.getLinearId());
-                agreementNegotiationState.setAgrementInitiationDate(previousState.getAgrementInitiationDateAsDate());
+                agreementNegotiationState.setAgrementInitiationDate(previousState.getAgrementInitiationDate());
                 agreementNegotiationState.setCptyInitiator(previousState.getCptyInitiator());
                 agreementNegotiationState.setStatus(AgreementEnumState.AMEND);
                 agreementNegotiationState.setAgrementLastAmendDate(new Date());
@@ -149,8 +149,9 @@ public class AgreementNegotiationAmendFlow {
                 //Copy old status in new map if they are still part of transaction
                 for (Map.Entry<String, String> partyStatus : previousState.getAllPartiesStatus().entrySet()) {
                     if (agreementNegotiationState.getAllPartiesStatus().get(partyStatus.getKey()) != null) {
-                        agreementNegotiationState.getAllPartiesStatus().put(partyStatus.getKey(),
-                                partyStatus.getValue());
+                        Map<String, String> tempPartyStatus = new LinkedHashMap<>(agreementNegotiationState.getAllPartiesStatus());
+                        tempPartyStatus.put(partyStatus.getKey(), partyStatus.getValue());
+                        agreementNegotiationState.setAllPartiesStatus(tempPartyStatus);
                     }
                 }
                 //Add old status of Initiator
@@ -252,6 +253,7 @@ public class AgreementNegotiationAmendFlow {
     }
 
     @InitiatedBy(Initiator.class)
+    @Suspendable
     public static class Responder extends FlowLogic<SignedTransaction> {
         private FlowSession counterpartySession;
 

@@ -240,7 +240,7 @@ public class AgreementUtil {
         agreement.setVersion(agreementNegotiationState.getVersion());
 
         //Additional
-        agreement.setAgrementInitiationDate(agreementNegotiationState.getAgrementInitiationDateAsDate());
+        agreement.setAgrementInitiationDate(agreementNegotiationState.getAgrementInitiationDate());
         agreement.setAgrementAgreedDate(agreementNegotiationState.getAgrementAgreedDateAsDate());
         agreement.setAgrementLastAmendDate(agreementNegotiationState.getAgrementLastAmendDateAsDate());
         agreement.setCptyInitiator(agreementNegotiationState.getCptyInitiator().getName().getOrganisation());
@@ -508,7 +508,7 @@ public class AgreementUtil {
     }
 
     public static void resetCounterPartiesStatus(AgreementNegotiationState agreementNegotiationState, AgreementEnumState status) {
-        Map<String, String> allPartiesStatus = new HashMap<>();
+        Map<String, String> allPartiesStatus = new LinkedHashMap<>();
         for (Party party : agreementNegotiationState.getCptyReciever()) {
             allPartiesStatus.put(party.getName().getOrganisation(), status.toString());
         }
@@ -665,7 +665,7 @@ public class AgreementUtil {
                 ? "N.A" : agreementNegotiationState.getValuationDate());
         placeHolders.put("valuationTime", StringUtils.isEmpty(agreementNegotiationState.getValuationTime())
                 ? "N.A" : agreementNegotiationState.getValuationTime());
-        placeHolders.put("notificationTime", StringUtils.isEmpty(agreementNegotiationState.getNotificationTime())
+        placeHolders.put("notificationTime", StringUtils.isEmpty(agreementNegotiationState.getNotificationTimeAsString())
                 ? "N.A" : agreementNegotiationState.getNotificationTime());
         placeHolders.put("consent", agreementNegotiationState.getConsent() ? "Yes" : "No");
 

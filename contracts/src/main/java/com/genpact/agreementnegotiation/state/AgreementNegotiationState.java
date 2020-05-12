@@ -1,13 +1,16 @@
 package com.genpact.agreementnegotiation.state;
 
+import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.util.AgreementUtil;
 import com.google.common.collect.ImmutableList
         ;
+import net.corda.core.contracts.BelongsToContract;
 import net.corda.core.identity.Party;
 import net.corda.core.schemas.MappedSchema;
 import net.corda.core.schemas.PersistentState;
 import net.corda.core.schemas.QueryableState;
+import net.corda.core.serialization.CordaSerializable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -17,6 +20,9 @@ import java.util.List;
 /**
  * Define your state object here.
  */
+
+@CordaSerializable
+@BelongsToContract(AgreementNegotiationContract.class)
 public class AgreementNegotiationState extends AgreementStateTemplate implements QueryableState {
 
     private String baseCurrency;
@@ -119,16 +125,26 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         this.valuationTime = valuationTime;
     }
 
-    public String getNotificationTime() {
+    public Date getNotificationTime() {
+      /*  if (notificationTime != null) {
+            String dateStr = AgreementUtil.FORMAT_TIME.format(notificationTime);
+            return dateStr;
+        }
+        return "";*/
+        return notificationTime;
+    }
+
+    public Date getNotificationTimeAsDate() {
+        return notificationTime;
+    }
+
+    public String getNotificationTimeAsString() {
         if (notificationTime != null) {
             String dateStr = AgreementUtil.FORMAT_TIME.format(notificationTime);
             return dateStr;
         }
         return "";
-    }
 
-    public Date getNotificationTimeAsDate() {
-        return notificationTime;
     }
 
 
@@ -148,12 +164,21 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         return substitutionDateFrom;
     }
 
-    public String getSubstitutionDateFrom() {
+    public String getSubstitutionDateFromAsString() {
         if (substitutionDateFrom != null) {
             String dateStr = AgreementUtil.FORMAT.format(substitutionDateFrom);
             return dateStr;
         }
         return "";
+    }
+
+    public Date getSubstitutionDateFrom() {
+       /* if (substitutionDateFrom != null) {
+            String dateStr = AgreementUtil.FORMAT.format(substitutionDateFrom);
+            return dateStr;
+        }
+        return "";*/
+        return substitutionDateFrom;
     }
 
     public void setSubstitutionDateFrom(Date substitutionDateFrom) {
@@ -164,12 +189,21 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
         return substitutionDateTo;
     }
 
-    public String getSubstitutionDateTo() {
+    public String getSubstitutionDateToAsString() {
         if (substitutionDateTo != null) {
             String dateStr = AgreementUtil.FORMAT.format(substitutionDateTo);
             return dateStr;
         }
         return "";
+    }
+
+    public Date getSubstitutionDateTo() {
+       /* if (substitutionDateTo != null) {
+            String dateStr = AgreementUtil.FORMAT.format(substitutionDateTo);
+            return dateStr;
+        }
+        return "";*/
+        return substitutionDateTo;
     }
 
     public void setSubstitutionDateTo(Date substitutionDateTo) {
@@ -217,10 +251,10 @@ public class AgreementNegotiationState extends AgreementStateTemplate implements
             return new AgreementNegotiationSchema.PersistentIOU(
                     this.getLinearId().getId(),
                     this.getAgrementName(),
-                    this.getAgrementInitiationDate(),
-                    this.getAgrementAgreedDate(),
+                    this.getAgrementInitiationDateAsString(),
+                    this.getAgrementAgreedDateAsString(),
                     this.getLastUpdatedBy().getName().getCommonName(),
-                    this.getAgrementLastAmendDate(),
+                    this.getAgrementLastAmendDateAsString(),
                     this.getStatus().toString(),
                     this.getCptyInitiator().getName().getCommonName(),
                     counterParties,

@@ -1,5 +1,6 @@
 package com.genpact.agreementnegotiation.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import net.corda.core.serialization.CordaSerializable;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -8,6 +9,7 @@ import java.util.*;
 @CordaSerializable
 public class Agreement {
     private String agrementName = null;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<String> counterparty;
     private String baseCurrency = null;
     private List<String> eligibleCurrency = new ArrayList<String>();

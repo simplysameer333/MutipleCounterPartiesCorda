@@ -68,7 +68,7 @@ public class AgreementNegotiationController {
     private final Map<String, CordaX500Name> cordaX500NameMap;
     private final Map<String, CordaX500Name> cordaX500AllNodesMap;
 
-    private final List<String> serviceNames = ImmutableList.of("Controller", "Network Map Service");
+    private final List<String> serviceNames = ImmutableList.of("Controller", "Network Map Service", "Notary");
 
     public AgreementNegotiationController(NodeRPCConnection rpc) {
         this.rpcOps = rpc.proxy;
@@ -134,7 +134,7 @@ public class AgreementNegotiationController {
      * Accessible at /api/template/initFlow.
      */
     @PostMapping(value ="template/initFlow", produces = MediaType.APPLICATION_JSON)
-    public Response startInitFlow(Agreement agreement) {
+    public Map<String, String> startInitFlow(@RequestBody Agreement agreement) {
 
         try {
             System.out.println("initFlow ==============================>" + agreement.toString());
@@ -142,9 +142,16 @@ public class AgreementNegotiationController {
             AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
             agreementNegotiationState.setCptyInitiator(rpcOps.wellKnownPartyFromX500Name(myLegalName));
             agreementNegotiationState.setCptyReciever(extractCounterParties(agreement));
+
             System.out.println("After  initFlow ==============================>" + agreementNegotiationState.toString());
             //Reset status of all participants
             AgreementUtil.resetCounterPartiesStatus(agreementNegotiationState, AgreementEnumState.INITIAL);
+
+            //Add initiator status
+            agreementNegotiationState.getAllPartiesStatus().
+                    put(agreementNegotiationState.getCptyInitiator().getName().getOrganisation(),
+                            AgreementEnumState.INITIAL.toString());
+
 
             //attach file if added and does not exists
             AgreementUtil.attachAttachmentHash(agreement, agreementNegotiationState);
@@ -166,7 +173,7 @@ public class AgreementNegotiationController {
             Map<String, String> response = new HashMap<>();
             response.put("transactionId", result.getId().toString());
             response.put("status", newAgreement.getStatus());
-            return Response.ok(response).build();
+            return response;
         } catch (Throwable ex) {
             ex.printStackTrace();
             Response.ResponseBuilder reposnse = Response.status(400);
@@ -174,7 +181,7 @@ public class AgreementNegotiationController {
             error.put("error", "Error occurred while submitted a Request.");
             JSONObject jsonObj = new JSONObject(error);
             reposnse.entity(jsonObj);
-            return reposnse.build();
+            return error;
         }
 
     }
@@ -183,7 +190,7 @@ public class AgreementNegotiationController {
      * Accessible at /api/template/amendFlow.
      */
     @PutMapping(value ="template/amendFlow", produces = MediaType.APPLICATION_JSON)
-    public Response startAmendFlow(Agreement agreement) {
+    public Map<String, String>  startAmendFlow(@RequestBody Agreement agreement) {
 
         try {
             AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
@@ -214,15 +221,12 @@ public class AgreementNegotiationController {
             if (newAgreement != null) {
                 response.put("status", newAgreement.getStatus());
             }
-            return Response.ok(response).build();
+            return response;
         } catch (Throwable ex) {
             ex.printStackTrace();
-            Response.ResponseBuilder reposnse = Response.status(400);
             Map<String, String> error = new HashMap<>();
             error.put("error", "Error occurred while Amending a Request.");
-            JSONObject jsonObj = new JSONObject(error);
-            reposnse.entity(jsonObj);
-            return reposnse.build();
+            return error;
         }
     }
 
@@ -230,7 +234,7 @@ public class AgreementNegotiationController {
      * Accessible at /api/template/amendFlow.
      */
     @PutMapping(value ="template/acceptFlow", produces = MediaType.APPLICATION_JSON)
-    public Response accept(Agreement agreement) {
+    public Map<String, String>  accept(@RequestBody Agreement agreement) {
         try {
             AgreementNegotiationState agreementNegotiationState = AgreementUtil.copyState(agreement);
 
@@ -251,15 +255,12 @@ public class AgreementNegotiationController {
             Map<String, String> response = new HashMap<>();
             response.put("transactionId", result.getId().toString());
             response.put("status", newAgreement.getStatus());
-            return Response.ok(response).build();
+            return response;
         } catch (Throwable ex) {
             ex.printStackTrace();
-            Response.ResponseBuilder reposnse = Response.status(400);
             Map<String, String> error = new HashMap<>();
             error.put("error", "Error occurred while Accepting a Request.");
-            JSONObject jsonObj = new JSONObject(error);
-            reposnse.entity(jsonObj);
-            return reposnse.build();
+             return error;
         }
     }
 
@@ -371,19 +372,34 @@ public class AgreementNegotiationController {
             Vault.Page<AgreementNegotiationState> results = rpcOps.vaultQueryByCriteria(vaultCriteria, AgreementNegotiationState.class);
             Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class);
 
-            //All agreements states UNCONSUMED & CONSUMED
-            results1.getStates().addAll(results.getStates());
+            //All agreements states UNCONSUMED & CONSUMED  - in V4 this getStates() in unModified
+            //results1.getStates().addAll(results.getStates());
 
             int count = 1;
-            for (StateAndRef<AgreementNegotiationState> value : results1.getStates()) {
-                Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
-                if (count > 1) {
-                    Agreement oldAgreement = agreementsList.get(agreementsList.size() - 1);
-                    agreement.setChangedFields(AgreementUtil.compare(agreement, oldAgreement));
+            if (results1 != null && results1.getStates() != null && results1.getStates().size() > 0) {
+                for (StateAndRef<AgreementNegotiationState> value : results1.getStates()) {
+                    Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
+                    if (count > 1) {
+                        Agreement oldAgreement = agreementsList.get(agreementsList.size() - 1);
+                        agreement.setChangedFields(AgreementUtil.compare(agreement, oldAgreement));
+                    }
+                    agreementsList.add(agreement);
+                    count++;
                 }
-                agreementsList.add(agreement);
-                count++;
             }
+
+            if (results != null && results.getStates() != null && results.getStates().size() > 0) {
+                for (StateAndRef<AgreementNegotiationState> value : results.getStates()) {
+                    Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
+                    if (count > 1) {
+                        Agreement oldAgreement = agreementsList.get(agreementsList.size() - 1);
+                        agreement.setChangedFields(AgreementUtil.compare(agreement, oldAgreement));
+                    }
+                    agreementsList.add(agreement);
+                    count++;
+                }
+            }
+
             return agreementsList;
         } catch (Exception ex) {
             System.out.println("Exception" + ex.toString());
@@ -410,11 +426,22 @@ public class AgreementNegotiationController {
                 openAgreements.add(value.getState().getData().getAgrementName());
             }
 
-            //All agreements states UNCONSUMED & CONSUMED
-            results1.getStates().addAll(results.getStates());
+            //All agreements states UNCONSUMED & CONSUMED - in V4 this getStates() in unModified
+            //results1.getStates().addAll(results.getStates());
 
             //iterate over all and put them in Map as per the name
             for (StateAndRef<AgreementNegotiationState> value : results1.getStates()) {
+                Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
+                List<Agreement> foundAgreementsData = allAgreements.get(agreement.getAgrementName());
+
+                if (foundAgreementsData == null) {
+                    List<Agreement> commonAgreementsData = new ArrayList<>();
+                    allAgreements.put(agreement.getAgrementName(), commonAgreementsData);
+                }
+                allAgreements.get(agreement.getAgrementName()).add(agreement);
+            }
+
+            for (StateAndRef<AgreementNegotiationState> value : results.getStates()) {
                 Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
                 List<Agreement> foundAgreementsData = allAgreements.get(agreement.getAgrementName());
 
@@ -482,9 +509,13 @@ public class AgreementNegotiationController {
                 Vault.Page<AgreementNegotiationState> results = rpcOps.vaultQueryByCriteria(vaultCriteria, AgreementNegotiationState.class);
                 Vault.Page<AgreementNegotiationState> results1 = rpcOps.vaultQueryByCriteria(customCriteria, AgreementNegotiationState.class);
 
-                results1.getStates().addAll(results.getStates());
+                //results1.getStates().addAll(results.getStates());
 
                 for (StateAndRef<AgreementNegotiationState> value : results1.getStates()) {
+                    Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
+                    agreementsList.add(agreement);
+                }
+                for (StateAndRef<AgreementNegotiationState> value : results.getStates()) {
                     Agreement agreement = AgreementUtil.copyStateToVO(value.getState().getData());
                     agreementsList.add(agreement);
                 }

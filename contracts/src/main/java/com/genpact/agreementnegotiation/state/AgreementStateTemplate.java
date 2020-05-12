@@ -1,15 +1,20 @@
 package com.genpact.agreementnegotiation.state;
 
+import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
 import com.genpact.agreementnegotiation.util.AgreementUtil;
+import net.corda.core.contracts.BelongsToContract;
 import net.corda.core.contracts.LinearState;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
+import net.corda.core.serialization.CordaSerializable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+@CordaSerializable
+@BelongsToContract(AgreementNegotiationContract.class)
 public class AgreementStateTemplate implements LinearState {
 
     private UniqueIdentifier linearId;
@@ -47,32 +52,49 @@ public class AgreementStateTemplate implements LinearState {
         this.agrementName = agrementName;
     }
 
-    public String getAgrementInitiationDate() {
-        if (agrementInitiationDate != null) {
+    public Date getAgrementInitiationDate() {
+       /* if (agrementInitiationDate != null) {
             String dateStr = AgreementUtil.FORMAT.format(agrementInitiationDate);
             return dateStr;
         }
         return "";
+
+        */
+        return agrementInitiationDate;
     }
 
     public void setAgrementInitiationDate(Date agrementInitiationDate) {
         this.agrementInitiationDate = agrementInitiationDate;
     }
 
-    public Date getAgrementInitiationDateAsDate() {
-        return agrementInitiationDate;
-    }
-
     public Date getAgrementAgreedDateAsDate() {
         return agrementAgreedDate;
     }
 
-    public String getAgrementAgreedDate() {
+    public String getAgrementInitiationDateAsString() {
+        if (agrementInitiationDate != null) {
+            String dateStr = AgreementUtil.FORMAT.format(agrementInitiationDate);
+            return dateStr;
+        }
+        return "";
+    }
+    public String getAgrementAgreedDateAsString() {
         if (agrementAgreedDate != null) {
             String dateStr = AgreementUtil.FORMAT.format(agrementAgreedDate);
             return dateStr;
         }
         return "";
+    }
+
+    public Date getAgrementAgreedDate() {
+       /* if (agrementAgreedDate != null) {
+            String dateStr = AgreementUtil.FORMAT.format(agrementAgreedDate);
+            return dateStr;
+        }
+        return "";
+
+        */
+        return agrementAgreedDate;
     }
 
     public void setAgrementAgreedDate(Date agrementAgreedDate) {
@@ -107,13 +129,23 @@ public class AgreementStateTemplate implements LinearState {
         return agrementLastAmendDate;
     }
 
-    public String getAgrementLastAmendDate() {
+    public String getAgrementLastAmendDateAsString() {
         if (agrementLastAmendDate != null) {
             String dateStr = AgreementUtil.FORMAT.format(agrementLastAmendDate);
             return dateStr;
         }
         return "";
 
+    }
+
+    public Date getAgrementLastAmendDate() {
+        /*if (agrementLastAmendDate != null) {
+            String dateStr = AgreementUtil.FORMAT.format(agrementLastAmendDate);
+            return dateStr;
+        }
+        return "";
+    */
+        return agrementLastAmendDate;
     }
 
     public void setAgrementLastAmendDate(Date agrementLastAmendDate) {
