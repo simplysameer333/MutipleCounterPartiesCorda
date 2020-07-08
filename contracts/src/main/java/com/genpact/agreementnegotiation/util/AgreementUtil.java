@@ -32,8 +32,10 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -598,6 +600,10 @@ public class AgreementUtil {
         MakeSignature.signDetached(appearance, digest, signature, chain, null, null, null,
                 0, MakeSignature.CryptoStandard.CMS);
 
+       /*         try (OutputStream outpdf = new FileOutputStream("out.pdf")) {
+                    outpdf.write(out.toByteArray());
+                 }
+*/
         return out;
     }
 
@@ -615,16 +621,19 @@ public class AgreementUtil {
     }
 
     public static void creationOfZIP(AgreementNegotiationState agreementNegotiationState, AttachmentStorage attachmentStorage,
-                                     ByteArrayOutputStream out, String fileSuffix) throws IOException {
+                                     ByteArrayOutputStream out, String fileSuffix, String uploader) throws IOException {
 
         String fileName = agreementNegotiationState.getAgrementName() + "_" + fileSuffix;
+        System.out.println("file name --------------> "+fileName);
+        //ByteArrayInputStream boi = new ByteArrayInputStream(AgreementUtil.zipBytes(fileName, out.toByteArray()));
         ByteArrayInputStream boi = new ByteArrayInputStream(AgreementUtil.zipBytes(fileName, out.toByteArray()));
-        SecureHash secureHash = attachmentStorage.importAttachment(boi);
-
+        //SecureHash secureHash = attachmentStorage.importAttachment(arg0) importAttachment(boi);
+        SecureHash secureHash = attachmentStorage.importAttachment(boi, uploader, fileName);
+        System.out.println("secureHash --------------> "+secureHash);
         //In case of accept, nothing is added from UI. Add final copy as nothing is taken from UI
-        Map<SecureHash, String> fileInfo = new HashMap<>();
+        Map<SecureHash, String> fileInfo = new LinkedHashMap<>();
         fileInfo.put(secureHash, fileName);
-
+        System.out.println("fileInfo --------------> "+fileInfo);
         //Either append final copy or add it with other attachments
        /* if (MapUtils.isNotEmpty(agreementNegotiationState.getAttachmentHash())) {
             agreementNegotiationState.getAttachmentHash().putAll(fileInfo);
@@ -634,6 +643,7 @@ public class AgreementUtil {
         */
 
         agreementNegotiationState.setFinalCOpy(fileInfo);
+        System.out.println("setFinalCOpy --------------> "+agreementNegotiationState.getFinalCOpy());
     }
 
     public static Map<String, Object> fillPlaceholders(AgreementNegotiationState agreementNegotiationState) {

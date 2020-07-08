@@ -30,6 +30,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -622,7 +623,7 @@ public class AgreementUtil {
         SecureHash secureHash = attachmentStorage.importAttachment(boi);
 
         //In case of accept, nothing is added from UI. Add final copy as nothing is taken from UI
-        Map<SecureHash, String> fileInfo = new HashMap<>();
+        Map<SecureHash, String> fileInfo = new LinkedHashMap<>();
         fileInfo.put(secureHash, fileName);
 
         //Either append final copy or add it with other attachments

@@ -53,7 +53,7 @@ public class AgreementNegotiationContract implements Contract {
 
                 // IOU-specific constraints.
                 if (out.getStatus() == AgreementEnumState.INITIAL) {
-                    final Party cptyA = out.getCptyInitiator();
+                   /* final Party cptyA = out.getCptyInitiator();
                     final List<Party> cptyB = out.getCptyReciever();
 
                     //Public keys all all participants to compared with participant that signed it.
@@ -63,10 +63,12 @@ public class AgreementNegotiationContract implements Contract {
                     }
 
                     allParties.add(cptyA.getOwningKey());
-                    // Constraints on the signers.
-                    // check.using("There must only be two signer.", command.getSigners().size() == 2);
+                   // Must be signed by initiator only
                     check.using("The signer must signed by All.", command.getSigners().containsAll(
                             Collections.unmodifiableList(allParties)));
+                    */
+                    check.using("The signer must signed by Initiator only.", command.getSigners().contains
+                            (out.getCptyInitiator().getOwningKey()));
 
                     checkMandatoryFields(out);
 
