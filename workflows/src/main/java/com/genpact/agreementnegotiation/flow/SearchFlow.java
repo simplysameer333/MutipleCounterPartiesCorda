@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Define your flow here.
  */
-public class AgreementNegotiationSearchFlow {
+public class SearchFlow {
     /**
      * You can add a constructor to each FlowLogic subclass to pass objects into the flow.
      */

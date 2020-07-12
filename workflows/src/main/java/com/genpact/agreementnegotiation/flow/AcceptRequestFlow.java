@@ -120,7 +120,6 @@ public class AcceptRequestFlow extends FlowLogic<SignedTransaction> {
 
         StateAndRef<AgreementNegotiationState>  previousStatesAndRef= previousStates.get(0);
         AgreementNegotiationState previousState = previousStatesAndRef.getState().getData();
-        System.out.println("================================> previousState "+ previousState.toString());
 
         // We create the transaction components - restore all data from previous state
         AgreementUtil.copyAllFields(agreementNegotiationState, previousState);

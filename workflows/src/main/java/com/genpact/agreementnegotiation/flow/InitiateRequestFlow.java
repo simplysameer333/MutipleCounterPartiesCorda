@@ -11,12 +11,13 @@ import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
-import static com.genpact.agreementnegotiation.contract.AgreementNegotiationContract.TEMPLATE_CONTRACT_ID;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import static com.genpact.agreementnegotiation.contract.AgreementNegotiationContract.TEMPLATE_CONTRACT_ID;
 
 // ******************
 // * Initiator flow *
@@ -63,7 +64,6 @@ public class InitiateRequestFlow extends FlowLogic<SignedTransaction> {
                 !agreementNegotiationState.getAttachmentHash().isEmpty()) {
             for (SecureHash secureHasId : agreementNegotiationState.getAttachmentHash().keySet()) {
                 txBuilder.addAttachment(secureHasId);
-                System.out.println("Add attachments =======> " + secureHasId);
             }
         }
 

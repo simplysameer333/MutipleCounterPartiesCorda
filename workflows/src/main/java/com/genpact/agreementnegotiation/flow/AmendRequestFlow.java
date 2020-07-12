@@ -7,7 +7,6 @@ import com.genpact.agreementnegotiation.state.AgreementEnumState;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.genpact.agreementnegotiation.util.AgreementUtil;
 import net.corda.core.contracts.StateAndRef;
-import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.SecureHash;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
@@ -23,7 +22,8 @@ import net.corda.core.utilities.ProgressTracker;
 import java.util.*;
 
 import static com.genpact.agreementnegotiation.contract.AgreementNegotiationContract.TEMPLATE_CONTRACT_ID;
-import static net.corda.core.node.services.vault.QueryCriteria.*;
+import static net.corda.core.node.services.vault.QueryCriteria.VaultCustomQueryCriteria;
+import static net.corda.core.node.services.vault.QueryCriteria.VaultQueryCriteria;
 import static net.corda.core.node.services.vault.QueryCriteriaUtils.getField;
 
 // ******************
@@ -187,7 +187,6 @@ public class AmendRequestFlow extends FlowLogic<SignedTransaction> {
                 !agreementNegotiationState.getAttachmentHash().isEmpty()) {
             for (SecureHash secureHasId : agreementNegotiationState.getAttachmentHash().keySet()) {
                 txBuilder.addAttachment(secureHasId);
-                System.out.println("Add attachments =======> " + secureHasId);
             }
         }
 
@@ -199,7 +198,6 @@ public class AmendRequestFlow extends FlowLogic<SignedTransaction> {
         progressTracker.setCurrentStep(COUNTER_PARTY_SESSION);
         List<FlowSession> otherPartySessionList = new ArrayList<>();
         for (Party party : otherParties) {
-            System.out.println("other party ------------> " + party.getName());
             otherPartySessionList.add(initiateFlow(party));
         }
 

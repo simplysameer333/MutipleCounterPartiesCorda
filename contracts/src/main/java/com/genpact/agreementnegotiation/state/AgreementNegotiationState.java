@@ -3,8 +3,7 @@ package com.genpact.agreementnegotiation.state;
 import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
 import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
 import com.genpact.agreementnegotiation.util.AgreementUtil;
-import com.google.common.collect.ImmutableList
-        ;
+import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.BelongsToContract;
 import net.corda.core.identity.Party;
 import net.corda.core.schemas.MappedSchema;

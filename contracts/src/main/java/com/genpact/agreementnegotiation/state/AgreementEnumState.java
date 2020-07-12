@@ -1,7 +1,5 @@
 package com.genpact.agreementnegotiation.state;
 
-import com.genpact.agreementnegotiation.contract.AgreementNegotiationContract;
-import net.corda.core.contracts.BelongsToContract;
 import net.corda.core.serialization.CordaSerializable;
 
 @CordaSerializable

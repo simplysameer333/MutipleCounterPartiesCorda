@@ -21,7 +21,7 @@ import com.itextpdf.tool.xml.XMLWorkerHelper;
 import net.corda.core.crypto.SecureHash;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
-import net.corda.core.node.services.AttachmentStorage;;
+import net.corda.core.node.services.AttachmentStorage;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,10 +32,8 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -48,6 +46,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+;
 
 public class AgreementUtil {
     //Or whatever format fits best your needs.

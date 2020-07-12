@@ -8,11 +8,7 @@ import net.corda.core.contracts.Contract;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.LedgerTransaction;
 
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import static net.corda.core.contracts.ContractsDSL.requireThat;
 
@@ -53,20 +49,6 @@ public class AgreementNegotiationContract implements Contract {
 
                 // IOU-specific constraints.
                 if (out.getStatus() == AgreementEnumState.INITIAL) {
-                   /* final Party cptyA = out.getCptyInitiator();
-                    final List<Party> cptyB = out.getCptyReciever();
-
-                    //Public keys all all participants to compared with participant that signed it.
-                    final List<PublicKey> allParties = new ArrayList<>();
-                    for (Party party : cptyB) {
-                        allParties.add(party.getOwningKey());
-                    }
-
-                    allParties.add(cptyA.getOwningKey());
-                   // Must be signed by initiator only
-                    check.using("The signer must signed by All.", command.getSigners().containsAll(
-                            Collections.unmodifiableList(allParties)));
-                    */
                     check.using("The signer must signed by Initiator only.", command.getSigners().contains
                             (out.getCptyInitiator().getOwningKey()));
 
@@ -135,10 +117,6 @@ public class AgreementNegotiationContract implements Contract {
                     if (out.getStatus() == AgreementEnumState.FULLY_ACCEPTED) {
                         check.using("For FULLY_ACCEPTED, INPUT state must be PARTIAL_ACCEPTED",
                                 in.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED);
-                        System.out.println("in.getLastUpdatedBy().getName() ========================= > " +
-                                in.getLastUpdatedBy().getName());
-                        System.out.println("out.getLastUpdatedBy().getName() ========================= > " +
-                                out.getLastUpdatedBy().getName());
                         check.using("Cannot be accepted by same person", !in.getLastUpdatedBy().getName()
                                 .equals(out.getLastUpdatedBy().getName()));
                     } else if (out.getStatus() == AgreementEnumState.PARTIAL_ACCEPTED) {

@@ -1,44 +1,31 @@
 package com.genpact.agreementnegotiation.webserver;
 
-import com.genpact.agreementnegotiation.flow.*;
-import net.corda.core.messaging.CordaRPCOps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import net.corda.core.identity.CordaX500Name;
-import net.corda.core.node.NodeInfo;
+import com.genpact.agreementnegotiation.flow.InitiateRequestFlow;
+import com.genpact.agreementnegotiation.flow.SearchFlow;
+import com.genpact.agreementnegotiation.model.Agreement;
+import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
+import com.genpact.agreementnegotiation.state.AgreementEnumState;
+import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
+import com.genpact.agreementnegotiation.utils.AgreementUtil;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.crypto.SecureHash;
+import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
+import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.messaging.FlowProgressHandle;
+import net.corda.core.node.NodeInfo;
 import net.corda.core.node.services.Vault;
-import net.corda.core.node.services.vault.Builder;
-import net.corda.core.node.services.vault.CriteriaExpression;
-import net.corda.core.node.services.vault.FieldInfo;
-import net.corda.core.node.services.vault.QueryCriteria;
-import net.corda.core.node.services.vault.QueryCriteriaUtils;
+import net.corda.core.node.services.vault.*;
 import net.corda.core.transactions.SignedTransaction;
-import org.json.simple.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.genpact.agreementnegotiation.model.Agreement;
-import com.genpact.agreementnegotiation.schema.AgreementNegotiationSchema;
-import com.genpact.agreementnegotiation.state.AgreementEnumState;
-import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
-import com.genpact.agreementnegotiation.utils.AgreementUtil;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
-
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -499,7 +486,7 @@ public class AgreementNegotiationController {
         try {
 
             final FlowProgressHandle<List<String>> flowHandle = rpcOps
-                    .startTrackedFlowDynamic(AgreementNegotiationSearchFlow.Initiator.class, listSearch);
+                    .startTrackedFlowDynamic(SearchFlow.Initiator.class, listSearch);
             final List<String> linerIds = flowHandle.getReturnValue().get();
 
             if (linerIds != null && !linerIds.isEmpty()) {

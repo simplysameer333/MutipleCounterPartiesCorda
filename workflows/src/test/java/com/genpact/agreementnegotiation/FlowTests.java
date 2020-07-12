@@ -3,7 +3,6 @@ package com.genpact.agreementnegotiation;
 import com.genpact.agreementnegotiation.flow.InitiateRequestFlow;
 import com.genpact.agreementnegotiation.state.AgreementNegotiationState;
 import com.google.common.collect.ImmutableList;
-
 import net.corda.core.concurrent.CordaFuture;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.testing.node.MockNetwork;
@@ -12,8 +11,6 @@ import net.corda.testing.node.StartedMockNode;
 import net.corda.testing.node.TestCordapp;
 import org.junit.After;
 import org.junit.Before;
-
-
 
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
